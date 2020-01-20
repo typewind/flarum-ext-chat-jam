@@ -1,0 +1,10 @@
+pushedx-chat:
+  forum:
+    toolbar:
+      title: Чат
+      enable_sounds: Включить звуковые уведомления
+      disable_sounds: Отключить звуковые уведомления
+      enable_notifications: Включить push-уведомления
+      disable_notifications: Отключить push-уведомления
+    errors:
+      unauthenticated: Писать в чате могут только зарегистрированные пользователи

@@ -5,7 +5,7 @@ import {ChatFrame,ChatMessage} from './components/ChatFrame';
 
 app.initializers.add('pushedx-realtime-chat', app => {
 
-    var forward = [];
+    var forward = [], isInitial = false;
 
     extend(HeaderPrimary.prototype, 'config', function(x, isInitialized, context) {
         if (isInitialized) return;
@@ -15,14 +15,12 @@ app.initializers.add('pushedx-realtime-chat', app => {
                 forward.push(data);
                 m.redraw();
             });
-
             extend(context, 'onunload', () => channels.main.unbind('newChat'));
         });
 
         // Just loaded? Fetch last 10 messages
         if (forward.length == 0)
         {
-            console.log('Loading');
             const data = new FormData();
 
             app.request({
@@ -35,6 +33,7 @@ app.initializers.add('pushedx-realtime-chat', app => {
                     for (var i = 0; i < response.data.attributes.messages.length; ++i) {
                         forward.push(response.data.attributes.messages[i]);
                     }
+                    isInitial = true;
                     m.redraw();
                 },
                 function (response) {
@@ -57,7 +56,9 @@ app.initializers.add('pushedx-realtime-chat', app => {
         */
         //status.forwardMessage = chatFrame.forwardMessage.bind(chatFrame);
         var forwarded = forward.slice(0);
-        items.add('pushedx-chat-frame', m.component(new ChatFrame, {forward: forwarded}));
+        items.add('pushedx-chat-frame', m.component(new ChatFrame, {forward: forwarded, isInitial: isInitial}));
         forward.splice(0, forward.length);
+
+        isInitial = false;
     });
 });

@@ -1,7 +1,13 @@
 {
-    "name": "push-edx/flarum-ext-chat",
-    "description": "Realtime chat.",
-    "keywords": ["chat", "flarum", "pushedx", "push-edx"],
+    "name": "xelson/flarum-ext-chat",
+    "description": "Realtime chat between users",
+    "keywords": [
+        "chat",
+        "flarum",
+        "pushedx",
+        "push-edx",
+        "Xelson"
+    ],
     "type": "flarum-extension",
     "license": "MIT",
     "authors": [
@@ -12,11 +18,15 @@
             "name": "Guillem Pascual",
             "email": "blipi.tube@gmail.com",
             "homepage": "http://pushedx.net"
+        },
+        {
+            "name": "Xelson",
+            "homepage": "https://neonsky.ru"
         }
     ],
     "support": {
-        "issues": "https://github.com/Push-EDX/flarum-ext-chat/issues",
-        "source": "https://github.com/Push-EDX/flarum-ext-chat"
+        "issues": "https://github.com/Xelson/flarum-ext-chat/issues",
+        "source": "https://github.com/Xelson/flarum-ext-chat"
     },
     "require": {
         "flarum/core": "^0.1.0-beta.8",
@@ -26,12 +36,10 @@
         "flarum-extension": {
             "title": "Realtime Chat",
             "icon": {
-                "image": "icon.png",
-                "backgroundSize": "75px 75px",
-                "backgroundPosition": "center",
-                "backgroundRepeat": "no-repeat",
-                "backgroundColor": "#244052",
-                "color": "#fff"
+                "image": "icon.svg",
+                "backgroundColor": "#ffaad4",
+                "backgroundSize": "cover",
+                "backgroundPosition": "center"
             }
         }
     },

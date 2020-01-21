@@ -2,6 +2,8 @@ import Component from 'flarum/Component';
 import icon from 'flarum/helpers/icon';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
 import avatar from 'flarum/helpers/avatar';
+import fullTime from 'flarum/helpers/fullTime';
+import humanTime from 'flarum/utils/humanTime';
 
 export function ChatMessage(id, user, message, created_at) {
     this.id = id;
@@ -34,9 +36,10 @@ var scrollInfo = {
     loadingOld: false,
 }
 
-export class ChatFrame extends Component {
-
-    controller(data, b, c) {
+export class ChatFrame extends Component
+{
+    controller(data, b, c)
+    {
         let showStatus = localStorage.getItem('beingShown');
         let isMuted = localStorage.getItem('isMuted');
         let notify = localStorage.getItem('notify');
@@ -59,15 +62,18 @@ export class ChatFrame extends Component {
     /**
      * Load the configured remote uploader service.
      */
-    init() {
+    init()
+    {
         this.chat = null;
         this.input = null;
+        this.avatarsCache = [];
     }
 
     /**
      * Gets the chat element from the current element
      */
-    getChat(el) {
+    getChat(el)
+    {
         return this.chat || (this.chat = ((el.id == 'chat') ? el :
             ((typeof el.parentNode !== 'undefined') ? this.getChat(el.parentNode) : null)));
     }
@@ -75,12 +81,13 @@ export class ChatFrame extends Component {
     /**
      * Gets the chat input
      */
-    getInput(chat) {
-        if (!this.input) {
+    getInput(chat)
+    {
+        if(!this.input) {
             // Find the input element
             for (let i = 0; i < chat.children.length; ++i) {
                 let el = chat.children[i];
-                if (el.tagName.toLowerCase() == 'input') {
+                if(el.tagName.toLowerCase() == 'input') {
                     this.input = el;
                     break;
                 }
@@ -90,12 +97,13 @@ export class ChatFrame extends Component {
         return this.input;
     }
 
-    toggle(ctrl, e) {
+    toggle(ctrl, e)
+    {
         var chat = this.getChat(e.target).parentNode;
         var classes = chat.className;
         var showing = false;
 
-        if (classes.indexOf(' hidden') >= 0) {
+        if(classes.indexOf(' hidden') >= 0) {
             classes = classes.substr(0, classes.indexOf(' hidden'));
             showing = true;
         } else {
@@ -105,9 +113,12 @@ export class ChatFrame extends Component {
         chat.className = classes;
         ctrl.beingShown = showing;
         localStorage.setItem('beingShown', JSON.stringify(showing));
+
+        m.redraw.strategy('none');
     }
 
-    toggleSound(ctrl, e) {
+    toggleSound(ctrl, e)
+    {
         ctrl.isMuted = !ctrl.isMuted;
         localStorage.setItem('isMuted', JSON.stringify(ctrl.isMuted));
 
@@ -115,7 +126,8 @@ export class ChatFrame extends Component {
         e.stopPropagation();
     }
 
-    toggleNotifications(ctrl, e) {
+    toggleNotifications(ctrl, e)
+    {
         ctrl.notify = !ctrl.notify;
         localStorage.setItem('notify', JSON.stringify(ctrl.notify));
 
@@ -123,7 +135,8 @@ export class ChatFrame extends Component {
         e.stopPropagation();
     }
 
-    insertReference(user, e) {
+    insertReference(user, e)
+    {
         // Get the chat div from the event target
         var chat = this.getChat(e.target);
 
@@ -133,45 +146,42 @@ export class ChatFrame extends Component {
         // Insert text
         input.value = input.value + " @" + user.username() + " ";
         input.focus();
+
+        m.redraw.strategy('none');
     }
 
-    reachedLimit(ctrl) {
+    reachedLimit(ctrl)
+    {
         ctrl.oldReached = (maxLength - (ctrl.oldlength || 0)) < 100;
         return ctrl.oldReached;
     }
 
-    refocus(ctrl, e) {
+    refocus(ctrl, e)
+    {
         this.input = e;
-        if ((ctrl.hadFocus || ctrl.loading) && e != document.activeElement)
+        if((ctrl.hadFocus || ctrl.loading) && e != document.activeElement)
         {
             e.focus();
             ctrl.hadFocus = false;
         }
     }
 
-    parseMessage(e) {
-        s9e.TextFormatter.preview(e.dataset.message, e);
+    scroll(ctrl, e)
+    {
+        if(ctrl.scrollInfo.autoScroll) e.scrollTop = e.scrollHeight;
+        else if(ctrl.scrollInfo.oldScroll >= 0) e.scrollTop = ctrl.scrollInfo.oldScroll;
+        else e.scrollTop = e.scrollHeight + ctrl.scrollInfo.oldScroll - 30;
     }
 
-    scroll(ctrl, e) {
-        if (ctrl.scrollInfo.autoScroll) {
-            e.scrollTop = e.scrollHeight;
-        }
-        else if(ctrl.scrollInfo.oldScroll >= 0) {
-            e.scrollTop = ctrl.scrollInfo.oldScroll;
-        }
-        else {
-            e.scrollTop = e.scrollHeight + ctrl.scrollInfo.oldScroll - 30;
-        }
-    }
-
-    disableAutoScroll(ctrl, e) {
+    disableAutoScroll(ctrl, e)
+    {
         let el = e.target;
         ctrl.scrollInfo.autoScroll = (el.scrollTop + el.offsetHeight >= el.scrollHeight);
         let currentHeight = el.scrollHeight;
 
         // Load older messages
-        if (el.scrollTop <= 0 && ctrl.scrollInfo.oldScroll > 0 && !ctrl.scrollInfo.loadingOld) {
+        if(el.scrollTop <= 0 && ctrl.scrollInfo.oldScroll > 0 && !ctrl.scrollInfo.loadingOld) 
+        {
             ctrl.scrollInfo.loadingOld = true;
             ctrl.scrollInfo.oldScroll = -currentHeight;
             m.redraw();
@@ -185,7 +195,8 @@ export class ChatFrame extends Component {
                 serialize: raw => raw,
                 data
             }).then(
-                (function (response){
+                (function (response)
+                {
                     ctrl.scrollInfo.loadingOld = false;
                     ctrl.scrollInfo.autoScroll = false;
 
@@ -202,25 +213,30 @@ export class ChatFrame extends Component {
                     ctrl.messages = messages;
                     m.redraw();
 
-                }).bind(this),
-                (function (){
+                }).bind(this), (function ()
+                {
                     ctrl.scrollInfo.loadingOld = false;
                     m.redraw();
                 }).bind(this)
             );
         }
-        else {
+        else 
+        {
             m.redraw.strategy('none');
             ctrl.scrollInfo.oldScroll = el.scrollTop;
         }
     }
 
-    flagDown(ctrl, e) {
+    flagDown(ctrl, e)
+    {
         ctrl.downAt = [e.clientX, e.clientY];
         ctrl.hadFocus = this.getInput(this.getChat(e.target)) == document.activeElement;
+
+        m.redraw.strategy('none');
     }
 
-    chatClick(ctrl, e) {
+    chatClick(ctrl, e)
+    {
         // Get the chat div from the event target
         var chat = this.getChat(e.target);
 
@@ -230,16 +246,22 @@ export class ChatFrame extends Component {
         var current = +new Date();
         var targetTag = e.target.tagName.toLowerCase();
         var samePlace = ctrl.downAt[0] == e.clientX && ctrl.downAt[1] == e.clientY;
-        if ((targetTag == "div" && samePlace) || (!ctrl.hadFocus && samePlace && current - ctrl.lastClick > 300)) {
+        if((targetTag == "div" && samePlace) || (!ctrl.hadFocus && samePlace && current - ctrl.lastClick > 300)) 
+        {
             input.focus();
             ctrl.hadFocus = true;
         }
-        else {
-            m.redraw.strategy('none');
-        }
         ctrl.lastClick = current;
 
+        m.redraw.strategy('none');
+
         return targetTag == "a";
+    }
+
+    avatarCached(user, attrs)
+    {
+        if(!this.avatarsCache.user) this.avatarsCache.user = avatar(user, attrs);
+        return this.avatarsCache.user;
     }
 
     /**
@@ -247,80 +269,80 @@ export class ChatFrame extends Component {
      *
      * @returns {*}
      */
-    view(ctrl, args) {
-        for (var i = 0; i < args.forward.length; ++i) {
-            this.forwardMessage(ctrl, args.forward[i], false);
-        }
+    view(ctrl, args) 
+    {
+        for (var i = 0; i < args.forward.length; ++i)
+            this.forwardMessage(ctrl, args.forward[i], !args.isInitial);
 
-        return m('div', {className: 'chat left container ' + (ctrl.beingShown ? '' : 'hidden')}, [
-            m('div', {
-                tabindex: 0,
-                className: 'frame',
-                id: 'chat',
-                //onfocusin: this.focusIn.bind(this),
-                //onfocusout: this.focusOut.bind(this),
-                //onclick: this.focusInput.bind(this),
-                onmousedown: this.flagDown.bind(this, ctrl),
-                //onmousemove: this.flagDrag.bind(this),
-                //onmouseup: this.flagUp.bind(this),
-                onclick: this.chatClick.bind(this, ctrl)
-             }, [
-                    m('div', {id: 'chat-header', onclick: this.toggle.bind(this, ctrl)}, [
-                        m('h2', app.translator.trans('pushedx-chat.forum.toolbar.title')),
-                        m('p', {
-                            'data-title': ctrl.isMuted ? app.translator.trans('pushedx-chat.forum.toolbar.enable_sounds') : app.translator.trans('pushedx-chat.forum.toolbar.disable_sounds'),
-                        },[
-                                m('img', {
-                                    src: ctrl.isMuted ? soundMuted : soundNormal,
-                                    onclick: this.toggleSound.bind(this, ctrl)
-                                }),
-                            ]),
-                        m('p', {
-                            'data-title': ctrl.notify ? app.translator.trans('pushedx-chat.forum.toolbar.disable_notifications') : app.translator.trans('pushedx-chat.forum.toolbar.enable_notifications'),
-                        },[
-                            m('img', {
-                                src: ctrl.notify ? notifyNormal : notifyDisabled,
-                                onclick: this.toggleNotifications.bind(this, ctrl),
-                            }),
-                        ]),
-                    ]),
-                    ctrl.loading ? LoadingIndicator.component({className: 'loading Button-icon'}) : m('span'),
-                    m('div', {
-                        className: 'wrapper',
-                        config: this.scroll.bind(this, ctrl),
-                        onscroll: this.disableAutoScroll.bind(this, ctrl)
-                    }, [
-                        ctrl.loadingOld ? (
-                            m('div', {className: 'message-wrapper'}, [
-                                m('span', {className: 'message'}, LoadingIndicator.component({className: 'loading-old Button-icon'})),
-                                m('div', {className: 'clear'})])
-                        ) : undefined,
-                        ctrl.messages.map((function(o) {
-                            return m('div', {className: 'message-wrapper', title: o.created_at}, [
-                                m('span', {className: 'avatar-wrapper', 'data-name': o.user ? o.user.username() : 'Loading...'},
-                                    avatar(o.user, {className: 'avatar', onclick: this.insertReference.bind(this, o.user)})),
-                                m('span', {className: 'message', 'data-message': o.message, config: this.parseMessage.bind(this) }),
-                                m('div', {className: 'clear'})
-                            ])
-                        }).bind(this))
-                    ]),
-                    m('input', {
-                        type: 'text',
-                        id: 'chat-input',
-                        className: this.reachedLimit(ctrl) ? 'reaching-limit' : '',
-                        maxlength: maxLength,
-                        disabled: !app.forum.attribute('canPostChat'),
-                        placeholder: app.forum.attribute('canPostChat') ? '' : app.translator.trans('pushedx-chat.forum.errors.unauthenticated'),
-                        onkeyup: this.process.bind(this, ctrl),
-                        onkeydown: this.checkLimit.bind(this, ctrl),
-                        config: this.refocus.bind(this, ctrl)
-                    }),
-                    m('span', {
-                        id: 'chat-limitter',
-                        className: this.reachedLimit(ctrl) ? 'reaching-limit' : '',
-                    }, "" + (maxLength - (ctrl.oldlength || 0)))
-                ])
-        ]);
+		if(ctrl.updateTimeout) clearTimeout(ctrl.updateTimeout);
+        ctrl.updateTimeout = setTimeout(() => m.redraw(), 30000);
+
+        return (
+            <div className={'chat left container ' + (ctrl.beingShown ? '' : 'hidden')}>
+                <div 
+                    tabindex = '0'
+                    className = 'frame' 
+                    id = 'chat' 
+                    onmousedown = {this.flagDown.bind(this, ctrl)} 
+                    onclick = {this.chatClick.bind(this, ctrl)}
+                >
+                    <div>
+                        <div id='chat-header' onclick={this.toggle.bind(this, ctrl)}>
+                            <h2>{app.translator.trans('pushedx-chat.forum.toolbar.title')}</h2>
+                            <p data-title={app.translator.trans(ctrl.isMuted ? 'pushedx-chat.forum.toolbar.enable_sounds' : 'pushedx-chat.forum.toolbar.disable_sounds')}>
+                                <img src={ctrl.isMuted ? soundMuted : soundNormal} onclick={this.toggleSound.bind(this, ctrl)} />
+                            </p>
+                            <p data-title={app.translator.trans(ctrl.notify ? 'pushedx-chat.forum.toolbar.disable_notifications' : 'pushedx-chat.forum.toolbar.enable_notifications')}>
+                                <img src={ctrl.notify ? notifyNormal : notifyDisabled} onclick={this.toggleNotifications.bind(this, ctrl)} />
+                            </p>       
+                        </div>
+                        {ctrl.loading ? <LoadingIndicator className='loading Button-icon' /> : <span />}
+                        <div className='wrapper' config={this.scroll.bind(this, ctrl)} onscroll={this.disableAutoScroll.bind(this, ctrl)}>
+                            {ctrl.loadingOld ?
+                                <div className='message-wrapper'>
+                                    <span className='message' >
+                                        <LoadingIndicator className='loading-old Button-icon' />
+                                    </span>
+                                    <div className='clear' />
+                                </div>
+                                : null
+                            }
+                            {ctrl.messages.map((function(o) {
+                                return (
+                                    <div className='message-wrapper'>
+                                        <span className='avatar-wrapper'>
+                                            {this.avatarCached(o.user, {className: 'avatar'})}
+                                        </span>
+                                        <a className='name' onclick={this.insertReference.bind(this, o.user)}>
+                                            {(o.user ? o.user.username() : '...') + ':'}
+                                        </a>
+                                        <span className='message'>
+                                            {o.messageFormated}
+                                        </span>
+                                        <a className='timestamp' title={fullTime(o.created_at).children[0]}>{o.humanTime = humanTime(o.created_at)}</a>
+                                        <div className='clear' />
+                                    </div>
+                                )
+                            }).bind(this))}
+                        </div>
+                        <input
+                            type = 'text'
+                            id = 'chat-input'
+                            className = {this.reachedLimit(ctrl) ? 'reaching-limit' : ''}
+                            maxlength = {maxLength}
+                            disabled = {!app.forum.attribute('canPostChat')}
+                            placeholder = {app.forum.attribute('canPostChat') ? '' : app.translator.trans('pushedx-chat.forum.errors.unauthenticated')}
+                            onkeyup = {this.process.bind(this, ctrl)}
+                            onkeydown = {this.checkLimit.bind(this, ctrl)}
+                            config = {this.refocus.bind(this, ctrl)}
+                        />
+                        <span id='chat-limitter' className={this.reachedLimit(ctrl) ? 'reaching-limit' : ''}>
+                            {"" + (maxLength - (ctrl.oldlength || 0))}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     /**
@@ -328,12 +350,13 @@ export class ChatFrame extends Component {
      *
      * @param e
      */
-    process(ctrl, e) {
+    process(ctrl, e) 
+    {
         var msg = e.target.value;
 
-        if (e.keyCode == 13 && !ctrl.loading) {
+        if(e.keyCode == 13 && !ctrl.loading) {
             // Assert the message is not empty
-            if (msg.trim().length == 0) {
+            if(msg.trim().length == 0) {
                 m.redraw.strategy('none');
                 return;
             }
@@ -355,29 +378,27 @@ export class ChatFrame extends Component {
                 this.failure.bind(this, ctrl)
             );
         }
-        else if (!ctrl.oldReached) {
+        else if(!ctrl.oldReached) {
             m.redraw.strategy('none');
         }
     }
 
-    checkLimit(ctrl, e) {
+    checkLimit(ctrl, e) 
+    {
         var redraw = false;
         var now = +new Date;
-        if (!ctrl.lastChecked || now > ctrl.lastChecked + 50) {
+        if(!ctrl.lastChecked || now > ctrl.lastChecked + 50) 
+        {
             ctrl.lastChecked = now;
 
             // Save length
             var msg = e.target.value;
             ctrl.oldlength = msg.length;
 
-            if (ctrl.oldReached || this.reachedLimit(ctrl)) {
+            if(ctrl.oldReached || this.reachedLimit(ctrl))
                 redraw = true;
-            }
         }
-
-        if (!redraw) {
-            m.redraw.strategy('none');
-        }
+        if(!redraw) m.redraw.strategy('none');
     }
 
     /**
@@ -385,7 +406,8 @@ export class ChatFrame extends Component {
      *
      * @param message
      */
-    failure(ctrl, message) {
+    failure(ctrl, message) 
+    {
         // todo show popup
         ctrl.loading = false;
         m.redraw();
@@ -396,7 +418,8 @@ export class ChatFrame extends Component {
      *
      * @param image
      */
-    success(ctrl, response) {
+    success(ctrl, response) 
+    {
         // End loading
         ctrl.loading = false;
 
@@ -404,70 +427,83 @@ export class ChatFrame extends Component {
         m.redraw();
     }
 
-    forwardMessage(ctrl, message, notify, redraw) {
+    forwardMessage(ctrl, message, notify, redraw) 
+    {
         var user = app.store.getById('users', message.actorId);
         var obj = this.addMessage(ctrl, message.id, message.message, user, message.created_at, notify, redraw);
 
-        if (user == undefined)
+        if(user == undefined)
         {
-            app.store.find('users', message.actorId).then(function(user){
+            app.store.find('users', message.actorId).then(function(user) {
                 obj.user = user;
                 m.redraw();
             });
         }
     }
 
-    addMessage(ctrl, id, msg, user, created_at, notify, redraw) {
+    addMessage(ctrl, id, msg, user, created_at, notify = true, redraw = false) 
+    {
         // Do note "messages" is a "set", thus = is a function
-        var obj = new ChatMessage(id, user, msg, created_at);
+        let obj = new ChatMessage(id, user, msg, created_at);
+
+        let formattedNode = document.createElement('div');
+        s9e.TextFormatter.preview(msg, formattedNode);
+        obj.messageFormated = m.trust(formattedNode.outerHTML);
+
         ctrl.messages.push(obj);
 
         // End loading
         ctrl.loading = false;
 
         // Redraw now
-        if (typeof redraw === "undefined"  || redraw) {
+        if(redraw) 
+        {
             ctrl.hadFocus = document.activeElement === this.input;
             m.redraw();
         }
 
-        // Notify (if we are not the author!)
-        if ((typeof notify === "undefined" || notify) &&
-            user && user.id() != app.session.user.id()) {
+        // Notify (ifwe are not the author!)
+        if(notify && (!app.session.user || (user && user.id() != app.session.user.id()))) 
             this.notify(ctrl, msg);
-        }
 
         // Return the object
         return obj;
     }
 
-    notify(ctrl, msg) {
-        if (ctrl.notify) {
-            if (!("Notification" in window)) {
-                return;
-            }
-            else if (Notification.permission === "granted") {
-                var notification = new Notification(msg);
-                this.notifySound(ctrl, msg);
-            }
-            else if (Notification.permission !== 'denied') {
-                Notification.requestPermission((function (permission) {
-                    if (permission === "granted") {
-                        var notification = new Notification(msg);
+    messageIsMention(msg)
+    {
+        let currentUser = app.session.user.username();
+        return currentUser && (msg.indexOf('@' + currentUser) >= 0);
+    }
 
-                        this.notifySound(ctrl, msg);
-                    }
+    notify(ctrl, msg, user) 
+    {
+        if(ctrl.notify && this.messageIsMention(msg)) 
+        {
+            if(!("Notification" in window)) return;
+            else if(Notification.permission === "granted") this.notifySend(msg, user.username(), user.avatarUrl())
+            else if(Notification.permission !== 'denied') 
+            {
+                Notification.requestPermission((function(permission) 
+                {
+                    if(permission === "granted") 
+                        this.notifySend(msg, user.username(), user.avatarUrl())
                 }).bind(this));
             }
         }
-        else {
-            this.notifySound(ctrl, msg);
-        }
+        this.notifySound(ctrl, msg);
     }
 
-    notifySound(ctrl, msg) {
-        if (!ctrl.isMuted) {
-            let sound = msg.indexOf('@' + app.session.user.username()) >= 0 ? refAudio : audio;
+    notifySend(msg, title, icon)
+    {
+        return new Notification(title, {body: msg, icon: icon});
+    }
+
+    notifySound(ctrl, msg) 
+    {
+        if(!ctrl.isMuted) 
+        {
+            let sound = this.messageIsMention(msg) ? refAudio : audio;
             sound.currentTime = 0;
             sound.play();
         }

@@ -30,6 +30,7 @@ use Intervention\Image\ImageManager;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use DateTime;
 use Pusher;
 
 class PostChatHandler
@@ -96,8 +97,9 @@ class PostChatHandler
             'message' => $command->msg
         ];
 
-        $id = FetchChatController::UpdateMessages($msg);
-        $msg['id'] = $id;
+        $message = FetchChatController::UpdateMessages($msg);
+        $msg['id'] = $message->id;
+        $msg['created_at'] = $message->created_at->format(DateTime::RFC3339);
 
         $pusher = $this->getPusher();
         $pusher->trigger('public', 'newChat', $msg);

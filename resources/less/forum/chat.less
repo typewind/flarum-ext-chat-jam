@@ -5,14 +5,14 @@
     padding-left: 15px !important;
     padding-right: 15px !important;
     max-width: 100%;
-    width: 600px;
+    width: 650px;
     color: #000;
 
     .frame {
         position: relative;
         float: right;
         max-width: 100%;
-        width: 600px;
+        width: 650px;
         background-color: white;
         border-radius: 4px 4px 0 0;
         box-shadow: 0 2px 6px rgba(0,0,0,0.35);
@@ -21,7 +21,7 @@
         #chat-header {
             width: 100%;
             height: 30px;
-            background-color: #506B90;
+            background-color: #313946;
             border-radius: 4px 4px 0 0;
             cursor: pointer;
 
@@ -123,7 +123,7 @@
 
         .wrapper {
             overflow: auto;
-            height: 390px;
+            height: 295px;
             max-height: 50vh;
 
             .message-wrapper {
@@ -134,8 +134,7 @@
                 .avatar-wrapper {
                     position: relative;
                     display:table-cell;
-                    padding-right: 5px;
-                    vertical-align: middle;
+                    padding-right: 10px;
 
                     .avatar {
                         width: 26px;
@@ -172,19 +171,56 @@
                     display:table-cell;
                     padding-top: 3px;
                     word-break: break-word;
-                    padding-right: 15px;
                     white-space: pre-wrap;
+					width: 700px;
 
-                    img {
-                        vertical-align: middle;
-                        max-height: 25px;
+                    img 
+					{
+                        max-width: 200px;
+						vertical-align: middle;
+                    }
+					
+					[data-s9e-mediaembed="youtube"]
+					{
+						vertical-align: middle;
+					}
+					
+					[data-s9e-mediaembed="soundcloud"] 
+					{
+						vertical-align: middle;
+						height: 130px !important;
+                    }
+                    
+                    code
+                    {
+                        max-width: 400px;
                     }
 
                     a {
                         color: #426799;
                     }
                 }
-
+				
+				.name {
+                    position: relative;
+                    display:table-cell;
+                    padding-right: 5px;
+					color: #000;
+					font-weight: bold;
+					cursor: pointer;
+				}
+				
+				.timestamp {
+                    position: relative;
+                    display:table-cell;
+					color: #7c7c7c;
+					cursor: pointer;
+					padding-right: 5px;
+					text-align: right;
+					width: 200px;
+					font-size: 11px;
+				}
+				
                 .message p,
                 .message div:not(.LoadingIndicator),
                 .UserMention {

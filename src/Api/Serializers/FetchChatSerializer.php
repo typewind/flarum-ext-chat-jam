@@ -12,6 +12,7 @@
 
 namespace PushEDX\Chat\Api\Serializers;
 
+use Carbon\Carbon;
 use Flarum\Api\Serializer\AbstractSerializer;
 
 class FetchChatSerializer extends AbstractSerializer
@@ -33,6 +34,7 @@ class FetchChatSerializer extends AbstractSerializer
         $ret = ['messages' => []];
 
         foreach ($model->msgs as $msg) {
+            $msg->created_at = $this->formatDate(new Carbon($msg->created_at));
             $ret['messages'][] = $msg;
         }
 

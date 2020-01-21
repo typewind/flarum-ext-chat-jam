@@ -64,12 +64,12 @@ class FetchChatController extends AbstractShowController
         $message = Message::build(
             $msg['message'],
             $msg['actorId'],
-            new Carbon
+            Carbon::now()
         );
 
         $message->save();
 
-        return $message->id;
+        return $message;
     }
 
     /**

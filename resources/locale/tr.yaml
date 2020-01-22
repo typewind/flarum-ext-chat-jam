@@ -6,5 +6,7 @@ pushedx-chat:
       disable_sounds: Sesleri devre dışı bırak
       enable_notifications: Bildirimleri etkinleştir
       disable_notifications: Bildirimleri devre dışı bırak
+      mimimize: Küçültmek
+      maximize: Üst Düzeye
     errors:
 unauthenticated: Sadece kayıtlı kullanıcılar sohbeti kullanabilirler.

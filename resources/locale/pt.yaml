@@ -6,5 +6,7 @@ pushedx-chat:
       disable_sounds: Desabilitar sons
       enable_notifications: Ativar notificações
       disable_notifications: Desabilitar notificações
+      mimimize: Minimizar
+      maximize: Maximizar
     errors:
       unauthenticated: Você precisa logar para mandar uma mensagem

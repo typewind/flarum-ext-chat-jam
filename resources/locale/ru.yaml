@@ -6,5 +6,7 @@ pushedx-chat:
       disable_sounds: Отключить звуковые уведомления
       enable_notifications: Включить push-уведомления
       disable_notifications: Отключить push-уведомления
+      minimize: Свернуть
+      maximize: Развернуть
     errors:
       unauthenticated: Писать в чате могут только зарегистрированные пользователи

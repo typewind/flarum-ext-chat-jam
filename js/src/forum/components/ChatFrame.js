@@ -40,19 +40,16 @@ export class ChatFrame extends Component
 {
     controller(data, b, c)
     {
-        let showStatus = localStorage.getItem('beingShown');
-        let isMuted = localStorage.getItem('isMuted');
-        let notify = localStorage.getItem('notify');
+        let showStatus = localStorage.getItem('chat_beingShown');
+        let isMuted = localStorage.getItem('chat_isMuted');
+        let notify = localStorage.getItem('chat_notify');
 
         return {
             loading: false,
-            hadFocus: false,
-            downAt: [0, 0],
-            lastClick: 0,
             scrollInfo: scrollInfo,
             oldlength: 0,
             beingShown: showStatus === null ? true : JSON.parse(showStatus),
-            isMuted: isMuted === null ? true : JSON.parse(isMuted),
+            isMuted: isMuted === null ? false : JSON.parse(isMuted),
             notify: notify === null ? false : JSON.parse(notify),
 
             messages: messages
@@ -113,8 +110,6 @@ export class ChatFrame extends Component
         chat.className = classes;
         ctrl.beingShown = showing;
         localStorage.setItem('beingShown', JSON.stringify(showing));
-
-        m.redraw.strategy('none');
     }
 
     toggleSound(ctrl, e)
@@ -135,8 +130,10 @@ export class ChatFrame extends Component
         e.stopPropagation();
     }
 
-    insertReference(user, e)
+    insertMention(user, e)
     {
+        if(!app.session.user) return;
+
         // Get the chat div from the event target
         var chat = this.getChat(e.target);
 
@@ -235,29 +232,6 @@ export class ChatFrame extends Component
         m.redraw.strategy('none');
     }
 
-    chatClick(ctrl, e)
-    {
-        // Get the chat div from the event target
-        var chat = this.getChat(e.target);
-
-        // Find the input element
-        var input = this.getInput(chat);
-
-        var current = +new Date();
-        var targetTag = e.target.tagName.toLowerCase();
-        var samePlace = ctrl.downAt[0] == e.clientX && ctrl.downAt[1] == e.clientY;
-        if((targetTag == "div" && samePlace) || (!ctrl.hadFocus && samePlace && current - ctrl.lastClick > 300)) 
-        {
-            input.focus();
-            ctrl.hadFocus = true;
-        }
-        ctrl.lastClick = current;
-
-        m.redraw.strategy('none');
-
-        return targetTag == "a";
-    }
-
     avatarCached(user, attrs)
     {
         if(!this.avatarsCache.user) this.avatarsCache.user = avatar(user, attrs);
@@ -283,18 +257,25 @@ export class ChatFrame extends Component
                     tabindex = '0'
                     className = 'frame' 
                     id = 'chat' 
-                    onmousedown = {this.flagDown.bind(this, ctrl)} 
-                    onclick = {this.chatClick.bind(this, ctrl)}
                 >
                     <div>
                         <div id='chat-header' onclick={this.toggle.bind(this, ctrl)}>
                             <h2>{app.translator.trans('pushedx-chat.forum.toolbar.title')}</h2>
-                            <p data-title={app.translator.trans(ctrl.isMuted ? 'pushedx-chat.forum.toolbar.enable_sounds' : 'pushedx-chat.forum.toolbar.disable_sounds')}>
-                                <img src={ctrl.isMuted ? soundMuted : soundNormal} onclick={this.toggleSound.bind(this, ctrl)} />
-                            </p>
+                            <p data-title={app.translator.trans(ctrl.beingShown ? 'pushedx-chat.forum.toolbar.minimize' : 'pushedx-chat.forum.toolbar.maximize')}>
+                                <div className='icon'>
+                                    <i className={ctrl.beingShown ? 'fas fa-window-minimize' : 'fas fa-window-maximize'}></i>
+                                </div>
+                            </p>   
                             <p data-title={app.translator.trans(ctrl.notify ? 'pushedx-chat.forum.toolbar.disable_notifications' : 'pushedx-chat.forum.toolbar.enable_notifications')}>
-                                <img src={ctrl.notify ? notifyNormal : notifyDisabled} onclick={this.toggleNotifications.bind(this, ctrl)} />
-                            </p>       
+                                <div className='icon' onclick={this.toggleNotifications.bind(this, ctrl)}>
+                                    <i className={ctrl.notify ? 'fas fa-bell' : 'fas fa-bell-slash'}></i>
+                                </div>
+                            </p>   
+                            <p data-title={app.translator.trans(ctrl.isMuted ? 'pushedx-chat.forum.toolbar.enable_sounds' : 'pushedx-chat.forum.toolbar.disable_sounds')}>
+                                <div className='icon' onclick={this.toggleSound.bind(this, ctrl)}>
+                                    <i className={ctrl.isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up'}></i>
+                                </div>
+                            </p>
                         </div>
                         {ctrl.loading ? <LoadingIndicator className='loading Button-icon' /> : <span />}
                         <div className='wrapper' config={this.scroll.bind(this, ctrl)} onscroll={this.disableAutoScroll.bind(this, ctrl)}>
@@ -313,7 +294,7 @@ export class ChatFrame extends Component
                                         <span className='avatar-wrapper'>
                                             {this.avatarCached(o.user, {className: 'avatar'})}
                                         </span>
-                                        <a className='name' onclick={this.insertReference.bind(this, o.user)}>
+                                        <a className='name' onclick={this.insertMention.bind(this, o.user)}>
                                             {(o.user ? o.user.username() : '...') + ':'}
                                         </a>
                                         <span className='message'>

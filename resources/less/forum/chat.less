@@ -1,4 +1,5 @@
-.chat {
+.chat
+{
     position: fixed;
     bottom: 0;
     z-index: 5;
@@ -8,7 +9,8 @@
     width: 650px;
     color: #000;
 
-    .frame {
+    .frame
+    {
         position: relative;
         float: right;
         max-width: 100%;
@@ -18,23 +20,41 @@
         box-shadow: 0 2px 6px rgba(0,0,0,0.35);
         outline: none;
 
-        #chat-header {
+        #chat-header
+        {
             width: 100%;
-            height: 30px;
+            height: 35px;
             background-color: #313946;
             border-radius: 4px 4px 0 0;
             cursor: pointer;
 
-            h2 {
-                display: inline-block;
-                color: #fff;
-                font-size: 18px;
-                font-weight: normal;
-                margin: 0 10px 0 15px;
-                line-height: 30px;
+            .icon
+            {
+                width: 24px;
+                color: #eeeeee;
+                vertical-align: middle;
+                text-align: center;
+                font-size: 12pt;
             }
 
-            p {
+            .icon:hover
+            {
+                color: #fff;
+                text-shadow: 0 0 2px #fff;
+            }
+
+            h2
+            {
+                display: inline-block;
+                color: #fff;
+                font-size: 19px;
+                font-weight: normal;
+                margin: 0 10px 0 15px;
+                line-height: 32px;
+            }
+
+            p
+            {
                 display: inline-block;
                 position: relative;
                 float: right;
@@ -43,12 +63,14 @@
                 padding: 0;
                 margin-right: 5px;
 
-                img {
+                img 
+                {
                     height: 20px;
                 }
             }
 
-            p[data-title]:hover:after {
+            p[data-title]:hover:after
+            {
                 content: attr(data-title);
                 padding: 4px 8px;
                 color: #FFF;
@@ -72,7 +94,8 @@
             }
         }
 
-        #chat-input {
+        #chat-input
+        {
             resize: none;
             width: 100%;
             padding: 5px 10px 5px 10px;
@@ -84,11 +107,13 @@
             border-bottom: 0;
         }
 
-        #chat-input.reaching-limit {
+        #chat-input.reaching-limit
+        {
             width: 90%;
         }
 
-        #chat-limitter {
+        #chat-limitter
+        {
             display: none;
             border-top: 2px solid #A0A0A0;
             border-left: 1px dashed #A0A0A0;
@@ -100,43 +125,50 @@
             -moz-user-select: none;
         }
 
-        #chat-limitter.reaching-limit {
+        #chat-limitter.reaching-limit
+        {
             display: block;
             width: 10%;
             float: right;
         }
 
-        #chat-input:disabled {
+        #chat-input:disabled
+        {
             background-color: #f0f0f0;
         }
 
-        .loading {
+        .loading
+        {
             position: absolute;
             top: 425px;
             float: left;
             right: 15px;
         }
 
-        .loading-old {
+        .loading-old
+        {
             padding-left: 525px;
         }
 
-        .wrapper {
+        .wrapper
+        {
             overflow: auto;
-            height: 295px;
-            max-height: 50vh;
+            max-height: 300px;
 
-            .message-wrapper {
+            .message-wrapper
+            {
                 padding-left: 15px;
                 padding-top: 2.5px;
                 padding-bottom: 2.5px;
 
-                .avatar-wrapper {
+                .avatar-wrapper
+                {
                     position: relative;
                     display:table-cell;
                     padding-right: 10px;
 
-                    .avatar {
+                    .avatar
+                    {
                         width: 26px;
                         height: 26px;
                         border-radius: 26px;
@@ -146,7 +178,8 @@
                     }
                 }
 
-                span[data-name]:hover:after {
+                span[data-name]:hover:after
+                {
                     content: attr(data-name);
                     padding: 4px 8px;
                     color: #FFF;
@@ -167,7 +200,8 @@
                     background-image: -o-linear-gradient(top, #000, #111);
                 }
 
-                .message {
+                .message 
+                {
                     display:table-cell;
                     padding-top: 3px;
                     word-break: break-word;
@@ -201,7 +235,8 @@
                     }
                 }
 				
-				.name {
+                .name
+                {
                     position: relative;
                     display:table-cell;
                     padding-right: 5px;
@@ -210,7 +245,8 @@
 					cursor: pointer;
 				}
 				
-				.timestamp {
+                .timestamp
+                {
                     position: relative;
                     display:table-cell;
 					color: #7c7c7c;
@@ -223,23 +259,27 @@
 				
                 .message p,
                 .message div:not(.LoadingIndicator),
-                .UserMention {
+                .UserMention
+                {
                     display: inline;
                     margin: 0;
                     padding: 0;
                 }
 
-                .UserMention {
+                .UserMention
+                {
                     display: inline-block;
                     color: #7088a9;
                 }
 
-                .clear {
+                .clear
+                {
                     clear: both;
                 }
             }
 
-            .message-wrapper:nth-child(odd) {
+            .message-wrapper:nth-child(odd)
+            {
                 background-color: #f3f6f9;
             }
         }
@@ -262,44 +302,32 @@
         }
     }
 
-    .frame.active {
+    .frame.active
+    {
         box-shadow: 0 0 0 2px #377F21, 0 2px 6px rgba(0,0,0,0.35);
     }
 }
 
-.chat.hidden {
-    .frame {
-        #chat-input {
+.hidden
+{
+    .frame
+    {
+        #chat-input
+        {
             display: none;
         }
-        .wrapper {
+        .wrapper
+        {
             display: none;
         }
     }
-
-    .frame.active {
+    .frame.active
+    {
         box-shadow: none;
     }
 }
 
-.chat.left-aligned {
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.chat.left {
+.left
+{
     right: 0;
 }
-
-/*
-    Text formatter
-    p {
-        margin: 0
-    }
-    img {
-        border: 0;
-        max-height: 20px;
-        display: inline-block;
-        vertical-align: top;
-    }
-*/

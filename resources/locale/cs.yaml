@@ -6,5 +6,7 @@ pushedx-chat:
       disable_sounds: Vypnout zvuky
       enable_notifications: Zapnout oznámení
       disable_notifications: Vypnout oznámení
+      minimize: Minimalizovat
+      maximize: Maximalizovat
     errors:
       unauthenticated: Do chatu mohou přispívat pouze registrovaní uživatelé

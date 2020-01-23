@@ -205,12 +205,6 @@ export default class ChatFrame extends Component
         }
     }
 
-    avatarCached(user, attrs)
-    {
-        if(!this.avatarsCache.user) this.avatarsCache.user = avatar(user, attrs);
-        return this.avatarsCache.user;
-    }
-
     /**
      * Show the actual Chat Frame.
      *
@@ -264,9 +258,7 @@ export default class ChatFrame extends Component
                             {ctrl.messages.map((function(o, index) {
                                 return (
                                     <div className='message-wrapper'>
-                                        <span className='avatar-wrapper'>
-                                            {this.avatarCached(o.user, {className: 'avatar'})}
-                                        </span>
+                                        <span className='avatar-wrapper'>{avatar(o.user, {className: 'avatar'})}</span>
                                         <a className='name' onclick={this.insertMention.bind(this, o.user)}>
                                             {(o.user ? o.user.username() : '...') + ':'}
                                         </a>

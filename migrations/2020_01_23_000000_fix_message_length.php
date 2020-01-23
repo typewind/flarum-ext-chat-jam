@@ -10,8 +10,8 @@ return [
         });
     },
     'down' => function (Builder $schema) {
-		$schema->table('pushedx_messages', function (Blueprint $table) {
-			$table->string('message')->change();
-		});
+        $schema->table('pushedx_messages', function (Blueprint $table) {
+            $table->string('message')->change();
+        });
     }
 ];

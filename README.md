@@ -36,6 +36,7 @@ composer update xelson/flarum-ext-chat
 
 * Customizing of notification sounds
 * Preventing flooding
+* Text Markdown and Emoji picker
 * Message editing
 * Alternative working mode without Pusher
 * Forum notifications for missed mentions

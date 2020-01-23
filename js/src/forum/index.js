@@ -1,11 +1,11 @@
-import { extend } from 'flarum/extend';
+import {extend} from 'flarum/extend';
 import HeaderPrimary from 'flarum/components/HeaderPrimary';
+import ChatFrame from './components/ChatFrame';
 
-import {ChatFrame,ChatMessage} from './components/ChatFrame';
-
-app.initializers.add('pushedx-realtime-chat', app => {
-
+app.initializers.add('pushedx-realtime-chat', app =>
+{
     var forward = [], isInitial = false;
+    let chatFrame = new ChatFrame
 
     extend(HeaderPrimary.prototype, 'config', function(x, isInitialized, context) {
         if (isInitialized) return;
@@ -23,16 +23,18 @@ app.initializers.add('pushedx-realtime-chat', app => {
         {
             const data = new FormData();
 
-            app.request({
+            app.request(
+            {
                 method: 'POST',
                 url: app.forum.attribute('apiUrl') + '/chat/fetch',
                 serialize: raw => raw,
                 data
             }).then(
-                function (response) {
-                    for (var i = 0; i < response.data.attributes.messages.length; ++i) {
+                function (response) 
+                {
+                    for (var i = 0; i < response.data.attributes.messages.length; ++i)
                         forward.push(response.data.attributes.messages[i]);
-                    }
+  
                     isInitial = true;
                     m.redraw();
                 },
@@ -46,17 +48,10 @@ app.initializers.add('pushedx-realtime-chat', app => {
     /**
      * Add the upload button to the post composer.
      */
-    extend(HeaderPrimary.prototype, 'items', function(items) {
-        //var chatFrame = new ChatFrame();
-        //var realView = chatFrame.view;
-        /*
-        chatFrame.view = () => {
-            return realView.call(chatFrame);
-        };
-        */
-        //status.forwardMessage = chatFrame.forwardMessage.bind(chatFrame);
+    extend(HeaderPrimary.prototype, 'items', function(items) 
+    {
         var forwarded = forward.slice(0);
-        items.add('pushedx-chat-frame', m.component(new ChatFrame, {forward: forwarded, isInitial: isInitial}));
+        items.add('pushedx-chat-frame', m.component(chatFrame, {forward: forwarded, isInitial: isInitial}));
         forward.splice(0, forward.length);
 
         isInitial = false;

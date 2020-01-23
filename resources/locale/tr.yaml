@@ -8,5 +8,7 @@ pushedx-chat:
       disable_notifications: Bildirimleri devre dışı bırak
       mimimize: Küçültmek
       maximize: Üst Düzeye
+    chat:
+      placeholder: Mesajını yaz...
     errors:
 unauthenticated: Sadece kayıtlı kullanıcılar sohbeti kullanabilirler.

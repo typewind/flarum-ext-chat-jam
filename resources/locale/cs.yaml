@@ -8,5 +8,7 @@ pushedx-chat:
       disable_notifications: Vypnout oznámení
       minimize: Minimalizovat
       maximize: Maximalizovat
+    chat:
+      placeholder: Napište zprávu...
     errors:
       unauthenticated: Do chatu mohou přispívat pouze registrovaní uživatelé

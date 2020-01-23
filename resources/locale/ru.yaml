@@ -8,5 +8,7 @@ pushedx-chat:
       disable_notifications: Отключить push-уведомления
       minimize: Свернуть
       maximize: Развернуть
+    chat:
+      placeholder: Напишите сообщение...
     errors:
       unauthenticated: Писать в чате могут только зарегистрированные пользователи

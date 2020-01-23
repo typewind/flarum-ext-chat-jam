@@ -8,5 +8,7 @@ pushedx-chat:
       disable_notifications: Desabilitar notificações
       mimimize: Minimizar
       maximize: Maximizar
+    chat:
+      placeholder: Digite sua mensagem...
     errors:
       unauthenticated: Você precisa logar para mandar uma mensagem

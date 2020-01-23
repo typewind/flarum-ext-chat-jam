@@ -8,5 +8,7 @@ pushedx-chat:
       disable_notifications: Deshabilitar notificaciones
       minimize: Minimizar
       maximize: Maximizar
+    chat:
+      placeholder: Escribe tu mensaje...
     errors:
       unauthenticated: Solo los usuarios registrados pueden usar el chat

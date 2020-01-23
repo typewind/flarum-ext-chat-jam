@@ -1,23 +1,15 @@
 <?php
 /*
- * This file is part of push-edx/flarum-ext-restricted-reply.
- *
- * Copyright (c) gpascualg.
- *
- * http://pushedx.net
+ * This file is part of xelson/flarum-ext-chat
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace PushEDX\Chat\Commands;
+namespace Xelson\Chat\Commands;
 
 use Carbon\Carbon;
-//use Flagrow\ImageUpload\Contracts\UploadAdapterContract;
-//use Flagrow\ImageUpload\Events\ImageWillBeSaved;
-//use Flagrow\ImageUpload\Image;
-//use Flagrow\ImageUpload\Validators\ImageValidator;
-use PushEDX\Chat\Api\Controllers\FetchChatController;
+use Xelson\Chat\Api\Controllers\FetchChatController;
 use Flarum\User\AssertPermissionTrait;
 use Flarum\Post\PostRepository;
 use Flarum\User\UserRepository;

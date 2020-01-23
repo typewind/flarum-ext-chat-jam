@@ -63,6 +63,8 @@ export default class ChatFrame extends Component
 
         document.addEventListener('mousedown', this.chatMoveListener.bind(this, 'mousedown'));
         document.addEventListener('mouseup', this.chatMoveListener.bind(this, 'mouseup'));
+        window.addEventListener('blur', (() => this.active = false).bind(this));
+        window.addEventListener('focus', (() => this.active = true).bind(this));
 
         // Dirty scroll fix. Media messages can change their height and it's resizing wrapper container too.
         setTimeout((() => this.getChatWrapper().scrollTop += 1000).bind(this), 1000);
@@ -119,6 +121,8 @@ export default class ChatFrame extends Component
     {
         ctrl.notify = !ctrl.notify;
         localStorage.setItem('chat_notify', JSON.stringify(ctrl.notify));
+
+        Notification.requestPermission();
 
         e.preventDefault();
         e.stopPropagation();
@@ -486,7 +490,7 @@ export default class ChatFrame extends Component
 
         // Notify (ifwe are not the author!)
         if(notify && (!app.session.user || (user && user.id() != app.session.user.id()))) 
-            this.notify(ctrl, msg);
+            this.notify(ctrl, msg, user);
 
         // Return the object
         return obj;
@@ -503,13 +507,13 @@ export default class ChatFrame extends Component
         if(ctrl.notify && this.messageIsMention(msg)) 
         {
             if(!("Notification" in window)) return;
-            else if(Notification.permission === "granted") this.notifySend(msg, user.username(), user.avatarUrl())
+            else if(Notification.permission === "granted") return this.notifySend(msg, user.username(), user.avatarUrl())
             else if(Notification.permission !== 'denied') 
             {
                 Notification.requestPermission((function(permission) 
                 {
                     if(permission === "granted") 
-                        this.notifySend(msg, user.username(), user.avatarUrl())
+                        return this.notifySend(msg, user.username(), user.avatarUrl())
                 }).bind(this));
             }
         }
@@ -518,7 +522,7 @@ export default class ChatFrame extends Component
 
     notifySend(msg, title, icon)
     {
-        return new Notification(title, {body: msg, icon: icon});
+        return !this.active ? new Notification(title, {body: msg, icon: icon}) : null;
     }
 
     notifySound(ctrl, msg) 

@@ -1,19 +1,15 @@
 <?php
 /*
- * This file is part of push-edx/flarum-ext-restricted-reply.
- *
- * Copyright (c) gpascualg.
- *
- * http://pushedx.net
+ * This file is part of xelson/flarum-ext-chat
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace PushEDX\Chat\Listeners;
+namespace Xelson\Chat\Listeners;
 
-use PushEDX\Chat\Api\Controllers\ChatController;
-use PushEDX\Chat\Api\Controllers\FetchChatController;
+use Xelson\Chat\Api\Controllers\ChatController;
+use Xelson\Chat\Api\Controllers\FetchChatController;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Event\ConfigureApiRoutes;
 use Flarum\Api\Event\Serializing;

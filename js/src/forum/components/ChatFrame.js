@@ -38,7 +38,7 @@ export default class ChatFrame extends Component
         let transform = localStorage.getItem('chat_transform');
 
         return {
-            loading: true,
+            loading: false,
             scrollInfo: scrollInfo,
             inputMessageLength: 0,
             inputRows: 1,
@@ -212,7 +212,7 @@ export default class ChatFrame extends Component
      */
     view(ctrl, args) 
     {
-        for (var i = 0; i < args.forward.length; ++i)
+        for(var i = 0; i < args.forward.length; ++i)
             this.forwardMessage(ctrl, args.forward[i], !args.isInitial);
 
 		if(ctrl.updateTimeout) clearTimeout(ctrl.updateTimeout);

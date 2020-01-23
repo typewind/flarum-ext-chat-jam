@@ -5,7 +5,7 @@ import ChatFrame from './components/ChatFrame';
 app.initializers.add('pushedx-chat', app =>
 {
     var forward = [], isInitial = false;
-    let chatFrame = new ChatFrame
+    let chatFrame = new ChatFrame();
 
     extend(HeaderPrimary.prototype, 'config', function(x, isInitialized, context) {
         if (isInitialized) return;
@@ -37,9 +37,6 @@ app.initializers.add('pushedx-chat', app =>
   
                     isInitial = true;
                     m.redraw();
-                },
-                function (response) {
-
                 }
             );
         }

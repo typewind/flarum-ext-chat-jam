@@ -1,5 +1,4 @@
 import Component from 'flarum/Component';
-import icon from 'flarum/helpers/icon';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
 import avatar from 'flarum/helpers/avatar';
 import fullTime from 'flarum/helpers/fullTime';
@@ -22,13 +21,6 @@ var audio = new Audio();
 audio.src = audioNotification;
 audio.volume = 0.5;
 
-const soundNormal = 'data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMS4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDQ4NSA0ODUiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDQ4NSA0ODU7IiB4bWw6c3BhY2U9InByZXNlcnZlIiB3aWR0aD0iMzJweCIgaGVpZ2h0PSIzMnB4Ij4KPGc+Cgk8Zz4KCQk8cGF0aCBkPSJNMjgyLjUsNTUuMTVjLTMzLjUsMC02Ni4zLDguOS05NSwyNS44Yy0yNS42LDE1LjEtNDcuMywzNi4xLTYzLjIsNjEuMUg1Mi43Yy0yOS4xLDAtNTIuNywyMy42LTUyLjcsNTIuN3Y5NS41ICAgIGMwLDI5LjEsMjMuNiw1Mi43LDUyLjcsNTIuN2g3MS42YzE1LjksMjUsMzcuNiw0Niw2My4yLDYxLjFjMjguNywxNi45LDYxLjUsMjUuOCw5NSwyNS44YzcuNSwwLDEzLjUtNiwxMy41LTEzLjVWNjguNjUgICAgQzI5Niw2MS4yNSwyOTAsNTUuMTUsMjgyLjUsNTUuMTV6IE0xMTguNCwzMTUuOTVINTIuN2MtMTQuMiwwLTI1LjctMTEuNS0yNS43LTI1Ljd2LTk1LjVjMC0xNC4yLDExLjUtMjUuNywyNS43LTI1LjdoNjUuN1YzMTUuOTUgICAgeiBNMjY5LDQwMi4zNWMtNTAuNy00LjMtOTYuOS0zMi44LTEyMy42LTc2LjZ2LTE2Ni40YzI2LjctNDMuOCw3Mi45LTcyLjMsMTIzLjYtNzYuNlY0MDIuMzV6IiBmaWxsPSIjRkZGRkZGIi8+CgkJPHBhdGggZD0iTTM0OC45LDEzNy45NWMtNi4xLTQuMy0xNC41LTIuOC0xOC44LDMuNGMtNC4zLDYuMS0yLjgsMTQuNSwzLjQsMTguOGMyNywxOC44LDQzLjEsNDkuNyw0My4xLDgyLjVzLTE2LjEsNjMuNy00My4xLDgyLjUgICAgYy02LjEsNC4zLTcuNiwxMi43LTMuNCwxOC44YzIuNiwzLjgsNi44LDUuOCwxMS4xLDUuOGMyLjcsMCw1LjQtMC44LDcuNy0yLjRjMzQuMi0yMy45LDU0LjctNjMsNTQuNy0xMDQuNiAgICBTMzgzLjEsMTYxLjc1LDM0OC45LDEzNy45NXoiIGZpbGw9IiNGRkZGRkYiLz4KCQk8cGF0aCBkPSJNNDAxLjEsODIuMDVjLTYuMS00LjMtMTQuNS0yLjgtMTguOCwzLjRjLTQuMyw2LjEtMi44LDE0LjUsMy40LDE4LjhjNDUuMywzMS42LDcyLjMsODMuMyw3Mi4zLDEzOC4zICAgIHMtMjcsMTA2LjgtNzIuMywxMzguM2MtNi4xLDQuMy03LjYsMTIuNy0zLjQsMTguOGMyLjYsMy44LDYuOCw1LjgsMTEuMSw1LjhjMi43LDAsNS40LTAuOCw3LjctMi40ICAgIGM1Mi41LTM2LjYsODMuOS05Ni42LDgzLjktMTYwLjVTNDUzLjcsMTE4LjY1LDQwMS4xLDgyLjA1eiIgZmlsbD0iI0ZGRkZGRiIvPgoJPC9nPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+Cjwvc3ZnPgo=';
-const soundMuted = 'data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDQ4My43ODggNDgzLjc4OCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgNDgzLjc4OCA0ODMuNzg4OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgd2lkdGg9IjMycHgiIGhlaWdodD0iMzJweCI+CjxnPgoJPGc+CgkJPHBhdGggZD0iTTE4Nyw0MDkuMDQxYzI4LjksMTcuMSw2Mi43LDI2LjIsOTYuMywyNS45aDAuM2MxMC40LTAuMSwxOC43LTguNSwxOC42LTE4LjljLTAuMi0yMy43LTAuNS00Ny40LTEtNzEuMSAgICBjMC40LTE4LjIsMC43LTM2LjQsMS4xLTU0LjZjMS4xLTc0LDEuNy0xNDcuOSwwLjktMjIxLjd2LTAuNGMtMC4xLTEwLjgtOS0xOS41LTE5LjgtMTkuNGMtNDYuMiwwLjQtOTIsMTguNS0xMjUuMSw0OS42ICAgIGMtMTMuMiwxMi4yLTIyLjYsMjUuOS0yNy4xLDM2LjZjLTIuNCw1LjItMy4zLDkuOS0zLjQsMTMuMmMwLDMuMywxLDUuNCwzLjMsNmM4LjcsMi4zLDIzLjktMTQuNiw0OC0zMy45ICAgIGMyNS0yMC40LDU2LjEtMzIuMiw4Ny44LTM0LjljLTAuMSwxMy45LTAuMiwyNy45LTAuMiw0MS44YzAuMyw5MS41LDIuMSwxODMsMy40LDI3NC41Yy0yMy43LTMuNS00Ni4zLTExLjktNjYtMjQuNiAgICBjLTIyLjYtMTQuNS00MS41LTM0LjUtNTQuNS01Ny44Yy0zLjItNS43LTkuMy05LjYtMTYuMy05LjdoLTAuNWMtMTQuNS0wLjEtMjkuMS0wLjMtNDMuNy0wLjRsLTIxLjktMC4xSDU2LjNoLTIuN2wtMS40LTAuMSAgICBjLTAuOSwwLTEuOC0wLjMtMi43LTAuM2MtNy0xLjQtMTMtNy4yLTE0LjYtMTQuMmMtMC40LTEuMS0wLjItMS4xLTAuNC0xLjZsLTAuMS0yLjd2LTAuN3YtMC4xdi0wLjl2LTEwLjlsLTAuMS0yMS45bDAtNDMuOHYtMTAuOSAgICB2LTUuNWMwLTEuMSwwLjEtMS4yLDAuMS0xLjhjMC4xLTAuNSwwLTAuOSwwLjEtMS40YzAuMi0xLjgsMC43LTMuNSwxLjQtNS4yYzAuOC0xLjYsMS43LTMuMiwyLjgtNC43YzIuMy0yLjgsNS40LTUsOC44LTYuMiAgICBjMC44LTAuNCwxLjgtMC41LDIuNS0wLjdjMC42LDAsMC4zLTAuMiwyLjctMC4zbDEuNC0wLjFoMC4yaDAuMmgyLjdoNS41YzE0LjYsMC4xLDI5LjEsMC4zLDQzLjcsMC40YzcuOCwwLjEsMjAuMS0zLjQsMjQtNS44ICAgIGM3LjctNC45LTIuMy05LTE3LjItMTIuMWMtMTIuMy0yLjYtMjUuMy00LjgtMzguNy02LjdjLTMuNC0wLjQtNi44LTAuOS0xMC4yLTEuNGwtNS4yLTAuNmwtMi42LTAuM2wtMS4zLTAuMmwtMC43LTAuMWgtMC4zSDU0ICAgIGgtMC4xaC0wLjRsLTIuNi0wLjJsLTEuMy0wLjFsLTEuNywwLjFsLTMuNCwwLjJsLTMuMiwwLjVjLTQuMiwwLjgtOC40LDIuMi0xMi40LDQuMmMtNy45LDQtMTQuOSwxMC41LTE5LjYsMTguNiAgICBjLTIuNCw0LTQuMSw4LjYtNS4zLDEzLjJjLTEuMiw0LjYtMS40LDEwLjEtMS41LDEzLjNjLTAuOCwxNC45LTEuMywzMC4xLTEuNiw0NS4ybC0wLjksNDcuNWwwLjEsMi45djAuN2wwLjEsMS4xbDAuMywyLjMgICAgYzAuNCwzLjIsMS4xLDUuNSwxLjgsOC4yYzEuNiw1LjIsNCwxMC4xLDYuOSwxNC42YzYuMSw5LDE0LjgsMTYuMiwyNSwyMC4yYzUuMSwyLjEsMTAuNSwzLjMsMTUuOSwzLjhsNCwwLjJsMi45LDAuMWw1LjgsMC4xICAgIGwyMy40LDAuNWwzNi43LDAuN0MxMzguOSwzNzIuMDQxLDE2MSwzOTMuNzQxLDE4Nyw0MDkuMDQxeiIgZmlsbD0iI0ZGRkZGRiIvPgoJCTxwYXRoIGQ9Ik0zNDMsMjg1LjY0MWMtMi45LDQuNS0yLjcsMTAuOSw0LDE3YzYuMSw1LjYsMTMsNy4zLDE3LjUsNC4yYzguMS01LjYsMTYuMy0xMS4yLDIzLTE4LjJjNy4xLTcuNCwxMy43LTE1LjQsMjAuMi0yMy4zICAgIGMxLjcsMi4yLDMuMyw0LjQsNS4xLDYuNWMxMS45LDE0LjMsMjQuNywyNy44LDQwLjcsMzcuOWM0LjUsMi45LDEwLjksMi43LDE3LTRjNS42LTYuMSw3LjMtMTMsNC4yLTE3LjUgICAgYy01LjYtOC4xLTExLjItMTYuMy0xOC4yLTIzYy03LjUtNy4yLTE1LjUtMTMuOC0yMy41LTIwLjRjMTkuMy0xMywzMi44LTMyLDUwLjQtNDYuOWMxLTAuOC0wLjEtNC43LTEuNC02LjkgICAgYy0yLjYtNC4zLTYuNi02LjEtMTAuNS02LjZjLTEyLjktMS43LTIyLjksMS45LTMwLjYsOGMtMTAuMiw4LTIwLjcsMTUuNi0zMC41LDI0Yy0xMi44LTE3LjUtMzAuNi0zMC41LTQ0LjUtNDcgICAgYy0wLjgtMS00LjcsMC4xLTYuOSwxLjRjLTQuMywyLjYtNi4xLDYuNi02LjYsMTAuNWMtMS43LDEyLjksMS45LDIyLjksOCwzMC42YzgsMTAuMiwxNS42LDIwLjcsMjQsMzAuNGMtMS4xLDAuOS0yLjIsMS43LTMuMywyLjYgICAgQzM2Ni43LDI1Ni45NDEsMzUzLjIsMjY5LjY0MSwzNDMsMjg1LjY0MXoiIGZpbGw9IiNGRkZGRkYiLz4KCTwvZz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8L3N2Zz4K';
-
-const notifyNormal = 'data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDU4IDU4IiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1OCA1ODsiIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSI1MTJweCIgaGVpZ2h0PSI1MTJweCI+CjxwYXRoIHN0eWxlPSJmaWxsOiM4Mzk1OTQ7IiBkPSJNNiwyM2gyNy40NzRDMzIuNTM3LDI0Ljc5NiwzMiwyNi44MzQsMzIsMjlzMC41MzcsNC4yMDQsMS40NzQsNkg2Yy0zLjMxNCwwLTYtMi42ODYtNi02ICBDMCwyNS42ODYsMi42ODYsMjMsNiwyM3oiLz4KPGNpcmNsZSBzdHlsZT0iZmlsbDojNjFCODcyOyIgY3g9IjQ1IiBjeT0iMjkiIHI9IjEzIi8+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+Cjwvc3ZnPgo=';
-const notifyDisabled = 'data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDU4IDU4IiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1OCA1ODsiIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSI1MTJweCIgaGVpZ2h0PSI1MTJweCI+CjxwYXRoIHN0eWxlPSJmaWxsOiM4Mzk1OTQ7IiBkPSJNNTIsMjNIMjQuNTI2QzI1LjQ2MywyNC43OTYsMjYsMjYuODM0LDI2LDI5cy0wLjUzNyw0LjIwNC0xLjQ3NCw2SDUyYzMuMzE0LDAsNi0yLjY4Niw2LTYgIFM1NS4zMTQsMjMsNTIsMjN6Ii8+CjxjaXJjbGUgc3R5bGU9ImZpbGw6I0M3Q0FDNzsiIGN4PSIxMyIgY3k9IjI5IiByPSIxMyIvPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8L3N2Zz4K';
-
-const maxLength = 512;
 var messages = [];
 var scrollInfo = {
     autoScroll: true,
@@ -40,20 +32,21 @@ export default class ChatFrame extends Component
 {
     controller()
     {
-        let showStatus = localStorage.getItem('chat_beingShown');
+        let beingShown = localStorage.getItem('chat_beingShown');
         let isMuted = localStorage.getItem('chat_isMuted');
         let notify = localStorage.getItem('chat_notify');
-        let offsetX = localStorage.getItem('chat_offsetX');
+        let transform = localStorage.getItem('chat_transform');
 
         return {
-            loading: false,
+            loading: true,
             scrollInfo: scrollInfo,
             inputMessageLength: 0,
             inputRows: 1,
-            beingShown: showStatus === null ? true : JSON.parse(showStatus),
+            beingShown: beingShown === null ? true : JSON.parse(beingShown),
             isMuted: isMuted === null ? false : JSON.parse(isMuted),
             notify: notify === null ? false : JSON.parse(notify),
-            offsetX: offsetX === null ? '0px' : JSON.parse(offsetX),
+            transform: JSON.parse(transform) ?? {x: 0, y: 0},
+            messageCharLimit: app.forum.attribute('pushedx-chat.charlimit') ?? 512,
 
             messages: messages
         };
@@ -70,6 +63,9 @@ export default class ChatFrame extends Component
 
         document.addEventListener('mousedown', this.chatMoveListener.bind(this, 'mousedown'));
         document.addEventListener('mouseup', this.chatMoveListener.bind(this, 'mouseup'));
+
+        // Dirty scroll fix. Media messages can change their height and it's resizing wrapper container too.
+        setTimeout((() => this.getChatWrapper().scrollTop += 1000).bind(this), 1000);
     }
 
     getChat()
@@ -80,6 +76,11 @@ export default class ChatFrame extends Component
     getChatHeader()
     {
         return document.querySelector('.chat #chat-header');
+    }
+    
+    getChatWrapper()
+    {
+        return document.querySelector('.chat .wrapper');
     }
 
     getInput()
@@ -139,7 +140,7 @@ export default class ChatFrame extends Component
 
     reachedLimit(ctrl)
     {
-        ctrl.oldReached = (maxLength - (ctrl.inputMessageLength || 0)) < 100;
+        ctrl.oldReached = (ctrl.messageCharLimit - (ctrl.inputMessageLength || 0)) < 100;
         return ctrl.oldReached;
     }
 
@@ -224,16 +225,14 @@ export default class ChatFrame extends Component
         ctrl.updateTimeout = setTimeout(() => m.redraw(), 30000);
 
         return (
-            <div className={'chat left container ' + (ctrl.beingShown ? '' : 'hidden')} style={{'right': ctrl.offsetX}}>
+            <div className={'chat left container ' + (ctrl.beingShown ? '' : 'hidden')} style={{'right': ctrl.transform.x + 'px'}}>
                 <div 
                     tabindex = '0'
                     className = 'frame' 
                     id = 'chat' 
                 >
                     <div>
-                        <div id='chat-header'
-                            ondragstart={() => false}
-                        >
+                        <div id='chat-header' ondragstart={() => false}>
                             <h2>{app.translator.trans('pushedx-chat.forum.toolbar.title')}</h2>
                             <p data-title={app.translator.trans(ctrl.beingShown ? 'pushedx-chat.forum.toolbar.minimize' : 'pushedx-chat.forum.toolbar.maximize')}>
                                 <div className='icon' onclick={this.toggleChat.bind(this, ctrl)}>
@@ -251,14 +250,18 @@ export default class ChatFrame extends Component
                                 </div>
                             </p>
                         </div>
-                        <div className='wrapper' config={this.scroll.bind(this, ctrl)} onscroll={this.disableAutoScroll.bind(this, ctrl)}>
+                        <div className='wrapper' 
+                            config={this.scroll.bind(this, ctrl)} 
+                            onscroll={this.disableAutoScroll.bind(this, ctrl)}
+                            style={{'height': ctrl.transform.y + 'px'}}
+                        >
                             {ctrl.scrollInfo.loadingFetch ?
                                 <div className='message-wrapper'>
                                     <LoadingIndicator className='loading-old Button-icon' />
                                 </div>
                                 : null
                             }
-                            {ctrl.messages.map((function(o) {
+                            {ctrl.messages.map((function(o, index) {
                                 return (
                                     <div className='message-wrapper'>
                                         <span className='avatar-wrapper'>
@@ -286,18 +289,22 @@ export default class ChatFrame extends Component
                             <textarea
                                 type = 'text'
                                 id = 'chat-input'
-                                maxlength = {maxLength}
-                                disabled = {!app.forum.attribute('canPostChat')}
-                                placeholder = {app.translator.trans(!app.forum.attribute('canPostChat') ? 'pushedx-chat.forum.errors.unauthenticated' : 'pushedx-chat.forum.chat.placeholder')}
+                                maxlength = {ctrl.messageCharLimit}
+                                disabled = {!app.forum.attribute('pushedx-chat.canchat')}
+                                placeholder = {app.translator.trans(!app.forum.attribute('pushedx-chat.canchat') ? 'pushedx-chat.forum.errors.unauthenticated' : 'pushedx-chat.forum.chat.placeholder')}
                                 onkeypress = {this.inputPressEnter.bind(this, ctrl)}
                                 oninput = {this.inputProcess.bind(this, ctrl)}
+                                onpaste = {this.inputProcess.bind(this, ctrl)}
                                 rows = {ctrl.inputRows}
                             />
                             <div className='icon-send' onclick = {this.inputPressButton.bind(this, ctrl)}>
-                                <i class="fas fa-chevron-right"></i>
+                                <i class="fas fa-angle-double-right"></i>
                             </div>
-                            <div id='chat-limitter' className={this.reachedLimit(ctrl) ? 'reaching-limit' : ''}>
-                                {(maxLength - (ctrl.inputMessageLength || 0)) + '/' + maxLength}
+                            <div id='chat-limitter' 
+                                className={this.reachedLimit(ctrl) ? 'reaching-limit' : ''}
+                                style={{display: !app.forum.attribute('pushedx-chat.canchat') ? 'none' : ''}}
+                            >
+                                {(ctrl.messageCharLimit - (ctrl.inputMessageLength || 0)) + '/' + ctrl.messageCharLimit}
                             </div>
                         </div>
                     </div>
@@ -333,8 +340,8 @@ export default class ChatFrame extends Component
     chatMoveStart(e)
     {
         this.chatMoving = true;
-        this.mouseMoveEvent = this.chatMoveProcess.bind(this)
-        this.moveLastX = e.clientX;
+        this.mouseMoveEvent = this.chatMoveProcess.bind(this);
+        this.moveLast = {x: e.clientX, y: e.clientY};
 
         document.addEventListener('mousemove', this.mouseMoveEvent);
         document.body.classList.add('moving');
@@ -348,18 +355,26 @@ export default class ChatFrame extends Component
         document.removeEventListener('mousemove', this.mouseMoveEvent);
         document.body.classList.remove('moving');
 
-        localStorage.setItem('chat_offsetX', JSON.stringify(this.getChat().style.right));
+        localStorage.setItem('chat_transform', JSON.stringify({x: parseInt(this.getChat().style.right) || 0, y: this.getChatWrapper().offsetHeight}));
     }
 
     chatMoveProcess(e)
     {
-        let moveX = e.clientX - this.moveLastX;
-        let margin = parseInt(this.getChat().style.right) || 0;
-        let nextMove = margin - moveX;
-        if(nextMove < 0 || nextMove > window.innerWidth - this.getChat().offsetWidth) return;
+        let chat = this.getChat();
+        let chatWrapper = this.getChatWrapper();
 
-        this.getChat().style.right = nextMove + 'px';
-        this.moveLastX = e.clientX;
+        let move = {x: e.clientX - this.moveLast.x, y: e.clientY - this.moveLast.y}
+        let right = parseInt(chat.style.right) || 0;
+        let wrapperHeight = chatWrapper.offsetHeight;
+        let nextMove = {x: right - move.x, y: wrapperHeight - move.y}; 
+
+        if(0 < nextMove.x && nextMove.x < (window.innerWidth - chat.offsetWidth))
+        chat.style.right = nextMove.x + 'px';
+
+        chatWrapper.style.height = nextMove.y + 'px';
+        chatWrapper.scrollTop += move.y;
+
+        this.moveLast = {x: e.clientX, y: e.clientY};
     }
 
     inputProcess(ctrl, e)
@@ -370,7 +385,7 @@ export default class ChatFrame extends Component
         if(!input.baseScrollHeight) 
         {
             input.baseScrollHeight = input.scrollHeight;
-            input.baseHeight = input.offsetHeight;
+            input.baseHeight = 19;
         }
         input.rows = 1;
         let rows = Math.ceil((input.scrollHeight - input.baseScrollHeight) / input.baseHeight) + 1;

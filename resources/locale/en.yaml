@@ -12,3 +12,7 @@ pushedx-chat:
       placeholder: Type your message...
     errors:
       unauthenticated: Only registered users can use the chat
+  admin:
+    settings:
+      title: Chat settings
+      charlimit: Maximum characters in the message

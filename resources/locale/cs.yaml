@@ -12,3 +12,7 @@ pushedx-chat:
       placeholder: Napište zprávu...
     errors:
       unauthenticated: Do chatu mohou přispívat pouze registrovaní uživatelé
+  admin:
+    settings:
+      title: Nastavení chatu
+      charlimit: Maximální počet znaků ve zprávě

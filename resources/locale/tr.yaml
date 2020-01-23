@@ -11,4 +11,8 @@ pushedx-chat:
     chat:
       placeholder: Mesajını yaz...
     errors:
-unauthenticated: Sadece kayıtlı kullanıcılar sohbeti kullanabilirler.
+      unauthenticated: Sadece kayıtlı kullanıcılar sohbeti kullanabilirler.
+  admin:
+    settings:
+      title: Konuşma ayarları
+      charlimit: Mesajdaki maksimum karakter

@@ -56,10 +56,8 @@ class PostChatHandler
     /**
      * @param Dispatcher                  $events
      * @param UserRepository              $users
-     * @param UploadAdapterContract       $upload
      * @param PostRepository              $posts
      * @param Application                 $app
-     * @param ImageValidator              $validator
      * @param SettingsRepositoryInterface $settings
      */
     public function __construct(
@@ -81,16 +79,16 @@ class PostChatHandler
      *
      * @param UploadImage $command
      * @return null|string
-     *
-     * @todo check permission
      */
     public function handle(PostChat $command)
     {
-        // check if the user can upload images, otherwise return
         $this->assertCan(
             $command->actor,
-            'pushedx.chat.post'
+            'pushedx-chat.canchat'
         );
+
+        $command->msg = trim($command->msg);
+        if(strlen($command->msg) > $this->settings->get('pushedx-chat.charlimit')) return null;
 
         $msg = [
             'actorId' => $command->actor->id,

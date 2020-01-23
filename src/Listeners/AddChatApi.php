@@ -18,9 +18,17 @@ use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Event\ConfigureApiRoutes;
 use Flarum\Api\Event\Serializing;
 use Illuminate\Events\Dispatcher;
+use Flarum\Settings\SettingsRepositoryInterface;
 
 class AddChatApi
 {
+    protected $settings;
+    
+    public function __construct(SettingsRepositoryInterface $settings) 
+    {
+        $this->settings = $settings;
+    }
+
     /**
      * Subscribes to the Flarum api routes configuration event.
      *
@@ -50,8 +58,10 @@ class AddChatApi
      */
     public function prepareApiAttributes(Serializing $event)
     {
-        if ($event->isSerializer(ForumSerializer::class)) {
-            $event->attributes['canPostChat'] = $event->actor->can('pushedx.chat.post');
+        if ($event->isSerializer(ForumSerializer::class)) 
+        {
+            $event->attributes['pushedx-chat.canchat'] = $event->actor->can('pushedx-chat.canchat');
+            $event->attributes['pushedx-chat.charlimit'] = $this->settings->get('pushedx-chat.charlimit');
         }
     }
 }

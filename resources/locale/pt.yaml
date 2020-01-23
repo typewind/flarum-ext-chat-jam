@@ -12,3 +12,7 @@ pushedx-chat:
       placeholder: Digite sua mensagem...
     errors:
       unauthenticated: Você precisa logar para mandar uma mensagem
+  admin:
+    settings:
+      title: Configurações de bate-papo
+      charlimit: Máximo de caracteres na mensagem

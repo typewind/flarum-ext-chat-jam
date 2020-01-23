@@ -12,3 +12,7 @@ pushedx-chat:
       placeholder: Напишите сообщение...
     errors:
       unauthenticated: Писать в чате могут только зарегистрированные пользователи
+  admin:
+    settings:
+      title: Настройки чата
+      charlimit: Максимум символов в сообщении

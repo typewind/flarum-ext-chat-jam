@@ -2,7 +2,7 @@ import {extend} from 'flarum/extend';
 import HeaderPrimary from 'flarum/components/HeaderPrimary';
 import ChatFrame from './components/ChatFrame';
 
-app.initializers.add('pushedx-realtime-chat', app =>
+app.initializers.add('pushedx-chat', app =>
 {
     var forward = [], isInitial = false;
     let chatFrame = new ChatFrame

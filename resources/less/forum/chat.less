@@ -26,6 +26,9 @@
             height: 35px;
             background-color: #313946;
             border-radius: 4px 4px 0 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
 
             .icon
             {
@@ -53,9 +56,6 @@
                 font-weight: normal;
                 margin: 0 10px 0 15px;
                 line-height: 35px;
-                user-select: none;
-                -webkit-user-select: none;
-                -moz-user-select: none;
             }
 
             p
@@ -107,6 +107,9 @@
                 {
                     color: #cfcfcf;
                 }
+                user-select: none;
+                -webkit-user-select: none;
+                -moz-user-select: none;
             }
 
             #chat-limitter
@@ -122,11 +125,6 @@
             .reaching-limit
             {
                 color: #ff5757 !important;
-            }
-
-            #chat-input:disabled
-            {
-                background-color: #f0f0f0;
             }
         }
 
@@ -242,7 +240,7 @@
                 .timestamp
                 {
                     position: relative;
-                    display:table-cell;
+                    display: table-cell;
 					color: #7c7c7c;
 					cursor: pointer;
 					padding-right: 5px;

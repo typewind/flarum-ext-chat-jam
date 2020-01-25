@@ -1,6 +1,7 @@
 import Component from 'flarum/Component';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
 import avatar from 'flarum/helpers/avatar';
+import username from 'flarum/helpers/username';
 import fullTime from 'flarum/helpers/fullTime';
 import humanTime from 'flarum/utils/humanTime';
 
@@ -21,45 +22,45 @@ var audio = new Audio();
 audio.src = audioNotification;
 audio.volume = 0.5;
 
-var messages = [];
-var scrollInfo = {
-    autoScroll: true,
-    oldScroll: 0,
-    loadingFetch: false,
-}
-
 export default class ChatFrame extends Component
 {
-    controller()
+    config(isInitialized, context)
     {
-        let beingShown = localStorage.getItem('chat_beingShown');
-        let isMuted = localStorage.getItem('chat_isMuted');
-        let notify = localStorage.getItem('chat_notify');
-        let transform = localStorage.getItem('chat_transform');
-
-        return {
-            loading: false,
-            scrollInfo: scrollInfo,
-            inputMessageLength: 0,
-            inputRows: 1,
-            beingShown: beingShown === null ? true : JSON.parse(beingShown),
-            isMuted: isMuted === null ? false : JSON.parse(isMuted),
-            notify: notify === null ? false : JSON.parse(notify),
-            transform: JSON.parse(transform) ?? {x: 0, y: 0},
-            messageCharLimit: app.forum.attribute('pushedx-chat.charlimit') ?? 512,
-
-            messages: messages
-        };
+        if(!isInitialized)
+        {
+            let input = this.getChatInput();
+            input.baseScrollHeight = input.scrollHeight;
+            input.baseHeight = 19;
+        }
     }
 
-    /**
-     * Load the configured remote uploader service.
-     */
     init()
     {
         this.chat = null;
         this.input = null;
         this.avatarsCache = [];
+
+        let beingShown = localStorage.getItem('chat_beingShown');
+        let isMuted = localStorage.getItem('chat_isMuted');
+        let notify = localStorage.getItem('chat_notify');
+        let transform = localStorage.getItem('chat_transform');
+        let charLimit = app.forum.attribute('pushedx-chat.charlimit');
+
+        this.loading = false;
+        this.scrollInfo = {autoScroll: true, oldScroll: 0, loadingFetch: false};
+        this.inputMessageLength = 0;
+        this.inputRows = 1;
+        this.beingShown = beingShown === null ? true : JSON.parse(beingShown);
+        this.isMuted = isMuted === null ? false : JSON.parse(isMuted);
+        this.notify = notify === null ? false : JSON.parse(notify);
+        this.transform = transform === null ? {x: 0, y: 0} : JSON.parse(transform);
+        this.messageCharLimit = charLimit === null ? 512 : charLimit;
+        this.messages = [];
+
+        if(this.notify) Notification.requestPermission();
+
+		if(this.updateTimeout) clearTimeout(this.updateTimeout);
+        this.updateTimeout = setTimeout(() => m.redraw(), 30000);
 
         document.addEventListener('mousedown', this.chatMoveListener.bind(this, 'mousedown'));
         document.addEventListener('mouseup', this.chatMoveListener.bind(this, 'mouseup'));
@@ -85,12 +86,12 @@ export default class ChatFrame extends Component
         return document.querySelector('.chat .wrapper');
     }
 
-    getInput()
+    getChatInput()
     {
         return document.querySelector('.chat #chat-input');
     }
 
-    toggleChat(ctrl, e)
+    toggleChat(e)
     {
         var chat = this.getChat();
         var classes = chat.className;
@@ -104,72 +105,68 @@ export default class ChatFrame extends Component
         else chat.classList.add('hidden')
 
         chat.className = classes;
-        ctrl.beingShown = showing;
+        this.beingShown = showing;
         localStorage.setItem('chat_beingShown', JSON.stringify(showing));
     }
 
-    toggleSound(ctrl, e)
+    toggleSound(e)
     {
-        ctrl.isMuted = !ctrl.isMuted;
-        localStorage.setItem('chat_isMuted', JSON.stringify(ctrl.isMuted));
+        this.isMuted = !this.isMuted;
+        localStorage.setItem('chat_isMuted', JSON.stringify(this.isMuted));
 
         e.preventDefault();
         e.stopPropagation();
     }
 
-    toggleNotifications(ctrl, e)
+    toggleNotifications(e)
     {
-        ctrl.notify = !ctrl.notify;
-        localStorage.setItem('chat_notify', JSON.stringify(ctrl.notify));
+        this.notify = !this.notify;
+        localStorage.setItem('chat_notify', JSON.stringify(this.notify));
 
-        Notification.requestPermission();
+        if(this.notify) Notification.requestPermission();
 
         e.preventDefault();
         e.stopPropagation();
     }
 
-    insertMention(user, e)
+    insertMention(user)
     {
         if(!app.session.user) return;
 
-        // Find the input element
-        var input = this.getInput();
-
-        // Insert text
+        var input = this.getChatInput();
         input.value = input.value + " @" + user.username() + " ";
         input.focus();
 
         m.redraw.strategy('none');
     }
 
-    reachedLimit(ctrl)
+    reachedLimit()
     {
-        ctrl.oldReached = (ctrl.messageCharLimit - (ctrl.inputMessageLength || 0)) < 100;
-        return ctrl.oldReached;
+        this.oldReached = (this.messageCharLimit - (this.inputMessageLength || 0)) < 100;
+        return this.oldReached;
     }
 
-    scroll(ctrl, e)
+    scroll(e)
     {
-        if(ctrl.scrollInfo.autoScroll) e.scrollTop = e.scrollHeight;
-        else if(ctrl.scrollInfo.oldScroll >= 0) e.scrollTop = ctrl.scrollInfo.oldScroll;
-        else e.scrollTop = e.scrollHeight + ctrl.scrollInfo.oldScroll - 30;
+        if(this.scrollInfo.autoScroll) e.scrollTop = e.scrollHeight;
+        else if(this.scrollInfo.oldScroll >= 0) e.scrollTop = this.scrollInfo.oldScroll;
+        else e.scrollTop = e.scrollHeight + this.scrollInfo.oldScroll - 30;
     }
 
-    disableAutoScroll(ctrl, e)
+    disableAutoScroll(e)
     {
         let el = e.target;
-        ctrl.scrollInfo.autoScroll = (el.scrollTop + el.offsetHeight >= el.scrollHeight);
+        this.scrollInfo.autoScroll = (el.scrollTop + el.offsetHeight >= el.scrollHeight);
         let currentHeight = el.scrollHeight;
 
-        // Load older messages
-        if(el.scrollTop <= 0 && ctrl.scrollInfo.oldScroll > 0 && !ctrl.scrollInfo.loadingFetch) 
+        if(el.scrollTop <= 0 && this.scrollInfo.oldScroll > 0 && !this.scrollInfo.loadingFetch) 
         {
-            ctrl.scrollInfo.loadingFetch = true;
-            ctrl.scrollInfo.oldScroll = -currentHeight;
+            this.scrollInfo.loadingFetch = true;
+            this.scrollInfo.oldScroll = -currentHeight;
             m.redraw();
 
             const data = new FormData();
-            data.append('id', ctrl.messages[0].id);
+            data.append('id', this.messages[0].id);
 
             app.request({
                 method: 'POST',
@@ -179,25 +176,17 @@ export default class ChatFrame extends Component
             }).then(
                 (function (response)
                 {
-                    ctrl.scrollInfo.loadingFetch = false;
-                    ctrl.scrollInfo.autoScroll = false;
+                    this.scrollInfo.loadingFetch = false;
+                    this.scrollInfo.autoScroll = false;
 
-                    let oldMissages = messages;
-                    messages = [];
-                    ctrl.messages = messages;
+                    let fetchedMessages = response.data.attributes.messages.map((message) => this.forwardMessage(message, false, false));
+                    this.messages = fetchedMessages.concat(this.messages);
 
-                    for (var i = 0; i < response.data.attributes.messages.length; ++i) {
-                        this.forwardMessage(ctrl, response.data.attributes.messages[i], false, false);
-                    }
-
-                    // Add old messages and redraw
-                    messages = messages.concat(oldMissages);
-                    ctrl.messages = messages;
                     m.redraw();
 
                 }).bind(this), (function ()
                 {
-                    ctrl.scrollInfo.loadingFetch = false;
+                    this.scrollInfo.loadingFetch = false;
                     m.redraw();
                 }).bind(this)
             );
@@ -205,7 +194,7 @@ export default class ChatFrame extends Component
         else 
         {
             m.redraw.strategy('none');
-            ctrl.scrollInfo.oldScroll = el.scrollTop;
+            this.scrollInfo.oldScroll = el.scrollTop;
         }
     }
 
@@ -214,93 +203,90 @@ export default class ChatFrame extends Component
      *
      * @returns {*}
      */
-    view(ctrl, args) 
+    view() 
     {
-        for(var i = 0; i < args.forward.length; ++i)
-            this.forwardMessage(ctrl, args.forward[i], !args.isInitial);
+        let args = this.props;
 
-		if(ctrl.updateTimeout) clearTimeout(ctrl.updateTimeout);
-        ctrl.updateTimeout = setTimeout(() => m.redraw(), 30000);
+        for(var i = 0; i < args.forward.length; ++i)
+            this.messages.push(this.forwardMessage(args.forward[i], !args.isInitial));
 
         return (
-            <div className={'chat left container ' + (ctrl.beingShown ? '' : 'hidden')} style={{'right': ctrl.transform.x + 'px'}}>
-                <div 
-                    tabindex = '0'
-                    className = 'frame' 
-                    id = 'chat' 
-                >
+            <div className={'chat left container ' + (this.beingShown ? '' : 'hidden')} style={{'right': this.transform.x + 'px'}}>
+                <div tabindex='0' className='frame' id='chat'>
                     <div>
                         <div id='chat-header' ondragstart={() => false}>
                             <h2>{app.translator.trans('pushedx-chat.forum.toolbar.title')}</h2>
-                            <p data-title={app.translator.trans(ctrl.beingShown ? 'pushedx-chat.forum.toolbar.minimize' : 'pushedx-chat.forum.toolbar.maximize')}>
-                                <div className='icon' onclick={this.toggleChat.bind(this, ctrl)}>
-                                    <i className={ctrl.beingShown ? 'fas fa-window-minimize' : 'fas fa-window-maximize'}></i>
+                            <p data-title={app.translator.trans(this.beingShown ? 'pushedx-chat.forum.toolbar.minimize' : 'pushedx-chat.forum.toolbar.maximize')}>
+                                <div className='icon' onclick={this.toggleChat.bind(this)}>
+                                    <i className={this.beingShown ? 'fas fa-window-minimize' : 'fas fa-window-maximize'}></i>
                                 </div>
                             </p>   
-                            <p data-title={app.translator.trans(ctrl.notify ? 'pushedx-chat.forum.toolbar.disable_notifications' : 'pushedx-chat.forum.toolbar.enable_notifications')}>
-                                <div className='icon' onclick={this.toggleNotifications.bind(this, ctrl)}>
-                                    <i className={ctrl.notify ? 'fas fa-bell' : 'fas fa-bell-slash'}></i>
+                            <p data-title={app.translator.trans(this.notify ? 'pushedx-chat.forum.toolbar.disable_notifications' : 'pushedx-chat.forum.toolbar.enable_notifications')}>
+                                <div className='icon' onclick={this.toggleNotifications.bind(this)}>
+                                    <i className={this.notify ? 'fas fa-bell' : 'fas fa-bell-slash'}></i>
                                 </div>
                             </p>   
-                            <p data-title={app.translator.trans(ctrl.isMuted ? 'pushedx-chat.forum.toolbar.enable_sounds' : 'pushedx-chat.forum.toolbar.disable_sounds')}>
-                                <div className='icon' onclick={this.toggleSound.bind(this, ctrl)}>
-                                    <i className={ctrl.isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up'}></i>
+                            <p data-title={app.translator.trans(this.isMuted ? 'pushedx-chat.forum.toolbar.enable_sounds' : 'pushedx-chat.forum.toolbar.disable_sounds')}>
+                                <div className='icon' onclick={this.toggleSound.bind(this)}>
+                                    <i className={this.isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up'}></i>
                                 </div>
                             </p>
                         </div>
                         <div className='wrapper' 
-                            config={this.scroll.bind(this, ctrl)} 
-                            onscroll={this.disableAutoScroll.bind(this, ctrl)}
-                            style={{'height': ctrl.transform.y + 'px'}}
+                            config={this.scroll.bind(this)} 
+                            onscroll={this.disableAutoScroll.bind(this)}
+                            style={{'height': this.transform.y + 'px'}}
                         >
-                            {ctrl.scrollInfo.loadingFetch ?
+                            {this.scrollInfo.loadingFetch ?
                                 <div className='message-wrapper'>
                                     <LoadingIndicator className='loading-old Button-icon' />
                                 </div>
                                 : null
                             }
-                            {ctrl.messages.map((function(o, index) {
+                            {this.messages.map((function(o, index) {
                                 return (
                                     <div className='message-wrapper'>
-                                        <span className='avatar-wrapper'>{avatar(o.user, {className: 'avatar'})}</span>
-                                        <a className='name' onclick={this.insertMention.bind(this, o.user)}>
-                                            {(o.user ? o.user.username() : '...') + ':'}
-                                        </a>
-                                        <span className='message'>
-                                            {o.messageFormated}
-                                        </span>
-                                        <a className='timestamp' title={fullTime(o.created_at).children[0]}>{o.humanTime = humanTime(o.created_at)}</a>
-                                        <div className='clear' />
+                                        {o.user ? 
+                                            <div>
+                                                <a className='avatar-wrapper' href={app.route.user(o.user)} config={m.route}>
+                                                    <span>
+                                                        {avatar(o.user, {className: 'avatar'})}
+                                                    </span>
+                                                </a>
+                                                <a className='name' onclick={this.insertMention.bind(this, o.user)}>
+                                                    {username(o.user).children[0] + ': '}
+                                                </a>
+                                                <span className='message'>
+                                                    {o.messageFormated}
+                                                </span>
+                                                <a className='timestamp' title={fullTime(o.created_at).children[0]}>{o.humanTime = humanTime(o.created_at)}</a>
+                                            </div>
+                                            : <LoadingIndicator className='loading-old Button-icon' />
+                                        }
                                     </div>
                                 )
                             }).bind(this))}
-                            {ctrl.loading ?
-                                <div className='message-wrapper' style='min-height:34px'>
-                                    <LoadingIndicator className='loading-old Button-icon' />
-                                </div>
-                                : null
-                            }
                         </div>
                         <div className='input-wrapper'>
                             <textarea
                                 type = 'text'
                                 id = 'chat-input'
-                                maxlength = {ctrl.messageCharLimit}
+                                maxlength = {this.messageCharLimit}
                                 disabled = {!app.forum.attribute('pushedx-chat.canchat')}
                                 placeholder = {app.translator.trans(!app.forum.attribute('pushedx-chat.canchat') ? 'pushedx-chat.forum.errors.unauthenticated' : 'pushedx-chat.forum.chat.placeholder')}
-                                onkeypress = {this.inputPressEnter.bind(this, ctrl)}
-                                oninput = {this.inputProcess.bind(this, ctrl)}
-                                onpaste = {this.inputProcess.bind(this, ctrl)}
-                                rows = {ctrl.inputRows}
+                                onkeypress = {this.inputPressEnter.bind(this)}
+                                oninput = {this.inputProcess.bind(this)}
+                                onpaste = {this.inputProcess.bind(this)}
+                                rows = {this.inputRows}
                             />
-                            <div className='icon-send' onclick = {this.inputPressButton.bind(this, ctrl)}>
+                            <div className='icon-send' onclick = {this.inputPressButton.bind(this)}>
                                 <i class="fas fa-angle-double-right"></i>
                             </div>
                             <div id='chat-limitter' 
-                                className={this.reachedLimit(ctrl) ? 'reaching-limit' : ''}
+                                className={this.reachedLimit() ? 'reaching-limit' : ''}
                                 style={{display: !app.forum.attribute('pushedx-chat.canchat') ? 'none' : ''}}
                             >
-                                {(ctrl.messageCharLimit - (ctrl.inputMessageLength || 0)) + '/' + ctrl.messageCharLimit}
+                                {(this.messageCharLimit - (this.inputMessageLength || 0)) + '/' + this.messageCharLimit}
                             </div>
                         </div>
                     </div>
@@ -373,47 +359,42 @@ export default class ChatFrame extends Component
         this.moveLast = {x: e.clientX, y: e.clientY};
     }
 
-    inputProcess(ctrl, e)
+    inputProcess(e)
     {
-        ctrl.inputMessageLength = e.target.value.length;
+        this.inputMessageLength = e.target.value.length;
 
         let input = e.target;
-        if(!input.baseScrollHeight) 
-        {
-            input.baseScrollHeight = input.scrollHeight;
-            input.baseHeight = 19;
-        }
         input.rows = 1;
         let rows = Math.ceil((input.scrollHeight - input.baseScrollHeight) / input.baseHeight) + 1;
-        ctrl.inputRows = rows;
+        this.inputRows = rows;
     }
 
-    inputPressEnter(ctrl, e)
+    inputPressEnter(e)
     {
         if(e.keyCode == 13 && !e.shiftKey)
         {
-            this.messageSend(ctrl, this.getInput().value);
+            this.messageSend(this.getChatInput().value);
             return false;
         }
         return true;
     }
 
-    inputPressButton(ctrl) 
+    inputPressButton() 
     {
-        this.messageSend(ctrl, this.getInput().value);
+        this.messageSend(this.getChatInput().value);
     }
 
-    messageSend(ctrl, msg)
+    messageSend(msg)
     {
-        if(msg.trim().length > 0 && !ctrl.loading)
+        if(msg.trim().length > 0 && !this.loading)
         {
             const data = new FormData();
             data.append('msg', msg);
 
-            ctrl.loading = true;
-            ctrl.inputMessageLength = 0;
-            ctrl.inputRows = 1;
-            this.getInput().value = '';
+            this.loading = true;
+            this.inputMessageLength = 0;
+            this.inputRows = 1;
+            this.getChatInput().value = '';
 
             app.request({
                 method: 'POST',
@@ -421,42 +402,28 @@ export default class ChatFrame extends Component
                 serialize: raw => raw,
                 data
             }).then(
-                this.success.bind(this, ctrl),
-                this.failure.bind(this, ctrl)
+                this.success.bind(this),
+                this.failure.bind(this)
             );
         }
     }
 
-    /**
-     * Handles errors.
-     *
-     * @param message
-     */
-    failure(ctrl, message) 
+    failure(message) 
     {
-        // todo show popup
-        ctrl.loading = false;
+        this.loading = false;
         m.redraw();
     }
 
-    /**
-     * Appends the image's link to the body of the composer.
-     *
-     * @param image
-     */
-    success(ctrl, response) 
+    success(response) 
     {
-        // End loading
-        ctrl.loading = false;
-
-        // Redraw now
+        this.loading = false;
         m.redraw();
     }
 
-    forwardMessage(ctrl, message, notify, redraw) 
+    forwardMessage(message, notify, redraw) 
     {
         var user = app.store.getById('users', message.actorId);
-        var obj = this.addMessage(ctrl, message.id, message.message, user, message.created_at, notify, redraw);
+        var obj = this.addMessage(message.id, message.message, user, message.created_at, notify, redraw);
 
         if(user == undefined)
         {
@@ -465,34 +432,24 @@ export default class ChatFrame extends Component
                 m.redraw();
             });
         }
+        return obj;
     }
 
-    addMessage(ctrl, id, msg, user, created_at, notify = true, redraw = false) 
+    addMessage(id, msg, user, created_at, notify = true, redraw = false) 
     {
-        // Do note "messages" is a "set", thus = is a function
         let obj = new ChatMessage(id, user, msg, created_at);
 
         let formattedNode = document.createElement('div');
         s9e.TextFormatter.preview(msg, formattedNode);
         obj.messageFormated = m.trust(formattedNode.outerHTML);
 
-        ctrl.messages.push(obj);
+        this.loading = false;
 
-        // End loading
-        ctrl.loading = false;
+        if(redraw) m.redraw();
 
-        // Redraw now
-        if(redraw) 
-        {
-            ctrl.hadFocus = document.activeElement === this.input;
-            m.redraw();
-        }
-
-        // Notify (ifwe are not the author!)
         if(notify && (!app.session.user || (user && user.id() != app.session.user.id()))) 
-            this.notify(ctrl, msg, user);
+            this.notify(msg, user);
 
-        // Return the object
         return obj;
     }
 
@@ -502,32 +459,21 @@ export default class ChatFrame extends Component
         return currentUser && (msg.indexOf('@' + currentUser) >= 0);
     }
 
-    notify(ctrl, msg, user) 
+    notify(msg, user) 
     {
-        if(ctrl.notify && this.messageIsMention(msg)) 
-        {
-            if(!("Notification" in window)) return;
-            else if(Notification.permission === "granted") return this.notifySend(msg, user.username(), user.avatarUrl())
-            else if(Notification.permission !== 'denied') 
-            {
-                Notification.requestPermission((function(permission) 
-                {
-                    if(permission === "granted") 
-                        return this.notifySend(msg, user.username(), user.avatarUrl())
-                }).bind(this));
-            }
-        }
-        this.notifySound(ctrl, msg);
+        if(!("Notification" in window)) return;
+        if(this.notify && this.messageIsMention(msg)) this.notifySend(msg, user.username(), user.avatarUrl())
+        this.notifySound(msg);
     }
 
     notifySend(msg, title, icon)
     {
-        return !this.active ? new Notification(title, {body: msg, icon: icon}) : null;
+        return !this.active ? new Notification(title, {body: msg, icon: icon, silent: true}) : null;
     }
 
-    notifySound(ctrl, msg) 
+    notifySound(msg) 
     {
-        if(!ctrl.isMuted) 
+        if(!this.isMuted) 
         {
             let sound = this.messageIsMention(msg) ? refAudio : audio;
             sound.currentTime = 0;

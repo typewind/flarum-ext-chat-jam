@@ -5,7 +5,6 @@ import ChatFrame from './components/ChatFrame';
 app.initializers.add('pushedx-chat', app =>
 {
     var forward = [], isInitial = false;
-    let chatFrame = new ChatFrame();
 
     extend(HeaderPrimary.prototype, 'config', function(x, isInitialized, context) {
         if (isInitialized) return;
@@ -48,7 +47,8 @@ app.initializers.add('pushedx-chat', app =>
     extend(HeaderPrimary.prototype, 'items', function(items) 
     {
         var forwarded = forward.slice(0);
-        items.add('pushedx-chat-frame', m.component(chatFrame, {forward: forwarded, isInitial: isInitial}));
+        m.redraw.strategy('diff');
+        items.add('pushedx-chat-frame', <ChatFrame forward={forwarded} isInitial={isInitial} />);
         forward.splice(0, forward.length);
 
         isInitial = false;

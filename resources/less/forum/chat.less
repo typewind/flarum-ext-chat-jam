@@ -144,14 +144,12 @@
         .wrapper
         {
             overflow-y: scroll;
-            height: 301px;
+            height: 300px;
             min-height: 300px;
 
             .message-wrapper
             {
-                padding-left: 15px;
-                padding-top: 2.5px;
-                padding-bottom: 2.5px;
+                padding: 3px 3px 3px 15px;
 
                 .avatar-wrapper
                 {
@@ -197,13 +195,15 @@
                     display:table-cell;
                     padding-top: 3px;
                     word-break: break-word;
-                    white-space: pre-wrap;
-					width: 700px;
+                    width: 700px;
 
-                    img 
-					{
-                        max-width: 200px;
-						vertical-align: middle;
+                    a
+                    {
+                        img 
+                        {
+                            max-width: 250px;
+                            vertical-align: middle;
+                        }
                     }
 					
 					[data-s9e-mediaembed="youtube"]
@@ -222,8 +222,12 @@
                         max-width: 400px;
                     }
 
-                    a {
-                        color: #426799;
+                    a
+                    {
+                        cursor: pointer;
+                        color: #2b384c;
+                        text-decoration: none;
+                        font-weight: 600;
                     }
                 }
 				
@@ -251,7 +255,6 @@
 				
                 .message p,
                 .message div:not(.LoadingIndicator),
-                .UserMention
                 {
                     display: inline;
                     margin: 0;
@@ -261,7 +264,10 @@
                 .UserMention
                 {
                     display: inline-block;
-                    color: #7088a9;
+                    color: #697a96 !important;
+                    border-radius: 4px;
+                    padding: 2px 5px;
+                    border: 0 !important;
                 }
 
                 .clear

@@ -1,0 +1,18 @@
+pushedx-chat:
+  forum:
+    toolbar:
+      title: チャットルーム
+      enable_sounds: サウンドを有効にします
+      disable_sounds: サウンドを無効にします
+      enable_notifications: 通知を有効にします
+      disable_notifications: 通知を無効にします
+      minimize: 最小化
+      maximize: 最大化
+    chat:
+      placeholder: 送信するメッセージを入力します...
+    errors:
+      unauthenticated: ログイン後にのみ利用可能
+  admin:
+    settings:
+      title: チャットルームの設定
+      charlimit: メッセージあたりの最大ワード数を制限します（インセンシティブなバイト長）

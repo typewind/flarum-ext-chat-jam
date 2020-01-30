@@ -6,7 +6,7 @@ use Illuminate\Database\Schema\Builder;
 return [
     'up' => function (Builder $schema) {
         $schema->table('pushedx_messages', function (Blueprint $table) {
-			$table->timestamp('edited_at');
+			$table->timestamp('edited_at')->nullable();
             $table->integer('deleted_by')->unsigned()->nullable();
         });
     },

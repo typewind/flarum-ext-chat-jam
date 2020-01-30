@@ -20,20 +20,20 @@ class FetchChatSerializer extends AbstractSerializer
     protected $type = 'chat';
 
     /**
-     * Get the default set of serialized attributes for a model.
      *
-     * @param object|array $model
+     * @param  object|array         $model
      * @return array
      */
     protected function getDefaultAttributes($model)
     {
         $ret = ['messages' => []];
 
-        foreach ($model->msgs as $msg) {
+        foreach($model->messages as $msg) 
+        {
             $msg->created_at = $this->formatDate(new Carbon($msg->created_at));
+            if($msg->edited_at) $msg->edited_at = $this->formatDate(new Carbon($msg->edited_at));
             $ret['messages'][] = $msg;
         }
-
         return $ret;
     }
 }

@@ -10,20 +10,29 @@ namespace Xelson\Chat\Commands;
 
 use Flarum\User\User;
 
-class FetchChat
+class DeleteChat
 {
     /**
-     * The chat message ID
+     * The chat message id
      *
      * @var int
      */
-    public $id;
+	public $id;
 
     /**
-     * @param int     $id
+     * The user performing the action.
+     *
+     * @var User
      */
-    public function __construct($id)
+    public $actor;
+
+    /**
+     * @param int		$id
+     * @param User		$actor
+     */
+    public function __construct($id, User $actor)
     {
         $this->id = $id;
+		$this->actor = $actor;
     }
 }

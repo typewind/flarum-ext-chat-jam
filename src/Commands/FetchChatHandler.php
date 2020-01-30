@@ -8,18 +8,13 @@
 
 namespace Xelson\Chat\Commands;
 
-use Carbon\Carbon;
-use Flarum\User\AssertPermissionTrait;
-use Flarum\Foundation\DispatchEventsTrait;
+use Xelson\Chat\MessageRepository;
 use Flarum\Foundation\Application;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Events\Dispatcher;
 
 class FetchChatHandler
 {
-    use DispatchEventsTrait;
-    use AssertPermissionTrait;
-
     /**
      * @var Application
      */
@@ -31,18 +26,26 @@ class FetchChatHandler
     protected $settings;
 
     /**
-     * @param Dispatcher                  $events
-     * @param Application                 $app
-     * @param SettingsRepositoryInterface $settings
+     * @var MessageRepository
+     */
+    protected $messages;
+
+    /**
+     * @param Dispatcher                    $events
+     * @param Application                   $app
+     * @param SettingsRepositoryInterface   $settings
+     * @param MessageRepository             $messages
      */
     public function __construct(
         Dispatcher $events,
         Application $app,
-        SettingsRepositoryInterface $settings
+        SettingsRepositoryInterface $settings,
+        MessageRepository $messages
     ) {
         $this->events    = $events;
         $this->app       = $app;
         $this->settings  = $settings;
+        $this->messages  = $messages;
     }
 
     /**
@@ -53,6 +56,10 @@ class FetchChatHandler
      */
     public function handle(FetchChat $command)
     {
+        $messageId = $command->id;
+        $messages = $this->messages->fetch($messageId);
+        $command->messages = $messages;
+
         return $command;
     }
 }

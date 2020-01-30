@@ -8,8 +8,11 @@
 
 namespace Xelson\Chat\Listeners;
 
-use Xelson\Chat\Api\Controllers\ChatController;
+use Xelson\Chat\Api\Controllers\PostChatController;
 use Xelson\Chat\Api\Controllers\FetchChatController;
+use Xelson\Chat\Api\Controllers\EditChatController;
+use Xelson\Chat\Api\Controllers\DeleteChatController;
+
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Event\ConfigureApiRoutes;
 use Flarum\Api\Event\Serializing;
@@ -43,8 +46,10 @@ class AddChatApi
      */
     public function configureApiRoutes(ConfigureApiRoutes $event)
     {
-        $event->post('/chat/post', 'pushedx.chat.post', ChatController::class);
-        $event->post('/chat/fetch', 'pushedx.chat.fetch', FetchChatController::class);
+        $event->post('/chat', 'pushedx.chat.post', PostChatController::class);
+        $event->get('/chat/{id}', 'pushedx.chat.fetch', FetchChatController::class);
+        $event->patch('/chat/{id}', 'pushedx.chat.edit', EditChatController::class);
+        $event->delete('/chat/{id}', 'pushedx.chat.delete', DeleteChatController::class);
     }
 
     /**
@@ -54,9 +59,14 @@ class AddChatApi
      */
     public function prepareApiAttributes(Serializing $event)
     {
-        if ($event->isSerializer(ForumSerializer::class)) 
+        if($event->isSerializer(ForumSerializer::class)) 
         {
-            $event->attributes['pushedx-chat.canchat'] = $event->actor->can('pushedx-chat.canchat');
+            $permissions = ['pushedx-chat.permissions.chat', 'pushedx-chat.permissions.edit',
+            'pushedx-chat.permissions.delete', 'pushedx-chat.permissions.moderate.delete'];
+
+            foreach($permissions as $permission)
+                $event->attributes[$permission] = $event->actor->can($permission);
+
             $event->attributes['pushedx-chat.charlimit'] = $this->settings->get('pushedx-chat.charlimit');
         }
     }

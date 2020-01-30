@@ -12,17 +12,20 @@ use Illuminate\Database\Schema\Builder;
 
 return [
     'up' => function (Builder $schema) {
-        $schema->create('pushedx_messages', function (Blueprint $table) {
-            $table->increments('id');
+        if(!$schema->hasTable('pushedx_messages'))
+        {
+            $schema->create('pushedx_messages', function (Blueprint $table) {
+                $table->increments('id');
 
-            $table->string('message');
+                $table->string('message');
 
-            $table->integer('actorId')->unsigned()->nullable();
+                $table->integer('actorId')->unsigned()->nullable();
 
-            $table->timestamp('created_at');
-        });
+                $table->timestamp('created_at');
+            });
+        }
     },
     'down' => function (Builder $schema) {
-        $schema->drop('pushedx_messages');
+        $schema->dropIfExists('pushedx_messages');
     }
 ];

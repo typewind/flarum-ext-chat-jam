@@ -8,25 +8,15 @@
 
 namespace Xelson\Chat\Api\Controllers;
 
-use Xelson\Chat\Api\Serializers\FetchChatSerializer;
-use Xelson\Chat\Commands\FetchChat;
-use Illuminate\Support\Arr;
-use Flarum\Api\Controller\AbstractShowController;
+use Xelson\Chat\Api\Serializers\ChatSerializer;
+use Xelson\Chat\Commands\DeleteChat;
+use Flarum\Api\Controller\AbstractDeleteController;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Psr\Http\Message\ServerRequestInterface;
-use Tobscure\JsonApi\Document;
+use Illuminate\Support\Arr;
 
-class FetchChatController extends AbstractShowController
+class DeleteChatController extends AbstractDeleteController
 {
-
-    /**
-     * The serializer instance for this request.
-     *
-     * @var FetchChatSerializer
-     */
-    public $serializer = FetchChatSerializer::class;
-
-
     /**
      * @var Dispatcher
      */
@@ -39,20 +29,17 @@ class FetchChatController extends AbstractShowController
     {
         $this->bus = $bus;
     }
-
     /**
-     * Get the data to be serialized and assigned to the response document.
-     *
      * @param ServerRequestInterface $request
-     * @param Document               $document
      * @return mixed
      */
-    protected function data(ServerRequestInterface $request, Document $document)
+    protected function delete(ServerRequestInterface $request)
     {
         $id = Arr::get($request->getQueryParams(), 'id');
+        $actor = $request->getAttribute('actor');
 
         return $this->bus->dispatch(
-            new FetchChat($id)
+            new DeleteChat($id, $actor)
         );
     }
 }

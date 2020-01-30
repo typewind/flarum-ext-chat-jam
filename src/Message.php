@@ -12,16 +12,6 @@ use Carbon\Carbon;
 use Flarum\User\User;
 use Flarum\Database\AbstractModel;
 
-/**
- * @property int        $id
- *
- * @property string     $message
- *
- * @property int        $actorId
- * @property User       $actor
- *
- * @property Carbon     $created_at
- */
 class Message extends AbstractModel
 {
     protected $table = 'pushedx_messages';
@@ -29,17 +19,22 @@ class Message extends AbstractModel
     /**
      * Create a new message.
      *
-     * @param string $message
-     * @param int $actorId
-     * @param Carbon $created_at
+     * @param string    $message
+     * @param int       $actorId
+     * @param Carbon    $created_at
+     * @param Carbon    $edited_at
+     * @param int       $deleted_by
+     * 
      */
-    public static function build($message, $actorId, $created_at)
+    public static function build($message, $actorId, $created_at, $edited_at = null, $deleted_by = null)
     {
         $msg = new static;
 
         $msg->message = $message;
         $msg->actorId = $actorId;
         $msg->created_at = $created_at;
+        $msg->edited_at = $edited_at;
+        $msg->deleted_by = $deleted_by;
 
         return $msg;
     }

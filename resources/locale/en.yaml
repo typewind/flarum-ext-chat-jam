@@ -12,7 +12,15 @@ pushedx-chat:
       placeholder: Type your message...
     errors:
       unauthenticated: Only registered users can use the chat
+      chatdenied: Your user group is not allowed to write messages
   admin:
+    permissions:
+      post: Post chat messages
+      edit: Edit chat messages
+      delete: Delete chat messages
+      moderate:
+        delete: Delete chat messages
+
     settings:
       title: Chat settings
       charlimit: Maximum characters in the message

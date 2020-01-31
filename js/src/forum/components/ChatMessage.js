@@ -19,24 +19,10 @@ export default class ChatMessage extends Component
 		Object.assign(this, this.props);
 
 		this.user = app.store.getById('users', this.actor);
-        if(this.user == undefined)
-        {
-			app.store.find('users', this.actor).then((function(user) 
-			{
-				this.user = user;
-				this.inited = true;
-				this.userResolved(this);
-				this.initLabels();
 
-				m.redraw();
-            }).bind(this));
-		}
-		else 
-		{
-			this.inited = true;
-			this.userResolved(this);
-			this.initLabels();
-		}
+		this.inited = true;
+		this.userResolved(this);
+		this.initLabels();
 		
 		this.textFormat();
 		this.instanceGetter(this);
@@ -48,11 +34,19 @@ export default class ChatMessage extends Component
 			<div className='message-wrapper' data-id={this.id} config={this.configWrapper.bind(this)}>
 				{this.inited ?
 					<div>
-						<a className='avatar-wrapper' href={app.route.user(this.user)} config={m.route}>
-							<span>
-								{avatar(this.user, {className: 'avatar'})}
-							</span>
-						</a>
+						{this.user ? 
+							<a className='avatar-wrapper' href={app.route.user(this.user)} config={m.route}>
+								<span>
+									{avatar(this.user, {className: 'avatar'})}
+								</span>
+							</a>
+							:
+							<div className='avatar-wrapper'>
+								<span>
+									{avatar(this.user, {className: 'avatar'})}
+								</span>
+							</div>
+						}
 						<div className='message-block'>
 							<div className='toolbar'>
 								<a className='name' onclick={this.chatFrame.insertMention.bind(this.chatFrame, this)}>

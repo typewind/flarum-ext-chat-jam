@@ -216,7 +216,7 @@ export default class ChatFrame extends Component
     scrollToBottom(e)
     {
         if(this.scrollInfo.timeout) clearTimeout(this.scrollInfo.timeout)
-        this.scrollInfo.timeout = setTimeout(() => e.scroll({top: e.scrollHeight, behavior: 'smooth'}), 300)
+        this.scrollInfo.timeout = setTimeout(() => e.scroll({top: e.scrollHeight, behavior: 'smooth'}), 200)
     }
 
     /**

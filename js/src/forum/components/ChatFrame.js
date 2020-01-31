@@ -351,10 +351,13 @@ export default class ChatFrame extends Component
         let nextMove = {x: right - move.x, y: wrapperHeight - move.y}; 
 
         if(0 < nextMove.x && nextMove.x < (window.innerWidth - chat.offsetWidth))
-        chat.style.right = nextMove.x + 'px';
+            chat.style.right = nextMove.x + 'px';
 
-        chatWrapper.style.height = nextMove.y + 'px';
-        chatWrapper.scrollTop += move.y;
+        if(0 < nextMove.y && nextMove.y < (window.innerHeight - 100))
+        {
+            chatWrapper.style.height = nextMove.y + 'px';
+            chatWrapper.scrollTop += move.y;
+        }
 
         this.moveLast = {x: e.clientX, y: e.clientY};
     }

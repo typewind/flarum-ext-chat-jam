@@ -184,8 +184,7 @@ export default class ChatFrame extends Component
 
     scroll(e)
     {
-        if(this.scrollInfo.autoScroll || this.scrollInfo.needToScroll) this.scrollToBottom(e);
-        else if(this.scrollInfo.oldScroll >= 0) e.scrollTop = this.scrollInfo.oldScroll;
+        if(this.scrollInfo.oldScroll >= 0) e.scrollTop = this.scrollInfo.oldScroll;
         else e.scrollTop = e.scrollHeight + this.scrollInfo.oldScroll - 30;
     }
 
@@ -196,7 +195,7 @@ export default class ChatFrame extends Component
         let currentHeight = el.scrollHeight;
         
         if(this.scrollInfo.autoScroll) this.scrollInfo.needToScroll = false;
-        if(this.scrollInfo.needToScroll) this.scrollToBottom(el);
+        if(this.scrollInfo.needToScroll) this.scrollToBottom();
 
         if(el.scrollTop <= 0 && this.scrollInfo.oldScroll > 0 && !this.scrollInfo.loadingFetch && !this.messageEditing) 
         {
@@ -213,10 +212,14 @@ export default class ChatFrame extends Component
         }
     }
 
-    scrollToBottom(e)
+    scrollToBottom()
     {
-        if(this.scrollInfo.timeout) clearTimeout(this.scrollInfo.timeout)
-        this.scrollInfo.timeout = setTimeout(() => e.scroll({top: e.scrollHeight, behavior: 'smooth'}), 200)
+        let chatWrapper = this.getChatWrapper();
+        if(chatWrapper)
+        {
+            if(this.scrollInfo.timeout) clearTimeout(this.scrollInfo.timeout)
+            this.scrollInfo.timeout = setTimeout(() => chatWrapper.scroll({top: chatWrapper.scrollHeight, behavior: 'smooth'}), 100)
+        }
     }
 
     /**
@@ -546,7 +549,9 @@ export default class ChatFrame extends Component
         if(notify && (!app.session.user || (message.user && message.user.id() != app.session.user.id()))) 
             this.notifyTry(message.message, message.user);
 
-        this.lastMessageElement = message.elementWrapper;
+        if(this.scrollInfo.needToScroll || this.scrollInfo.autoScroll ||
+            (app.session.user && message.user.id() == app.session.user.id())) 
+                this.scrollToBottom();
 
         if(notify) message.flash();
     }

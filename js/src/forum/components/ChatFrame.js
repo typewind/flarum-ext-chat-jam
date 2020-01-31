@@ -550,7 +550,7 @@ export default class ChatFrame extends Component
             this.notifyTry(message.message, message.user);
 
         if(this.scrollInfo.needToScroll || this.scrollInfo.autoScroll ||
-            (app.session.user && message.user.id() == app.session.user.id())) 
+            (message.user && app.session.user && message.user.id() == app.session.user.id()))
                 this.scrollToBottom();
 
         if(notify) message.flash();

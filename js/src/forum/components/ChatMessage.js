@@ -19,13 +19,28 @@ export default class ChatMessage extends Component
 		Object.assign(this, this.props);
 
 		this.user = app.store.getById('users', this.actor);
-
-		this.inited = true;
-		this.userResolved(this);
-		this.initLabels();
+        if(this.user == undefined)
+        {
+			app.store.find('chat/user', this.actor).then((user) =>
+			{
+				if(user.data.id != '') this.user = user;
+				this.initEvents();
+			});
+		}
+		else this.initEvents();
 		
 		this.textFormat();
 		this.instanceGetter(this);
+	}
+
+	initEvents()
+	{
+		this.inited = true;
+
+		this.userResolved(this);
+		this.initLabels();
+
+		m.redraw();
 	}
 
 	view()

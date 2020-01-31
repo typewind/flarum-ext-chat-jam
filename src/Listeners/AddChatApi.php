@@ -12,6 +12,7 @@ use Xelson\Chat\Api\Controllers\PostChatController;
 use Xelson\Chat\Api\Controllers\FetchChatController;
 use Xelson\Chat\Api\Controllers\EditChatController;
 use Xelson\Chat\Api\Controllers\DeleteChatController;
+use Xelson\Chat\Api\Controllers\ShowUserSafeController;
 
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Event\ConfigureApiRoutes;
@@ -50,6 +51,8 @@ class AddChatApi
         $event->get('/chat/{id}', 'pushedx.chat.fetch', FetchChatController::class);
         $event->patch('/chat/{id}', 'pushedx.chat.edit', EditChatController::class);
         $event->delete('/chat/{id}', 'pushedx.chat.delete', DeleteChatController::class);
+
+        $event->get('/chat/user/{id}', 'pushedx.chat.user', ShowUserSafeController::class);
     }
 
     /**

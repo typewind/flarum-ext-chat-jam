@@ -33,15 +33,15 @@ export default class ChatFrame extends Component
         let charLimit = app.forum.attribute('pushedx-chat.charlimit');
 
         this.loading = false;
-        this.scrollInfo = {autoScroll: true, oldScroll: 0, loadingFetch: false, needToScroll: true};
+        this.scroll = {autoScroll: true, oldScroll: 0, loadingFetch: false, needToScroll: true};
         this.beingShown = beingShown === null ? true : JSON.parse(beingShown);
         this.isMuted = isMuted === null ? false : JSON.parse(isMuted);
         this.notify = notify === null ? false : JSON.parse(notify);
-        this.transform = transform === null ? {x: 0, y: 0} : JSON.parse(transform);
+        this.transform = transform === null ? {x: 0, y: 400} : JSON.parse(transform);
         this.messageCharLimit = charLimit === null ? 512 : charLimit;
         this.messages = {components: [], instances: {}};
         this.permissions = {moderate: {}};
-        this.input = {messageLength: 0, rows: 1};
+        this.input = {messageLength: 0, rows: 1, preview: {}}
 
         if(!app.session.user) this.input.placeholder = app.translator.trans('pushedx-chat.forum.errors.unauthenticated');
         else
@@ -80,21 +80,25 @@ export default class ChatFrame extends Component
 
         this.pusherChannels = 
         [
-            channel('eventPost', data =>
+            channel('pushedx-chat.socket.event.post', data =>
             {
-                this.messages.components.push(this.createMessage(data, true));
-                m.redraw();
+                if(!app.session.user || data.actorId != app.session.user.id())
+                {
+                    this.messages.components.push(this.createMessage(data, {}, true));
+                    this.scroll.needToScroll = true;
+                    m.redraw();
+                }
             }),
-            channel('eventEdit', data =>
+            channel('pushedx-chat.socket.event.edit', data =>
             {
                 if(!app.session.user || data.actorId != app.session.user.id())
                     if(this.messages.instances[data.id])
                         this.messages.instances[data.id].edit(data.message, true);
             }),
-            channel('eventDelete', data =>
+            channel('pushedx-chat.socket.event.delete', data =>
             {
-                if(!app.session.user || data.actor != app.session.user.id())
-                    data.restored ? this.messageRestore(data) : this.messageDelete(data);
+                if(!app.session.user || data.invoker != app.session.user.id())
+                    data.deleted_by ? this.messageDelete(data) : this.messageRestore(data)
             })  
         ]
 
@@ -182,25 +186,25 @@ export default class ChatFrame extends Component
         return this.oldReached;
     }
 
-    scroll(e)
+    configScroll(e)
     {
-        if(this.scrollInfo.oldScroll >= 0) e.scrollTop = this.scrollInfo.oldScroll;
-        else e.scrollTop = e.scrollHeight + this.scrollInfo.oldScroll - 30;
+        if(this.scroll.oldScroll >= 0) e.scrollTop = this.scroll.oldScroll;
+        else e.scrollTop = e.scrollHeight + this.scroll.oldScroll - 30;
     }
 
     disableAutoScroll(e)
     {
         let el = e.target;
-        this.scrollInfo.autoScroll = (el.scrollTop + el.offsetHeight >= el.scrollHeight);
+        this.scroll.autoScroll = (el.scrollTop + el.offsetHeight >= el.scrollHeight);
         let currentHeight = el.scrollHeight;
         
-        if(this.scrollInfo.autoScroll) this.scrollInfo.needToScroll = false;
-        if(this.scrollInfo.needToScroll) this.scrollToBottom();
+        if(this.scroll.autoScroll) this.scroll.needToScroll = false;
+        if(this.scroll.needToScroll) this.scrollToBottom();
 
-        if(el.scrollTop <= 0 && this.scrollInfo.oldScroll > 0 && !this.scrollInfo.loadingFetch && !this.messageEditing) 
+        if(el.scrollTop <= 0 && this.scroll.oldScroll > 0 && !this.scroll.loadingFetch && !this.messageEditing) 
         {
-            this.scrollInfo.loadingFetch = true;
-            this.scrollInfo.oldScroll = -currentHeight;
+            this.scroll.loadingFetch = true;
+            this.scroll.oldScroll = -currentHeight;
             m.redraw();
 
            this.apiFetch(Object.values(this.messages.instances)[0].id);
@@ -208,7 +212,7 @@ export default class ChatFrame extends Component
         else 
         {
             m.redraw.strategy('none');
-            this.scrollInfo.oldScroll = el.scrollTop;
+            this.scroll.oldScroll = el.scrollTop;
         }
     }
 
@@ -217,8 +221,8 @@ export default class ChatFrame extends Component
         let chatWrapper = this.getChatWrapper();
         if(chatWrapper)
         {
-            if(this.scrollInfo.timeout) clearTimeout(this.scrollInfo.timeout)
-            this.scrollInfo.timeout = setTimeout(() => chatWrapper.scroll({top: chatWrapper.scrollHeight, behavior: 'smooth'}), 100)
+            if(this.scroll.timeout) clearTimeout(this.scroll.timeout)
+            this.scroll.timeout = setTimeout(() => chatWrapper.scroll({top: chatWrapper.scrollHeight, behavior: 'smooth'}), 100)
         }
     }
 
@@ -252,17 +256,17 @@ export default class ChatFrame extends Component
                             </p>
                         </div>
                         <div className='wrapper' 
-                            config={this.scroll.bind(this)} 
+                            config={this.configScroll.bind(this)} 
                             onscroll={this.disableAutoScroll.bind(this)}
                             style={{'height': this.transform.y + 'px'}}
                         >
-                            {this.scrollInfo.loadingFetch ?
+                            {this.scroll.loadingFetch ?
                                 <div className='message-wrapper'>
                                     <LoadingIndicator className='loading-old Button-icon' />
                                 </div>
                                 : null
                             }
-                            {this.messages.components}
+                            {this.messages.components.concat(this.input.writing ? this.input.preview.component : null)}
                         </div>
                         <div className='input-wrapper'>
                             <textarea
@@ -274,6 +278,7 @@ export default class ChatFrame extends Component
                                 onkeypress = {this.inputPressEnter.bind(this)}
                                 oninput = {this.inputProcess.bind(this)}
                                 onpaste = {this.inputProcess.bind(this)}
+
                                 rows = {this.input.rows}
                             />
                             {this.messageEditing ?
@@ -373,14 +378,32 @@ export default class ChatFrame extends Component
         input.rows = 1;
         let rows = Math.ceil((input.scrollHeight - input.baseScrollHeight) / input.baseHeight) + 1;
         this.input.rows = rows;
+        input.rows = rows;
 
-        if(this.messageEditing)
+        if(this.input.messageLength)
+        {
+            if(!this.input.writing && !this.messageEditing)
+                this.inputPreviewStart();
+        }
+        else
+        {
+            if(this.input.writing && !this.getChatInput().value.length)
+                this.inputPreviewEnd();
+        }
+
+        if(this.messageEditing) 
         {
             this.messageEditing.textFormatted = input.value;
-            this.messageEditing.textFormat(this.messageEditing.textFormatted);
-
-            m.redraw();
+            this.messageEditing.textFormat(input.value);
         }
+        else if(this.input.writing)
+        {
+            let preview = this.input.preview.instance;
+            preview.message = input.value;
+            preview.textFormat(input.value);
+            if(this.scroll.autoScroll) this.scrollToBottom();
+        }
+        this.timedRedraw(100);
     }
 
     inputPressEnter(e)
@@ -390,6 +413,7 @@ export default class ChatFrame extends Component
             this.messageSend(this.getChatInput().value);
             return false;
         }
+        else m.redraw.strategy('none');
         return true;
     }
 
@@ -405,8 +429,50 @@ export default class ChatFrame extends Component
         this.getChatInput().value = '';
     }
 
+    inputPreviewStart()
+    {
+        this.input.writing = true;
+        if(!this.input.preview.component) 
+        {
+            this.input.preview.component = this.createMessage(
+            {
+                id: 0, 
+                actorId: app.session.user.id(), 
+                is_editing: true,
+                message: ' '
+            },
+            {
+                instanceGetter: (instance) => this.input.preview.instance = instance
+            });
+        }
+
+        m.redraw();
+    }
+
+    inputPreviewEnd()
+    {
+        this.input.writing = false;
+
+        m.redraw();
+    }
+
     messageSend(text)
     {
+        if(this.input.writing) 
+        {
+            this.input.writing = false;
+
+            let message = this.input.preview.instance;
+            message.created_at = new Date();
+            message.is_editing = false;
+
+            this.messages.components.push(Object.assign({}, this.input.preview.component));
+            this.input.preview.component = null;
+
+            m.redraw();
+            message.flash();
+        }
+
         if(text.trim().length > 0 && !this.loading)
         {
             this.inputClear();
@@ -415,17 +481,19 @@ export default class ChatFrame extends Component
             if(editingMsg)
             {
                 if(editingMsg.message.trim() !== editingMsg.textFormatted.trim()) editingMsg.edit(editingMsg.textFormatted);
+
                 this.messageEditEnd();
             }
-            else this.apiSend(text);
+            else this.apiPost(text);
         }
     }
 
     messageEdit(message)
     {
         let chatInput = this.getChatInput();
+        this.inputPreviewEnd();
         
-        message.elementWrapper.classList.add('editing');
+        message.is_editing = true;
         message.textFormatted = message.message;
 
         this.messageEditing = message;
@@ -440,7 +508,7 @@ export default class ChatFrame extends Component
     {
         let message = this.messageEditing;
 
-        message.elementWrapper.classList.remove('editing');
+        message.is_editing = false;
         this.inputClear();
         message.textFormat();
         m.redraw();
@@ -450,40 +518,38 @@ export default class ChatFrame extends Component
 
     messageDelete(data)
     {
-        let message = this.messages.instances[data.message.id];
+        let message = this.messages.instances[data.id];
         if(message) message.elementWrapper.style.display = 'none'; 
     }
 
     messageRestore(data)
     {
-        let message = this.messages.instances[data.message.id];
+        let message = this.messages.instances[data.id];
         if(message) message.elementWrapper.style.display = ''; 
         else
         {
             let messageIds = Object.keys(this.messages.instances);
             messageIds.some((value, index, array) => 
             {
-                if(array[index - 1] < data.message.id && data.message.id < array[index])
-                    return this.messages.components.splice(index, 0, this.createMessage(data.message))
+                if(array[index - 1] < data.id && data.id < array[index])
+                    return this.messages.components.splice(index, 0, this.createMessage(data))
             })
             m.redraw();
         }
     }
 
-    createMessage(message, notify = false) 
+    createMessage(message, options = {}, notify = false) 
     {
         let chatMessage = new ChatMessage(
-        {
-            id: message.id,
-            message: message.message,
-            actor: message.actorId,
-            created_at: message.created_at || new Date(),
-            edited_at: message.edited_at,
-            deleted_by: message.deleted_by,
-            chatFrame: this,
-            instanceGetter: ((instance) => this.messages.instances[instance.id] = instance),
-            userResolved: this.messageUserResolved.bind(this, notify),
-        });
+            Object.assign(message, 
+            {
+                actor: message.actorId,
+                created_at: message.created_at || new Date(),
+                chatFrame: this,
+                instanceGetter: (instance) => this.messages.instances[instance.id] = instance,
+                userResolved: this.messageUserResolved.bind(this, notify),
+            }, options)
+        );
         return m.component(chatMessage);
 
         /* Working with lists prepend and flarum's component wrapper is complete anomaly
@@ -503,55 +569,13 @@ export default class ChatFrame extends Component
         */
     }
 
-    apiSend(text)
-    {
-        this.loading = true;
-
-        app.request({
-            method: 'POST',
-            url: app.forum.attribute('apiUrl') + '/chat',
-            data: {msg: text}
-        }).then(() =>
-        {
-            this.loading = false;
-            m.redraw();
-        });
-    }
-
-    apiFetch(lastMessageId = 0)
-    {
-        let self = this;
-
-        app.request({
-            method: 'GET',
-            url: app.forum.attribute('apiUrl') + '/chat/' + lastMessageId
-        }).then(
-            function(response)
-            {
-                self.scrollInfo.loadingFetch = false;
-                self.scrollInfo.autoScroll = false;
-
-                let fetchedMessages = response.data.attributes.messages.map((message) => self.createMessage(message));
-                self.messages.components = fetchedMessages.concat(self.messages.components);
-
-                m.redraw();
-            },
-            function()
-            {
-                self.scrollInfo.loadingFetch = false;
-                m.redraw();
-            }
-        );
-    }
-
     messageUserResolved(notify, message)
     {
         if(notify && (!app.session.user || (message.user && message.user.id() != app.session.user.id()))) 
             this.notifyTry(message.message, message.user);
 
-        if(this.scrollInfo.needToScroll || this.scrollInfo.autoScroll ||
-            (message.user && app.session.user && message.user.id() == app.session.user.id()))
-                this.scrollToBottom();
+        if(this.scroll.needToScroll || this.scroll.autoScroll)
+            this.scrollToBottom();
 
         if(notify) message.flash();
     }
@@ -583,6 +607,67 @@ export default class ChatFrame extends Component
             sound.play();
         }
     }
+
+    apiPost(text)
+    {
+        this.loading = true;
+        this.scroll.needToScroll = true;
+
+        app.request({
+            method: 'POST',
+            url: app.forum.attribute('apiUrl') + '/chat',
+            data: {msg: text}
+        }).then((result) =>
+        {
+            let sendedMessage = this.input.preview.instance;
+            sendedMessage.id = result.data.id;
+
+            this.messages.instances[sendedMessage.id] = sendedMessage;
+            this.input.preview.instance = null;
+        
+            this.loading = false;
+            m.redraw();
+        });
+    }
+
+    apiFetch(lastMessageId = 0)
+    {
+        let self = this;
+
+        app.request({
+            method: 'GET',
+            url: app.forum.attribute('apiUrl') + '/chat/' + lastMessageId
+        }).then(
+            function(response)
+            {
+                self.scroll.loadingFetch = false;
+                self.scroll.autoScroll = false;
+
+                let fetchedMessages = response.data.map((data) => self.createMessage(data.attributes));
+                self.messages.components = fetchedMessages.concat(self.messages.components);
+
+                m.redraw();
+            },
+            function()
+            {
+                self.scroll.loadingFetch = false;
+                m.redraw();
+            }
+        );
+    }
+
+	timedRedraw(timeout)
+	{
+		m.redraw.strategy('none');
+		
+        if(!this.redrawTimeout)
+        {
+		    this.redrawTimeout = setTimeout(() => {
+                m.redraw();
+                this.redrawTimeout = null;
+            }, timeout);
+        }
+	}
 
     onunload()
     {

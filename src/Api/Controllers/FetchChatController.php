@@ -8,24 +8,23 @@
 
 namespace Xelson\Chat\Api\Controllers;
 
-use Xelson\Chat\Api\Serializers\FetchChatSerializer;
+use Xelson\Chat\Api\Serializers\ChatSerializer;
 use Xelson\Chat\Commands\FetchChat;
 use Illuminate\Support\Arr;
-use Flarum\Api\Controller\AbstractShowController;
+use Flarum\Api\Controller\AbstractListController;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
 
-class FetchChatController extends AbstractShowController
+class FetchChatController extends AbstractListController
 {
 
     /**
      * The serializer instance for this request.
      *
-     * @var FetchChatSerializer
+     * @var ChatSerializer
      */
-    public $serializer = FetchChatSerializer::class;
-
+    public $serializer = ChatSerializer::class;
 
     /**
      * @var Dispatcher

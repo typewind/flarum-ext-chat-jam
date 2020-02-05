@@ -18,7 +18,6 @@ use Illuminate\Support\Arr;
 
 class EditChatController extends AbstractShowController
 {
-
     /**
      * The serializer instance for this request.
      *

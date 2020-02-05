@@ -10,49 +10,24 @@ namespace Xelson\Chat\Commands;
 
 use Carbon\Carbon;
 use Xelson\Chat\Message;
-use Xelson\Chat\PusherWrapper;
+use Xelson\Chat\MessageValidator;
 use Flarum\User\AssertPermissionTrait;
-use Flarum\Foundation\DispatchEventsTrait;
-use Flarum\Foundation\Application;
-use Flarum\Settings\SettingsRepositoryInterface;
-use Illuminate\Events\Dispatcher;
 
 class PostChatHandler
 {
-    use DispatchEventsTrait;
     use AssertPermissionTrait;
 
     /**
-     * @var Application
+     * @var MessageValidator
      */
-    protected $app;
+    protected $validator;
 
     /**
-     * @var SettingsRepositoryInterface
+     * @param MessageValidator              $validator
      */
-    protected $settings;
-
-    /**
-     * @var PusherWrapper
-     */
-    protected $pusher;
-
-    /**
-     * @param Dispatcher                    $events
-     * @param Application                   $app
-     * @param SettingsRepositoryInterface   $settings
-     * @param PusherWrapper                 $pusher
-     */
-    public function __construct(
-        Dispatcher $events,
-        Application $app,
-        SettingsRepositoryInterface $settings,
-        PusherWrapper $pusher
-    ) {
-        $this->events    = $events;
-        $this->app       = $app;
-        $this->settings  = $settings;
-        $this->pusher    = $pusher->pusher;
+    public function __construct(MessageValidator $validator) 
+    {
+        $this->validator = $validator;
     }
 
     /**
@@ -71,23 +46,18 @@ class PostChatHandler
             'pushedx-chat.permissions.chat'
         );
 
-        $content = trim($content);
-        if(strlen($content) > $this->settings->get('pushedx-chat.charlimit')) return null;
-
         $message = Message::build(
             $content,
             $actor->id,
             Carbon::now()
         );
+
+        $this->validator->assertValid($message->getDirty());
+
         $message->save();
 
-        $msg = [
-            'id' => $message->id,
-            'actorId' => $actor->id,
-            'message' => $content
-        ];
-        $this->pusher->trigger('public', 'eventPost', $msg);
+        $message->event = 'pushedx-chat.socket.event.post';
 
-        return $content;
+        return $message;
     }
 }

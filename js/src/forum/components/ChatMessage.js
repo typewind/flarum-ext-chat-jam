@@ -46,7 +46,14 @@ export default class ChatMessage extends Component
 	view()
 	{
 		return (
-			<div className='message-wrapper' data-id={this.id} config={this.configWrapper.bind(this)}>
+			<div 
+				className={[
+					'message-wrapper', 
+					this.deleted_by ? 'deleted' : '',
+					this.is_editing ? 'editing' : ''
+				].join(' ')}
+				data-id={this.id} 
+				config={this.configWrapper.bind(this)}>
 				{this.inited ?
 					<div>
 						{this.user ? 
@@ -67,18 +74,23 @@ export default class ChatMessage extends Component
 								<a className='name' onclick={this.chatFrame.insertMention.bind(this.chatFrame, this)}>
 									{username(this.user).children[0] + ': '}
 								</a>
-								<a className='timestamp' title={fullTime(this.created_at).children[0]}>{this.humanTime = humanTime(this.created_at)}</a>
-								<div className='labels'>
-									{this.labels.map(label => label.condition() ? label.component : null)}
-								</div>
-								{this.user == app.session.user ?
-									this.editDropDown()
-									: (this.chatFrame.permissions.moderate.delete ? this.editDropDownModerate() : null)
+								{this.id ?
+									<div style='display: inline'>
+										<a className='timestamp' title={fullTime(this.created_at).children[0]}>{this.humanTime = humanTime(this.created_at)}</a>
+										<div className='labels'>
+											{this.labels.map(label => label.condition() ? label.component() : null)}
+										</div>
+										{this.user == app.session.user ?
+											this.editDropDown()
+											: (this.chatFrame.permissions.moderate.delete ? this.editDropDownModerate() : null)
+										}
+									</div>
+									: null
 								}
 							</div>
 							<div className='message'>
 								<div config={this.configFormat.bind(this)}>
-									{this.message}
+
 								</div>
 							</div>
 						</div>
@@ -91,20 +103,26 @@ export default class ChatMessage extends Component
 
 	initLabels()
 	{
-		this.labelBind(() => this.edited_at, (
-			<div class='icon' title={extractText(app.translator.trans(
-				'core.forum.post.edited_tooltip',
-				{user: this.user, ago: humanTime(this.edited_at)}
-			))}>
-				<i class="fas fa-pencil-alt"></i>
-			</div>
-		));
+		this.labelBind(
+			() => this.edited_at, 
+			() => (
+				<div class='icon' title={extractText(app.translator.trans(
+					'core.forum.post.edited_tooltip',
+					{user: this.user, ago: humanTime(this.edited_at)}
+				))}>
+					<i class="fas fa-pencil-alt"></i>
+				</div>
+			)
+		);
 
-		this.labelBind(() => this.deleted_by, (
-			<div class='icon'>
-				<i class="fas fa-trash-alt"></i>
-			</div>
-		));
+		this.labelBind(
+			() => this.deleted_by, 
+			() => (
+				<div class='icon'>
+					<i class="fas fa-trash-alt"></i>
+				</div>
+			)
+		);
 	}
 
 	labelBind(condition, component)
@@ -183,6 +201,7 @@ export default class ChatMessage extends Component
 	configWrapper(element)
 	{
 		this.elementWrapper = element;
+
 		if(this.needToFlash) 
 		{
 			this.flash();
@@ -202,7 +221,7 @@ export default class ChatMessage extends Component
 	textFormat(text)
 	{
 		if(!text) text = this.message
-		if(this.element) s9e.TextFormatter.preview(text, this.element);
+		if(this.element) s9e.TextFormatter.preview(text, this.element)
 
 		setTimeout(() => {
 			$('.chat script').each(function() {
@@ -214,16 +233,12 @@ export default class ChatMessage extends Component
 	hide()
 	{
 		this.deleted_by = app.session.user.id();
-		this.elementWrapper.classList.add('deleted');
-
 		this.apiDelete();
 	}
 
 	restore()
 	{
 		this.deleted_by = null;
-		this.elementWrapper.classList.remove('deleted');
-
 		this.apiDelete();
 	}
 

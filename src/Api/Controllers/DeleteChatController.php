@@ -10,13 +10,21 @@ namespace Xelson\Chat\Api\Controllers;
 
 use Xelson\Chat\Api\Serializers\ChatSerializer;
 use Xelson\Chat\Commands\DeleteChat;
-use Flarum\Api\Controller\AbstractDeleteController;
+use Flarum\Api\Controller\AbstractShowController;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Psr\Http\Message\ServerRequestInterface;
+use Tobscure\JsonApi\Document;
 use Illuminate\Support\Arr;
 
-class DeleteChatController extends AbstractDeleteController
+class DeleteChatController extends AbstractShowController
 {
+    /**
+     * The serializer instance for this request.
+     *
+     * @var ChatSerializer
+     */
+    public $serializer = ChatSerializer::class;
+
     /**
      * @var Dispatcher
      */
@@ -33,7 +41,7 @@ class DeleteChatController extends AbstractDeleteController
      * @param ServerRequestInterface $request
      * @return mixed
      */
-    protected function delete(ServerRequestInterface $request)
+    protected function data(ServerRequestInterface $request, Document $document)
     {
         $id = Arr::get($request->getQueryParams(), 'id');
         $actor = $request->getAttribute('actor');

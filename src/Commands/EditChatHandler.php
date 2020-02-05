@@ -11,32 +11,12 @@ namespace Xelson\Chat\Commands;
 use Carbon\Carbon;
 use Xelson\Chat\Message;
 use Xelson\Chat\MessageRepository;
-use Xelson\Chat\PusherWrapper;
+use Xelson\Chat\MessageValidator;
 use Flarum\User\AssertPermissionTrait;
-use Flarum\Foundation\DispatchEventsTrait;
-use Flarum\Foundation\Application;
-use Flarum\Settings\SettingsRepositoryInterface;
-use Illuminate\Events\Dispatcher;
 
 class EditChatHandler
 {
-    use DispatchEventsTrait;
     use AssertPermissionTrait;
-
-    /**
-     * @var Application
-     */
-    protected $app;
-
-    /**
-     * @var SettingsRepositoryInterface
-     */
-    protected $settings;
-
-    /**
-     * @var PusherWrapper
-     */
-    protected $pusher;
 
     /**
      * @var MessageRepository
@@ -44,24 +24,20 @@ class EditChatHandler
     protected $messages;
 
     /**
-     * @param Dispatcher                    $events
-     * @param Application                   $app
-     * @param SettingsRepositoryInterface   $settings
-     * @param PusherWrapper                 $pusher
+     * @var MessageValidator
+     */
+    protected $validator;
+
+    /**
      * @param MessageRepository             $messages
+     * @param MessageValidator              $validator
      */
     public function __construct(
-        Dispatcher $events,
-        Application $app,
-        SettingsRepositoryInterface $settings,
-        PusherWrapper $pusher,
-        MessageRepository $messages
+        MessageRepository $messages,
+        MessageValidator $validator
     ) {
-        $this->events    = $events;
-        $this->app       = $app;
-        $this->settings  = $settings;
-        $this->pusher    = $pusher->pusher;
         $this->messages  = $messages;
+        $this->validator = $validator;
     }
 
     /**
@@ -81,24 +57,18 @@ class EditChatHandler
             'pushedx-chat.permissions.edit'
         );
 
-        $content = trim($content);
-        if(strlen($content) > $this->settings->get('pushedx-chat.charlimit')) return null;
-
         $message = $this->messages->findOrFail($messageid);
         $this->assertPermission($actor->id == $message->actorId);
 
         $message->message = $content;
         $message->edited_at = Carbon::now();
 
+        $this->validator->assertValid($message->getDirty());
+
         $message->save();
 
-        $msg = [
-            'id' => $message->id,
-            'actorId' => $actor->id,
-            'message' => $content
-        ];
-        $this->pusher->trigger('public', 'eventEdit', $msg);
+        $message->event = 'pushedx-chat.socket.event.edit';
 
-        return $content;
+        return $message;
     }
 }

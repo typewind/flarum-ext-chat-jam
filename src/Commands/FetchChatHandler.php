@@ -9,42 +9,19 @@
 namespace Xelson\Chat\Commands;
 
 use Xelson\Chat\MessageRepository;
-use Flarum\Foundation\Application;
-use Flarum\Settings\SettingsRepositoryInterface;
-use Illuminate\Events\Dispatcher;
 
 class FetchChatHandler
 {
-    /**
-     * @var Application
-     */
-    protected $app;
-
-    /**
-     * @var SettingsRepositoryInterface
-     */
-    protected $settings;
-
     /**
      * @var MessageRepository
      */
     protected $messages;
 
     /**
-     * @param Dispatcher                    $events
-     * @param Application                   $app
-     * @param SettingsRepositoryInterface   $settings
      * @param MessageRepository             $messages
      */
-    public function __construct(
-        Dispatcher $events,
-        Application $app,
-        SettingsRepositoryInterface $settings,
-        MessageRepository $messages
-    ) {
-        $this->events    = $events;
-        $this->app       = $app;
-        $this->settings  = $settings;
+    public function __construct(MessageRepository $messages) 
+    {
         $this->messages  = $messages;
     }
 
@@ -58,8 +35,7 @@ class FetchChatHandler
     {
         $messageId = $command->id;
         $messages = $this->messages->fetch($messageId);
-        $command->messages = $messages;
 
-        return $command;
+        return $messages;
     }
 }

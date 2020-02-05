@@ -8,36 +8,13 @@
 
 namespace Xelson\Chat\Commands;
 
-use Carbon\Carbon;
 use Xelson\Chat\Message;
 use Xelson\Chat\MessageRepository;
-use Xelson\Chat\PusherWrapper;
 use Flarum\User\AssertPermissionTrait;
-use Flarum\Foundation\DispatchEventsTrait;
-use Flarum\Foundation\Application;
-use Flarum\Settings\SettingsRepositoryInterface;
-use Illuminate\Events\Dispatcher;
-use DateTime;
 
 class DeleteChatHandler
 {
-    use DispatchEventsTrait;
     use AssertPermissionTrait;
-
-    /**
-     * @var Application
-     */
-    protected $app;
-
-    /**
-     * @var SettingsRepositoryInterface
-     */
-    protected $settings;
-
-    /**
-     * @var PusherWrapper
-     */
-    protected $pusher;
 
     /**
      * @var MessageRepository
@@ -45,23 +22,10 @@ class DeleteChatHandler
     protected $messages;
 
     /**
-     * @param Dispatcher                    $events
-     * @param Application                   $app
-     * @param SettingsRepositoryInterface   $settings
-     * @param PusherWrapper                 $pusher
      * @param MessageRepository             $messages
      */
-    public function __construct(
-        Dispatcher $events,
-        Application $app,
-        SettingsRepositoryInterface $settings,
-        PusherWrapper $pusher,
-        MessageRepository $messages
-    ) {
-        $this->events    = $events;
-        $this->app       = $app;
-        $this->settings  = $settings;
-        $this->pusher    = $pusher->pusher;
+    public function __construct(MessageRepository $messages) 
+    {
         $this->messages  = $messages;
     }
 
@@ -108,17 +72,9 @@ class DeleteChatHandler
         
         $message->save();
 
-        $messageData = $message->toArray();
-        $messageData['created_at'] = (new Carbon($message->created_at))->format(DateTime::RFC3339);
-        if($messageData['edited_at']) $messageData['edited_at'] = (new Carbon($message->edited_at))->format(DateTime::RFC3339);
+        $message->invoker = $actor->id;
+        $message->event = 'pushedx-chat.socket.event.delete';
 
-        $msg = [
-            'message' => $messageData,
-            'restored' => !$message->deleted_by,
-            'actor' => $actor->id
-        ];
-        $this->pusher->trigger('public', 'eventDelete', $msg);
-
-        return $message->deleted_by;
+        return $message;
     }
 }

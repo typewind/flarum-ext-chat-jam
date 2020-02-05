@@ -44,7 +44,6 @@ composer update xelson/flarum-ext-chat
 Reenable extenstion in admin panel to execute database migration
 # To Do List:
 
-* Messages preview 
 * Preventing flooding
 * Text Markdown and Emoji picker
 * Forum notifications for missed mentions

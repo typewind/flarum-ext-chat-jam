@@ -16,6 +16,8 @@ class Message extends AbstractModel
 {
     protected $table = 'pushedx_messages';
 
+    protected $dates = ['created_at', 'edited_at'];
+
     /**
      * Create a new message.
      *

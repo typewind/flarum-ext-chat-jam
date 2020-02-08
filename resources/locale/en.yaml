@@ -10,6 +10,10 @@ pushedx-chat:
       maximize: Maximize
     chat:
       placeholder: Type your message...
+      message:
+        actions:
+          hide: Hide
+          resend: Resend
     errors:
       unauthenticated: Only registered users can use the chat
       chatdenied: Your user group is not allowed to write messages
@@ -24,3 +28,7 @@ pushedx-chat:
     settings:
       title: Chat settings
       charlimit: Maximum characters in the message
+      floodgate:
+        title: Antiflood
+        number: Number of messages in a row
+        time: Over a period

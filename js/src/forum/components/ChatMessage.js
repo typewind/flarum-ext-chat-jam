@@ -45,6 +45,8 @@ export default class ChatMessage extends Component
 
 	view()
 	{
+		if(this.hidden) return <div/>;
+
 		return (
 			<div 
 				className={[
@@ -84,8 +86,13 @@ export default class ChatMessage extends Component
 											this.editDropDown()
 											: (this.chatFrame.permissions.moderate.delete ? this.editDropDownModerate() : null)
 										}
-									</div>
-									: null
+									</div> : (this.timedOut ? 
+									<div style='display: inline'>	
+										<div className='labels'>
+											{this.labels.map(label => label.condition() ? label.component() : null)}
+										</div>
+										{this.editDropDownTimedOut()}
+									</div> : null)
 								}
 							</div>
 							<div className='message'>
@@ -120,6 +127,15 @@ export default class ChatMessage extends Component
 			() => (
 				<div class='icon'>
 					<i class="fas fa-trash-alt"></i>
+				</div>
+			)
+		);
+
+		this.labelBind(
+			() => this.timedOut, 
+			() => (
+				<div class='icon' style='color: #ff4063'>
+					<i class="fas fa-exclamation-circle"></i>
 				</div>
 			)
 		);
@@ -197,6 +213,32 @@ export default class ChatMessage extends Component
 			</div>
 		)
 	}
+	
+	editDropDownTimedOut()
+	{
+		return (
+			<div className='edit'>
+				<DropDown 
+					buttonClassName="Button Button--icon Button--flat"
+					menuClassName="Dropdown-menu--top Dropdown-menu--bottom Dropdown-menu--left Dropdown-menu--right"
+					icon="fas fa-ellipsis-h"
+				>
+					<Button 
+						onclick={this.delete.bind(this)} 
+						icon='fas fa-trash-alt'
+					>
+						{app.translator.trans('pushedx-chat.forum.chat.message.actions.hide')}
+					</Button>
+					<Button 
+						onclick={this.chatFrame.messageResend.bind(this.chatFrame, this)}
+						icon='fas fa-reply'
+					>
+						{app.translator.trans('pushedx-chat.forum.chat.message.actions.resend')}
+					</Button>
+				</DropDown>
+			</div>
+		)
+	}
 
 	configWrapper(element)
 	{
@@ -230,6 +272,11 @@ export default class ChatMessage extends Component
 		}, 1000);
 	}
 
+	delete()
+	{
+		this.hidden = true;
+	}
+
 	hide()
 	{
 		this.deleted_by = app.session.user.id();
@@ -246,10 +293,9 @@ export default class ChatMessage extends Component
 	{
 		this.edited_at = new Date();
 		this.message = newContent;
-		m.redraw();
+		this.needToFlash = true;
 
 		this.textFormat();
-		this.flash();
 
 		if(!outside) this.apiEdit(newContent);
 	}

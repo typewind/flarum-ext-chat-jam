@@ -16,7 +16,7 @@ class MessageValidator extends AbstractValidator
 	protected function getRules()
 	{
 		$settings = app(SettingsRepositoryInterface::class);
-		$max_chars = $settings->get('pushedx-chat.charlimit');
+		$max_chars = $settings->get('pushedx-chat.settings.charlimit');
 		
 		return 
 		[

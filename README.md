@@ -42,12 +42,21 @@ Via composer:
 composer update xelson/flarum-ext-chat
 ```
 Reenable extenstion in admin panel to execute database migration
+
+For development builds:
+```
+composer require xelson/flarum-ext-chat:dev-master
+php flarum migrate
+php flarum cache:clear
+```
+
 # To Do List:
 
-* Preventing flooding
-* Text Markdown and Emoji picker
+* Emoji picker
+* [FriendsOfFlarum/upload](https://github.com/FriendsOfFlarum/upload) support
 * Forum notifications for missed mentions
 * Global user muting
 * Customizing of notification sounds
 * Alternative working mode without Pusher
+* Private chat rooms
 * Chat messages history. Finding messages by keywords or name

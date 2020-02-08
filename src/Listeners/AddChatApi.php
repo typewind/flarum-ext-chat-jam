@@ -70,7 +70,7 @@ class AddChatApi
             foreach($permissions as $permission)
                 $event->attributes[$permission] = $event->actor->can($permission);
 
-            $event->attributes['pushedx-chat.charlimit'] = $this->settings->get('pushedx-chat.charlimit');
+            $event->attributes['pushedx-chat.settings.charlimit'] = $this->settings->get('pushedx-chat.settings.charlimit');
         }
     }
 }

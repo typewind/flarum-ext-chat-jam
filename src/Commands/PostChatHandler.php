@@ -11,6 +11,7 @@ namespace Xelson\Chat\Commands;
 use Carbon\Carbon;
 use Xelson\Chat\Message;
 use Xelson\Chat\MessageValidator;
+use Xelson\Chat\MessageFloodgate;
 use Flarum\User\AssertPermissionTrait;
 
 class PostChatHandler
@@ -23,11 +24,21 @@ class PostChatHandler
     protected $validator;
 
     /**
-     * @param MessageValidator              $validator
+     * @var MessageFloodgate
      */
-    public function __construct(MessageValidator $validator) 
+    protected $floodgate;
+
+    /**
+     * @param MessageValidator      $validator
+     * @param MessageFloodgate      $floodgate
+     */
+    public function __construct(
+        MessageValidator $validator,
+        MessageFloodgate $floodgate
+    ) 
     {
         $this->validator = $validator;
+        $this->floodgate = $floodgate;
     }
 
     /**
@@ -45,6 +56,8 @@ class PostChatHandler
             $actor,
             'pushedx-chat.permissions.chat'
         );
+
+        $this->floodgate->assertNotFlooding($actor);
 
         $message = Message::build(
             $content,

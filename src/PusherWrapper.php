@@ -12,7 +12,11 @@ use Pusher;
 
 class PusherWrapper
 {
-
+    /**
+     * @var SettingsRepositoryInterface
+     */
+    protected $settings;
+    
     /**
      * @param SettingsRepositoryInterface $settings
      */

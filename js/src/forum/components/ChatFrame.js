@@ -30,7 +30,7 @@ export default class ChatFrame extends Component
         let isMuted = localStorage.getItem('chat_isMuted');
         let notify = localStorage.getItem('chat_notify');
         let transform = localStorage.getItem('chat_transform');
-        let charLimit = app.forum.attribute('pushedx-chat.charlimit');
+        let charLimit = app.forum.attribute('pushedx-chat.settings.charlimit');
 
         this.loading = false;
         this.scroll = {autoScroll: true, oldScroll: 0, loadingFetch: false, needToScroll: true};
@@ -221,8 +221,9 @@ export default class ChatFrame extends Component
         let chatWrapper = this.getChatWrapper();
         if(chatWrapper)
         {
-            if(this.scroll.timeout) clearTimeout(this.scroll.timeout)
-            this.scroll.timeout = setTimeout(() => chatWrapper.scroll({top: chatWrapper.scrollHeight, behavior: 'smooth'}), 100)
+            if(this.scroll.timeout) clearTimeout(this.scroll.timeout);
+            this.scroll.timeout = setTimeout(() => chatWrapper.scroll({top: chatWrapper.scrollHeight, behavior: 'smooth'}), 100);
+            if(!this.scroll.autoScroll) this.scroll.needToScroll = true;
         }
     }
 
@@ -370,7 +371,7 @@ export default class ChatFrame extends Component
         this.moveLast = {x: e.clientX, y: e.clientY};
     }
 
-    inputProcess()
+    inputProcess(e)
     {
         let input = this.getChatInput();
         this.input.messageLength = input.value.length;
@@ -401,13 +402,13 @@ export default class ChatFrame extends Component
             let preview = this.input.preview.instance;
             preview.message = input.value;
             preview.textFormat(input.value);
-            if(this.scroll.autoScroll) this.scrollToBottom();
         }
-        this.timedRedraw(100);
+        this.timedRedraw(100, () => this.scroll.autoScroll && !this.messageEditing ? this.scrollToBottom() : null);
     }
 
     inputPressEnter(e)
     {
+        if(this.loading) return false;
         if(e.keyCode == 13 && !e.shiftKey)
         {
             this.messageSend(this.getChatInput().value);
@@ -432,6 +433,7 @@ export default class ChatFrame extends Component
     inputPreviewStart()
     {
         this.input.writing = true;
+
         if(!this.input.preview.component) 
         {
             this.input.preview.component = this.createMessage(
@@ -445,7 +447,6 @@ export default class ChatFrame extends Component
                 instanceGetter: (instance) => this.input.preview.instance = instance
             });
         }
-
         m.redraw();
     }
 
@@ -458,30 +459,29 @@ export default class ChatFrame extends Component
 
     messageSend(text)
     {
-        if(this.input.writing) 
-        {
-            this.input.writing = false;
-
-            let message = this.input.preview.instance;
-            message.created_at = new Date();
-            message.is_editing = false;
-
-            this.messages.components.push(Object.assign({}, this.input.preview.component));
-            this.input.preview.component = null;
-
-            m.redraw();
-            message.flash();
-        }
-
         if(text.trim().length > 0 && !this.loading)
         {
+            if(this.input.writing) 
+            {
+                this.input.writing = false;
+    
+                let message = this.input.preview.instance;
+                message.created_at = new Date();
+                message.is_editing = false;
+    
+                this.messages.components.push(this.input.preview.component);
+                this.input.preview.component = null;
+    
+                m.redraw();
+                message.flash();
+            }
+
             this.inputClear();
 
             let editingMsg = this.messageEditing;
             if(editingMsg)
             {
                 if(editingMsg.message.trim() !== editingMsg.textFormatted.trim()) editingMsg.edit(editingMsg.textFormatted);
-
                 this.messageEditEnd();
             }
             else this.apiPost(text);
@@ -538,6 +538,29 @@ export default class ChatFrame extends Component
         }
     }
 
+    messageResend(instance)
+    {
+		this.apiPost(instance.message, this).then(
+			(result) =>
+			{
+				if(result)
+				{
+                    this.messages.components.some((value, index, array) => 
+                    {
+                        if(value == instance.component)
+                            return array.splice(index, 1) && array.push(instance.component) && this.scrollToBottom();
+                    });
+                    instance.id = result.data.id;
+                    instance.created_at = new Date();
+                    instance.timedOut = false;
+                    instance.needToFlash = true;
+
+                    m.redraw();
+				}
+			}
+		);
+    }
+
     createMessage(message, options = {}, notify = false) 
     {
         let chatMessage = new ChatMessage(
@@ -550,7 +573,9 @@ export default class ChatFrame extends Component
                 userResolved: this.messageUserResolved.bind(this, notify),
             }, options)
         );
-        return m.component(chatMessage);
+        let component = m.component(chatMessage);
+        chatMessage.component = component;
+        return component;
 
         /* Working with lists prepend and flarum's component wrapper is complete anomaly
         If new components are added to the top of the list, new components get incorrect attributes (attrs of already existing components) when they are updated
@@ -608,26 +633,37 @@ export default class ChatFrame extends Component
         }
     }
 
-    apiPost(text)
+    apiPost(text, targetInstance = this.input.preview.instance)
     {
         this.loading = true;
         this.scroll.needToScroll = true;
 
-        app.request({
+        return app.request({
             method: 'POST',
             url: app.forum.attribute('apiUrl') + '/chat',
             data: {msg: text}
-        }).then((result) =>
-        {
-            let sendedMessage = this.input.preview.instance;
-            sendedMessage.id = result.data.id;
+        }).then(
+            (result) =>
+            {
+                targetInstance.id = result.data.id;
 
-            this.messages.instances[sendedMessage.id] = sendedMessage;
-            this.input.preview.instance = null;
-        
-            this.loading = false;
-            m.redraw();
-        });
+                this.messages.instances[targetInstance.id] = targetInstance;
+                if(targetInstance == this.input.preview.instance) this.input.preview.instance = null;
+            
+                this.loading = false;
+                m.redraw();
+
+                return result;
+            },
+            (error) =>
+            {
+                targetInstance.timedOut = true;
+                if(targetInstance == this.input.preview.instance) this.input.preview.instance = null;
+
+                this.loading = false;
+                m.redraw();
+            }
+        );
     }
 
     apiFetch(lastMessageId = 0)
@@ -656,7 +692,7 @@ export default class ChatFrame extends Component
         );
     }
 
-	timedRedraw(timeout)
+	timedRedraw(timeout, callback)
 	{
 		m.redraw.strategy('none');
 		
@@ -664,6 +700,7 @@ export default class ChatFrame extends Component
         {
 		    this.redrawTimeout = setTimeout(() => {
                 m.redraw();
+                callback();
                 this.redrawTimeout = null;
             }, timeout);
         }

@@ -46,6 +46,8 @@ class MessageFloodgate
 	{
 		$number = $this->settings->get('pushedx-chat.settings.floodgate.number');
 		$time = $this->settings->get('pushedx-chat.settings.floodgate.time');
+		if($number <= 0) return false;
+		
 		$lastMessages = Message::where('created_at', '>=', new DateTime('-' . $time))->orderBy('id', 'DESC')->limit($number)->get();
 		
 		if(count($lastMessages) != $number) return false;

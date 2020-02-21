@@ -18,7 +18,7 @@ Typo? It's okay. Just edit the message or delete it by starting over.
 Stay up to date with the chat discussion and find out about mentions of you via push notifications.  
 ![Image](https://sun9-8.userapi.com/K5yxp2Vey0-gs7bg4UYF3uAo4gc7PIzP5y6Jaw/VVTi5GMKLoY.jpg)
 
-# Realtime Chat
+# Neon Chat
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg) 
 [![Latest Release](https://img.shields.io/packagist/v/xelson/flarum-ext-chat)](https://packagist.org/packages/xelson/flarum-ext-chat)   

@@ -34,7 +34,7 @@
     },
     "extra": {
         "flarum-extension": {
-            "title": "Realtime Chat",
+            "title": "Neon Chat",
             "icon": {
                 "image": "icon.svg",
                 "backgroundColor": "#ffaad4",

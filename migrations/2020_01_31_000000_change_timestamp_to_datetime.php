@@ -6,12 +6,16 @@ use Illuminate\Database\Schema\Builder;
 return [
     'up' => function (Builder $schema) {
         $connection = $schema->getConnection();
-        $connection->statement("ALTER TABLE `pushedx_messages` MODIFY created_at DATETIME");
-        $connection->statement("ALTER TABLE `pushedx_messages` MODIFY edited_at DATETIME");
+        $prefix = $connection->getTablePrefix();
+        
+        $connection->statement("ALTER TABLE `{$prefix}pushedx_messages` MODIFY created_at DATETIME");
+        $connection->statement("ALTER TABLE `{$prefix}pushedx_messages` MODIFY edited_at DATETIME");
     },
     'down' => function (Builder $schema) {
         $connection = $schema->getConnection();
-        $connection->statement("ALTER TABLE `pushedx_messages` MODIFY created_at TIMESTAMP");
-        $connection->statement("ALTER TABLE `pushedx_messages` MODIFY edited_at TIMESTAMP");
+        $prefix = $connection->getTablePrefix();
+
+        $connection->statement("ALTER TABLE `{$prefix}pushedx_messages` MODIFY created_at TIMESTAMP");
+        $connection->statement("ALTER TABLE `{$prefix}pushedx_messages` MODIFY edited_at TIMESTAMP");
     }
 ];

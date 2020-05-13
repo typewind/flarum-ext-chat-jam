@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Flarum\User\User;
 use Flarum\Database\AbstractModel;
 use Illuminate\Database\Eloquent\Builder;
+use Flarum\Settings\SettingsRepositoryInterface;
 
 class MessageRepository
 {
@@ -42,13 +43,19 @@ class MessageRepository
     /**
      * Query for visible messages
      *
+     * @param  User 	$actor
      * @return Builder
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function queryVisible()
+    public function queryVisible(User $actor)
     {
-        return $this->query()->whereNull('deleted_by');
+        $settings = app(SettingsRepositoryInterface::class);
+
+        $query = $this->query();
+        if(!$actor->can('pushedx-chat.permissions.moderate.vision')) $query->whereNull('deleted_by');
+
+        return $query;
     }
 
     /**
@@ -59,9 +66,9 @@ class MessageRepository
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function fetch($id)
+    public function fetch($id, User $actor)
     {
-        $messages = $this->queryVisible();
+        $messages = $this->queryVisible($actor);
 
         $list = $id ? 
             $messages->where('id', '<', $id)->orderBy('id', 'desc')->limit(20) 

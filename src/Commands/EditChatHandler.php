@@ -50,24 +50,63 @@ class EditChatHandler
     {
         $messageid = $command->id;
         $actor = $command->actor;
-        $content = $command->msg;
-
-        $this->assertCan(
-            $actor,
-            'pushedx-chat.permissions.edit'
-        );
+        $data = $command->data;
 
         $message = $this->messages->findOrFail($messageid);
-        $this->assertPermission($actor->id == $message->actorId);
 
-        $message->message = $content;
-        $message->edited_at = Carbon::now();
+        if(isset($data['msg']))
+        {
+            $this->assertCan(
+                $actor,
+                'pushedx-chat.permissions.edit'
+            );
+            $this->assertPermission($actor->id == $message->actorId);
 
-        $this->validator->assertValid($message->getDirty());
+            $message->message = $data['msg'];
+            $message->edited_at = Carbon::now();
+    
+            $this->validator->assertValid($message->getDirty());
+    
+            $message->save();
+    
+            $message->event = 'pushedx-chat.socket.event.edit';
+        }
+        else if(isset($data['hide']))
+        {
+            $this->assertCan(
+                $actor,
+                'pushedx-chat.permissions.delete'
+            );
 
-        $message->save();
+            if($data['hide'])
+            {
+                if($message->actorId != $actor->id)
+                {
+                    $this->assertCan(
+                        $actor,
+                        'pushedx-chat.permissions.moderate.edit'
+                    );
+                }	
+                $message->deleted_by = $actor->id;
+            }
+            else
+            {
+                if($message->deleted_by != $actor->id)
+                {
+                    $this->assertCan(
+                        $actor,
+                        'pushedx-chat.permissions.moderate.edit'
+                    );
+                }	
+                $message->deleted_by = null;
+            }
 
-        $message->event = 'pushedx-chat.socket.event.edit';
+            $message->save();
+
+            $message->invoker = $actor->id;
+            $message->event = 'pushedx-chat.socket.event.edit';
+        }
+        $message->attributes = $data;
 
         return $message;
     }

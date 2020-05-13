@@ -24,6 +24,17 @@ export default class ChatSettingsModal extends SettingsModal
 					<label>{app.translator.trans('pushedx-chat.admin.settings.floodgate.time')}</label>
 					<input className='FormControl' type='text' bidi={this.setting('pushedx-chat.settings.floodgate.time', '1 hour')} />
 				</div>
+				<label>{app.translator.trans('pushedx-chat.admin.settings.display.title')}</label>
+				<div>
+					<label className="checkbox">
+						<input type="checkbox" bidi={this.setting('pushedx-chat.settings.display.minimize')}/>
+						{app.translator.trans('pushedx-chat.admin.settings.display.minimize')}
+					</label>
+					<label className="checkbox">
+						<input type="checkbox" bidi={this.setting('pushedx-chat.settings.display.censor')}/>
+						{app.translator.trans('pushedx-chat.admin.settings.display.censor')}
+					</label>
+				</div>
 			</div>
 		];
 	}

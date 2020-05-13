@@ -28,6 +28,8 @@ export default class ChatMessage extends Component
 			});
 		}
 		else this.initEvents();
+
+		if(this.deleted_by) this.hide(this.deleted_by);
 		
 		this.textFormat();
 		this.instanceGetter(this);
@@ -45,8 +47,6 @@ export default class ChatMessage extends Component
 
 	view()
 	{
-		if(this.hidden) return <div/>;
-
 		return (
 			<div 
 				className={[
@@ -82,10 +82,7 @@ export default class ChatMessage extends Component
 										<div className='labels'>
 											{this.labels.map(label => label.condition() ? label.component() : null)}
 										</div>
-										{this.user == app.session.user ?
-											this.editDropDown()
-											: (this.chatFrame.permissions.moderate.delete ? this.editDropDownModerate() : null)
-										}
+										{this.deleted_forever ? null : this.editDropDown()}
 									</div> : (this.timedOut ? 
 									<div style='display: inline'>	
 										<div className='labels'>
@@ -96,9 +93,15 @@ export default class ChatMessage extends Component
 								}
 							</div>
 							<div className='message'>
-								<div config={this.configFormat.bind(this)}>
+								{this.censored ?
+									<div className='censored' title={app.translator.trans('pushedx-chat.forum.chat.message.censored')}>
+										{this.message}
+									</div>
+									:
+									<div config={this.configFormat.bind(this)}>
 
-								</div>
+									</div>
+								}
 							</div>
 						</div>
 					</div>
@@ -126,7 +129,7 @@ export default class ChatMessage extends Component
 			() => this.deleted_by, 
 			() => (
 				<div class='icon'>
-					<i class="fas fa-trash-alt"></i>
+					<i class="fas fa-trash-alt"></i> {app.translator.trans('pushedx-chat.forum.chat.message.deleted' + (this.deleted_forever ? '_forever' : ''))} {this.user_deleted_by ? username(this.user_deleted_by).children[0] : null}
 				</div>
 			)
 		);
@@ -155,59 +158,40 @@ export default class ChatMessage extends Component
 					menuClassName="Dropdown-menu--top Dropdown-menu--bottom Dropdown-menu--left Dropdown-menu--right"
 					icon="fas fa-ellipsis-h"
 				>
-					<Button 
-						onclick={this.chatFrame.messageEdit.bind(this.chatFrame, this)} 
-						icon='fas fa-pencil-alt'
-						disabled={this.deleted_by || this.chatFrame.messageEditing || !this.chatFrame.permissions.edit}
-					>
-						{app.translator.trans('core.forum.post_controls.edit_button')}
-					</Button>
-					<Separator />
-					{this.deleted_by ?
-						<Button 
-							onclick={this.restore.bind(this)} 
-							icon='fas fa-reply'
+					{this.user && this.user == app.session.user ?
+						[<Button 
+							onclick={this.chatFrame.messageEdit.bind(this.chatFrame, this)} 
+							icon='fas fa-pencil-alt'
+							disabled={this.deleted_by || this.chatFrame.messageEditing || !this.chatFrame.permissions.edit}
 						>
-							{app.translator.trans('core.forum.post_controls.restore_button')}
-						</Button>
-						:
-						<Button 
-							onclick={this.hide.bind(this)} 
-							icon='fas fa-trash-alt'
-							disabled={!this.chatFrame.permissions.delete}
-						>
-							{app.translator.trans('core.forum.post_controls.delete_button')}
-						</Button>
+							{app.translator.trans('core.forum.post_controls.edit_button')}
+						</Button>, <Separator />] : <div></div>
 					}
-				</DropDown>
-			</div>
-		)
-	}
-
-	editDropDownModerate()
-	{
-		return (
-			<div className='edit'>
-				<DropDown 
-					buttonClassName="Button Button--icon Button--flat"
-					menuClassName="Dropdown-menu--top Dropdown-menu--bottom Dropdown-menu--left Dropdown-menu--right"
-					icon="fas fa-ellipsis-h"
-				>
 					{this.deleted_by ?
-						<Button 
+						[<Button 
 							onclick={this.restore.bind(this)} 
 							icon='fas fa-reply'
 						>
 							{app.translator.trans('core.forum.post_controls.restore_button')}
-						</Button>
-						:
+						</Button>, <Separator />] : <div></div>
+					}
+					{!this.deleted_by && this.chatFrame.permissions.delete ?
 						<Button 
-							onclick={this.hide.bind(this)} 
+							onclick={this.delete.bind(this)} 
 							icon='fas fa-trash-alt'
 							disabled={!this.chatFrame.permissions.delete}
 						>
 							{app.translator.trans('core.forum.post_controls.delete_button')}
-						</Button>
+						</Button> : <div></div>
+					}
+					{this.deleted_by && this.chatFrame.permissions.moderate.delete ?
+						<Button 
+							onclick={this.delete.bind(this, true)} 
+							icon='fas fa-trash-alt'
+							disabled={!this.chatFrame.permissions.delete}
+						>
+							{app.translator.trans('core.forum.post_controls.delete_forever_button')}
+						</Button> : <div></div>
 					}
 				</DropDown>
 			</div>
@@ -255,15 +239,17 @@ export default class ChatMessage extends Component
 	{
 		if(element.chatMessage == this.message) return;
 
-		element.chatMessage = this.message
+		element.chatMessage = this.message;
 		this.element = element;
 		this.textFormat();
+
+		if(this.chatFrame.chatOnResize) this.chatFrame.chatOnResize();
 	}
 
 	textFormat(text)
 	{
-		if(!text) text = this.message
-		if(this.element) s9e.TextFormatter.preview(text, this.element)
+		if(!text) text = this.message;
+		if(this.element) s9e.TextFormatter.preview(text, this.element);
 
 		setTimeout(() => {
 			$('.chat script').each(function() {
@@ -272,21 +258,48 @@ export default class ChatMessage extends Component
 		}, 1000);
 	}
 
-	delete()
-	{
-		this.hidden = true;
-	}
-
-	hide()
+	delete(e, forever)
 	{
 		this.deleted_by = app.session.user.id();
-		this.apiDelete();
+		if(forever) 
+		{
+			this.deleted_forever = forever;
+			this.elementWrapper.style.display = 'none';
+			this.apiDelete(forever);
+		}
+		else 
+		{
+			this.apiEdit({hide: true});
+			this.hide(this.deleted_by);
+		}
+	}
+
+	hide(deleted_by)
+	{
+		this.deleted_by = deleted_by;
+		if(this.deleted_by == app.session.user.id()) this.user_deleted_by = app.session.user;
+		else
+		{
+			this.user_deleted_by = app.store.getById('users', this.deleted_by);
+			if(this.user_deleted_by == undefined)
+			{
+				app.store.find('chat/user', this.deleted_by).then((user) =>
+				{
+					if(user.data.id != '') 
+					{
+						this.user_deleted_by = user;
+						m.redraw();
+					}
+				});
+			}
+		}
+		m.redraw();
 	}
 
 	restore()
 	{
 		this.deleted_by = null;
-		this.apiDelete();
+		this.apiEdit({hide: false});
 	}
 
 	edit(newContent, outside = false)
@@ -297,15 +310,17 @@ export default class ChatMessage extends Component
 
 		this.textFormat();
 
-		if(!outside) this.apiEdit(newContent);
+		if(!outside) this.apiEdit({msg: newContent});
+
+		m.redraw();
 	}
 
-    apiEdit(content)
+    apiEdit(attributes)
     {
         app.request({
             method: 'PATCH',
             url: app.forum.attribute('apiUrl') + '/chat/' + this.id,
-            data: {msg: content}
+            data: {attributes: attributes}
         })
 	}
 	

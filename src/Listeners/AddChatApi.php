@@ -64,13 +64,25 @@ class AddChatApi
     {
         if($event->isSerializer(ForumSerializer::class)) 
         {
-            $permissions = ['pushedx-chat.permissions.chat', 'pushedx-chat.permissions.edit',
-            'pushedx-chat.permissions.delete', 'pushedx-chat.permissions.moderate.delete'];
+            $permissions = [
+                'pushedx-chat.permissions.chat', 
+                'pushedx-chat.permissions.edit',
+                'pushedx-chat.permissions.delete', 
+                'pushedx-chat.permissions.moderate.delete',
+                'pushedx-chat.permissions.moderate.vision'
+            ];
+
+            $attributes = [
+                'pushedx-chat.settings.charlimit',
+                'pushedx-chat.settings.display.minimize',
+                'pushedx-chat.settings.display.censor'
+            ];
 
             foreach($permissions as $permission)
                 $event->attributes[$permission] = $event->actor->can($permission);
 
-            $event->attributes['pushedx-chat.settings.charlimit'] = $this->settings->get('pushedx-chat.settings.charlimit');
+            foreach($attributes as $attribute)
+                $event->attributes[$attribute] = $this->settings->get($attribute);
         }
     }
 }

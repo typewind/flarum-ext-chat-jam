@@ -42,37 +42,14 @@ class DeleteChatHandler
 
         $this->assertCan(
             $actor,
-            'pushedx-chat.permissions.delete'
+            'pushedx-chat.permissions.moderate.delete'
         );
 
 		$message = $this->messages->findOrFail($messageId);
 		
-		if($message->deleted_by)
-		{
-			if($message->deleted_by != $actor->id)
-			{
-				$this->assertCan(
-					$actor,
-					'pushedx-chat.permissions.moderate.delete'
-				);
-			}	
-			$message->deleted_by = null;
-		}
-		else 
-		{
-			if($message->actorId != $actor->id)
-			{
-				$this->assertCan(
-					$actor,
-					'pushedx-chat.permissions.moderate.delete'
-				);
-			}	
-			$message->deleted_by = $actor->id;
-		}
-        
-        $message->save();
+        $message->delete();
 
-        $message->invoker = $actor->id;
+        $message->deleted_forever = true;
         $message->event = 'pushedx-chat.socket.event.delete';
 
         return $message;

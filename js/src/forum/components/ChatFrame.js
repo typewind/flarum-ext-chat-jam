@@ -34,7 +34,7 @@ export default class ChatFrame extends Component
 
         this.loading = false;
         this.scroll = {autoScroll: true, oldScroll: 0, loadingFetch: false, needToScroll: true};
-        this.beingShown = beingShown === null ? true : JSON.parse(beingShown);
+        this.beingShown = beingShown === null ? !app.forum.attribute('pushedx-chat.settings.display.minimize') : JSON.parse(beingShown);
         this.isMuted = isMuted === null ? false : JSON.parse(isMuted);
         this.notify = notify === null ? false : JSON.parse(notify);
         this.transform = transform === null ? {x: 0, y: 400} : JSON.parse(transform);
@@ -50,6 +50,7 @@ export default class ChatFrame extends Component
             this.permissions.edit = app.forum.attribute('pushedx-chat.permissions.edit');
             this.permissions.delete = app.forum.attribute('pushedx-chat.permissions.delete');
             this.permissions.moderate.delete = app.forum.attribute('pushedx-chat.permissions.moderate.delete');
+            this.permissions.moderate.vision = app.forum.attribute('pushedx-chat.permissions.moderate.vision');
 
             this.input.placeholder = app.translator.trans(this.permissions.post ? 'pushedx-chat.forum.chat.placeholder' : 'pushedx-chat.forum.errors.chatdenied')
         }
@@ -63,11 +64,14 @@ export default class ChatFrame extends Component
         window.addEventListener('blur', (() => this.active = false));
         window.addEventListener('focus', (() => this.active = true));
 
-        app.pusher.then(channel => 
+        if(!app.forum.attribute('pushedx-chat.settings.censor') || app.session.user)
         {
-            this.pusherChannel = channel
-            this.pusherAttach(channel)
-        });
+            app.pusher.then(channel => 
+            {
+                this.pusherChannel = channel
+                this.pusherAttach(channel)
+            });
+        }
 
         this.apiFetch();
     }
@@ -91,14 +95,24 @@ export default class ChatFrame extends Component
             }),
             channel('pushedx-chat.socket.event.edit', data =>
             {
-                if(!app.session.user || data.actorId != app.session.user.id())
-                    if(this.messages.instances[data.id])
-                        this.messages.instances[data.id].edit(data.message, true);
+                if(data.attributes.msg !== undefined)
+                {
+                    if(!app.session.user || data.actorId != app.session.user.id())
+                    {
+                        if(this.messages.instances[data.id])
+                            this.messages.instances[data.id].edit(data.attributes.msg, true);
+                    }
+                }
+                else if(data.attributes.hide !== undefined)
+                {
+                    if(!app.session.user || data.invoker != app.session.user.id())
+                        data.attributes.hide ? this.messageDelete(data) : this.messageRestore(data)
+                }
             }),
             channel('pushedx-chat.socket.event.delete', data =>
             {
-                if(!app.session.user || data.invoker != app.session.user.id())
-                    data.deleted_by ? this.messageDelete(data) : this.messageRestore(data)
+                if(!app.session.user || data.actorId != app.session.user.id())
+                    this.messageDelete(data)
             })  
         ]
 
@@ -371,6 +385,12 @@ export default class ChatFrame extends Component
         this.moveLast = {x: e.clientX, y: e.clientY};
     }
 
+    chatOnResize()
+    {
+        if(this.scroll.autoScroll) 
+            this.scrollToBottom();
+    }
+
     inputProcess(e)
     {
         let input = this.getChatInput();
@@ -519,20 +539,33 @@ export default class ChatFrame extends Component
     messageDelete(data)
     {
         let message = this.messages.instances[data.id];
-        if(message) message.elementWrapper.style.display = 'none'; 
+        if(message) 
+        {
+            if(this.permissions.moderate.vision) 
+            {
+                message.hide(data.deleted_by);
+                m.redraw();
+            }
+            else message.elementWrapper.style.display = 'none'; 
+        }
     }
 
     messageRestore(data)
     {
         let message = this.messages.instances[data.id];
-        if(message) message.elementWrapper.style.display = ''; 
+        if(message) 
+        {
+            message.elementWrapper.style.display = ''; 
+            message.deleted_by = null;
+            m.redraw();
+        }
         else
         {
             let messageIds = Object.keys(this.messages.instances);
             messageIds.some((value, index, array) => 
             {
                 if(array[index - 1] < data.id && data.id < array[index])
-                    return this.messages.components.splice(index, 0, this.createMessage(data))
+                    return this.messages.components.splice(index, 0, this.createMessage(data));
             })
             m.redraw();
         }
@@ -607,8 +640,7 @@ export default class ChatFrame extends Component
 
     messageIsMention(msg)
     {
-        let currentUser = app.session.user.username();
-        return currentUser && (msg.indexOf('@' + currentUser) >= 0);
+        return app.session.user && (msg.indexOf('@' + app.session.user.username()) >= 0);
     }
 
     notifyTry(msg, user) 

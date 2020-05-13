@@ -27,21 +27,21 @@ class EditChat
     public $actor;
 	
     /**
-     * Chat message content
+     * Chat message attributes
      *
      * @var string
      */
-    public $msg;
+    public $data;
 
     /**
      * @param int		$id
      * @param User		$actor
-	 * @param string	$msg
+	 * @param string	$data
      */
-    public function __construct($id, User $actor, $msg)
+    public function __construct($id, User $actor, $data)
     {
         $this->id = $id;
 		$this->actor = $actor;
-		$this->msg = $msg;
+		$this->data = $data;
     }
 }

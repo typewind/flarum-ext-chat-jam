@@ -33,8 +33,9 @@ class FetchChatHandler
      */
     public function handle(FetchChat $command)
     {
+        $actor = $command->actor;
         $messageId = $command->id;
-        $messages = $this->messages->fetch($messageId);
+        $messages = $this->messages->fetch($messageId, $actor);
 
         return $messages;
     }

@@ -49,9 +49,10 @@ class FetchChatController extends AbstractListController
     protected function data(ServerRequestInterface $request, Document $document)
     {
         $id = Arr::get($request->getQueryParams(), 'id');
+        $actor = $request->getAttribute('actor');
 
         return $this->bus->dispatch(
-            new FetchChat($id)
+            new FetchChat($id, $actor)
         );
     }
 }

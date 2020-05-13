@@ -22,8 +22,9 @@ class FetchChat
     /**
      * @param int     $id
      */
-    public function __construct($id)
+    public function __construct($id, $actor)
     {
         $this->id = $id;
+        $this->actor = $actor;
     }
 }

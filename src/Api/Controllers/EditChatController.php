@@ -49,10 +49,10 @@ class EditChatController extends AbstractShowController
     {
         $id = Arr::get($request->getQueryParams(), 'id');
         $actor = $request->getAttribute('actor');
-        $msg = array_get($request->getParsedBody(), 'msg');
+        $data = Arr::get($request->getParsedBody(), 'attributes', []);
 
         return $this->bus->dispatch(
-            new EditChat($id, $actor, $msg)
+            new EditChat($id, $actor, $data)
         );
     }
 }

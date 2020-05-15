@@ -129,7 +129,7 @@ export default class ChatMessage extends Component
 			() => this.deleted_by, 
 			() => (
 				<div class='icon'>
-					<i class="fas fa-trash-alt"></i> {app.translator.trans('pushedx-chat.forum.chat.message.deleted' + (this.deleted_forever ? '_forever' : ''))} {this.user_deleted_by ? username(this.user_deleted_by).children[0] : null}
+					<i class="fas fa-trash-alt"></i> <span>{'(' + app.translator.trans('pushedx-chat.forum.chat.message.deleted' + (this.deleted_forever ? '_forever' : ''))} {this.user_deleted_by ? (username(this.user_deleted_by).children[0]  + ')') : null}</span>
 				</div>
 			)
 		);

@@ -10,7 +10,7 @@ namespace Xelson\Chat\Commands;
 
 use Flarum\User\User;
 
-class DeleteChat
+class DeleteMessage
 {
     /**
      * The chat message id

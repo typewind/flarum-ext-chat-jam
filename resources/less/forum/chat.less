@@ -6,26 +6,131 @@
     padding-left: 15px !important;
     padding-right: 15px !important;
     max-width: 100%;
-    width: 700px;
     color: #000;
 
     .frame
     {
+        display: flex;
         position: relative;
         float: right;
         max-width: 100%;
-        width: 700px;
         background-color: white;
-        border-radius: 4px 4px 0 0;
         box-shadow: 0 2px 6px rgba(0,0,0,0.35);
         outline: none;
+
+        #chats-list
+        {
+            width: 70px;
+            background-color: #ffe0ed;
+
+            .header
+            {
+                display: flex;
+                justify-content: flex-end;
+                height: 35px;
+                background-color: #ff94c1;
+
+                p
+                {
+                    position: relative;
+                    float: right;
+                }
+                
+                .icon
+                {
+                    width: 28px;
+                    height: 35px;
+                    color: #3a3a3a;
+                    vertical-align: middle;
+                    text-align: center;
+                    font-size: 12pt;
+                    cursor: pointer;
+                    padding-top: 5px;
+    
+                    &:hover
+                    {
+                        color: #fcfcfc;
+                        text-shadow: 0 0 2px #fcfcfc;
+                    }
+                }
+            }
+
+            &:hover, &.toggled
+            {
+                width: 225px;
+                .header
+                {
+                    justify-content: space-between;
+                }
+
+                .panel-preview
+                {
+                    border-radius: 15px;
+                }
+
+                .input-wrapper
+                {
+                    display: block;
+                }
+            }
+
+            &.toggled
+            {
+                .icon-toggle
+                {
+                    color: #FFF;
+                }
+            }
+
+            .input-wrapper
+            {
+                display: none;
+
+                #chat-find
+                {
+                    resize: none;
+                    width: 80%;
+                    border-radius: 8px;
+                    background-color: #ffffff;
+                    border: none;
+                    margin: 5px 5px 5px 10px;
+                    outline: none;
+                    padding: 3px 8px;
+                    height: 25px;
+                    overflow: hidden;
+    
+                    &:focus::placeholder {color: #adadad}
+                    &:focus:-moz-placeholder {color: #adadad}
+                    &:focus::-moz-placeholder {color: #adadad}
+                    &:focus:-ms-input-placeholder {color: #adadad}
+                    &:focus::-webkit-input-placeholder {color: #adadad}
+                }
+            }
+
+            .panel-preview
+            {
+                height: 55px;
+                background-color: #fff;
+                margin: 8px;
+                border-radius: 100px;
+
+                &:hover, &.active
+                {
+                    box-shadow: 0 0 0 3px #ff4593;
+                }
+            }
+        }
+
+        #chat-panel
+        {
+            width: 650px;
+        }
 
         #chat-header
         {
             width: 100%;
             height: 35px;
             background-color: #313946;
-            border-radius: 4px 4px 0 0;
             user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -405,11 +510,7 @@
 {
     .frame
     {
-        .input-wrapper
-        {
-            display: none;
-        }
-        .wrapper
+        .input-wrapper, .wrapper, #chats-list
         {
             display: none;
         }

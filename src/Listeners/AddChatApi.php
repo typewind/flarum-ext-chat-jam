@@ -8,10 +8,10 @@
 
 namespace Xelson\Chat\Listeners;
 
-use Xelson\Chat\Api\Controllers\PostChatController;
-use Xelson\Chat\Api\Controllers\FetchChatController;
-use Xelson\Chat\Api\Controllers\EditChatController;
-use Xelson\Chat\Api\Controllers\DeleteChatController;
+use Xelson\Chat\Api\Controllers\PostMessageController;
+use Xelson\Chat\Api\Controllers\FetchMessageController;
+use Xelson\Chat\Api\Controllers\EditMessageController;
+use Xelson\Chat\Api\Controllers\DeleteMessageController;
 use Xelson\Chat\Api\Controllers\ShowUserSafeController;
 
 use Flarum\Api\Serializer\ForumSerializer;
@@ -47,10 +47,10 @@ class AddChatApi
      */
     public function configureApiRoutes(ConfigureApiRoutes $event)
     {
-        $event->post('/chat', 'pushedx.chat.post', PostChatController::class);
-        $event->get('/chat/{id}', 'pushedx.chat.fetch', FetchChatController::class);
-        $event->patch('/chat/{id}', 'pushedx.chat.edit', EditChatController::class);
-        $event->delete('/chat/{id}', 'pushedx.chat.delete', DeleteChatController::class);
+        $event->post('/chat', 'pushedx.chat.post', PostMessageController::class);
+        $event->get('/chat/{id}', 'pushedx.chat.fetch', FetchMessageController::class);
+        $event->patch('/chat/message/{id}', 'pushedx.chat.edit', EditMessageController::class);
+        $event->delete('/chat/message/{id}', 'pushedx.chat.delete', DeleteMessageController::class);
 
         $event->get('/chat/user/{id}', 'pushedx.chat.user', ShowUserSafeController::class);
     }

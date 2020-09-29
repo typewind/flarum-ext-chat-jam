@@ -19,7 +19,7 @@ class ShowUserSafeController extends ShowUserController
     /**
      * ShowUserController causes an immediate error if the user does not exist by the request, 
      * so checking the user for existence turns into an 404 error, which is then displayed 
-     * to the user. Don't beat me if it's bad solution
+     * to the user. Don't beat me if this is a bad solution
      * 
      * {@inheritdoc}
      */

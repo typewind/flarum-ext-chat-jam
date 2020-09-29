@@ -13,7 +13,7 @@ use Flarum\User\User;
 use Flarum\Api\Serializer\AbstractSerializer;
 use Flarum\Settings\SettingsRepositoryInterface;
 
-class ChatSerializer extends AbstractSerializer
+class MessageSerializer extends AbstractSerializer
 {
     /**
      * @var string

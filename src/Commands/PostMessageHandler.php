@@ -14,7 +14,7 @@ use Xelson\Chat\MessageValidator;
 use Xelson\Chat\MessageFloodgate;
 use Flarum\User\AssertPermissionTrait;
 
-class PostChatHandler
+class PostMessageHandler
 {
     use AssertPermissionTrait;
 
@@ -44,10 +44,10 @@ class PostChatHandler
     /**
      * Handles the command execution.
      *
-     * @param PostChat $command
+     * @param PostMessage $command
      * @return null|string
      */
-    public function handle(PostChat $command)
+    public function handle(PostMessage $command)
     {
         $actor = $command->actor;
         $content = $command->msg;

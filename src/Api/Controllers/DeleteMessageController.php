@@ -8,22 +8,22 @@
 
 namespace Xelson\Chat\Api\Controllers;
 
-use Xelson\Chat\Api\Serializers\ChatSerializer;
-use Xelson\Chat\Commands\PostChat;
+use Xelson\Chat\Api\Serializers\MessageSerializer;
+use Xelson\Chat\Commands\DeleteMessage;
 use Flarum\Api\Controller\AbstractShowController;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
+use Illuminate\Support\Arr;
 
-class PostChatController extends AbstractShowController
+class DeleteMessageController extends AbstractShowController
 {
-
     /**
      * The serializer instance for this request.
      *
-     * @var ChatSerializer
+     * @var MessageSerializer
      */
-    public $serializer = ChatSerializer::class;
+    public $serializer = MessageSerializer::class;
 
     /**
      * @var Dispatcher
@@ -38,19 +38,16 @@ class PostChatController extends AbstractShowController
         $this->bus = $bus;
     }
     /**
-     * Get the data to be serialized and assigned to the response document.
-     *
      * @param ServerRequestInterface $request
-     * @param Document               $document
      * @return mixed
      */
     protected function data(ServerRequestInterface $request, Document $document)
     {
+        $id = Arr::get($request->getQueryParams(), 'id');
         $actor = $request->getAttribute('actor');
-        $msg = array_get($request->getParsedBody(), 'msg');
 
         return $this->bus->dispatch(
-            new PostChat($msg, $actor)
+            new DeleteMessage($id, $actor)
         );
     }
 }

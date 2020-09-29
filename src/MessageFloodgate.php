@@ -53,7 +53,7 @@ class MessageFloodgate
 		if(count($lastMessages) != $number) return false;
 		foreach($lastMessages as $message)
 		{
-			if($message->actorId != $actor->id)
+			if($message->user_id != $actor->id)
 				return false;
 		}
 		return true;

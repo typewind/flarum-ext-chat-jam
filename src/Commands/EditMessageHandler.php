@@ -14,7 +14,7 @@ use Xelson\Chat\MessageRepository;
 use Xelson\Chat\MessageValidator;
 use Flarum\User\AssertPermissionTrait;
 
-class EditChatHandler
+class EditMessageHandler
 {
     use AssertPermissionTrait;
 
@@ -43,10 +43,10 @@ class EditChatHandler
     /**
      * Handles the command execution.
      *
-     * @param EditChat $command
+     * @param EditMessage $command
      * @return null|string
      */
-    public function handle(EditChat $command)
+    public function handle(EditMessage $command)
     {
         $messageid = $command->id;
         $actor = $command->actor;
@@ -60,7 +60,7 @@ class EditChatHandler
                 $actor,
                 'pushedx-chat.permissions.edit'
             );
-            $this->assertPermission($actor->id == $message->actorId);
+            $this->assertPermission($actor->id == $message->user_id);
 
             $message->message = $data['msg'];
             $message->edited_at = Carbon::now();
@@ -80,7 +80,7 @@ class EditChatHandler
 
             if($data['hide'])
             {
-                if($message->actorId != $actor->id)
+                if($message->user_id != $actor->id)
                 {
                     $this->assertCan(
                         $actor,

@@ -10,14 +10,14 @@ namespace Xelson\Chat\Commands;
 
 use Flarum\User\User;
 
-class EditChat
+class PostMessage
 {
     /**
-     * The chat message id
+     * The chat message
      *
-     * @var int
+     * @var string
      */
-	public $id;
+    public $msg;
 
     /**
      * The user performing the action.
@@ -25,23 +25,14 @@ class EditChat
      * @var User
      */
     public $actor;
-	
-    /**
-     * Chat message attributes
-     *
-     * @var string
-     */
-    public $data;
 
     /**
-     * @param int		$id
-     * @param User		$actor
-	 * @param string	$data
+     * @param int                          $postId The ID of the post to upload the image for.
+     * @param User                         $actor  The user performing the action.
      */
-    public function __construct($id, User $actor, $data)
+    public function __construct(/*\string*/ $msg, User $actor)
     {
-        $this->id = $id;
-		$this->actor = $actor;
-		$this->data = $data;
+        $this->msg = $msg;
+        $this->actor = $actor;
     }
 }

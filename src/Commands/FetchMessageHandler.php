@@ -10,7 +10,7 @@ namespace Xelson\Chat\Commands;
 
 use Xelson\Chat\MessageRepository;
 
-class FetchChatHandler
+class FetchMessageHandler
 {
     /**
      * @var MessageRepository
@@ -31,7 +31,7 @@ class FetchChatHandler
      * @return null|string
      *
      */
-    public function handle(FetchChat $command)
+    public function handle(FetchMessage $command)
     {
         $actor = $command->actor;
         $messageId = $command->id;

@@ -8,23 +8,23 @@
 
 namespace Xelson\Chat\Api\Controllers;
 
-use Xelson\Chat\Api\Serializers\ChatSerializer;
-use Xelson\Chat\Commands\EditChat;
-use Flarum\Api\Controller\AbstractShowController;
+use Xelson\Chat\Api\Serializers\MessageSerializer;
+use Xelson\Chat\Commands\FetchMessage;
+use Illuminate\Support\Arr;
+use Flarum\Api\Controller\AbstractListController;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
-use Illuminate\Support\Arr;
 
-class EditChatController extends AbstractShowController
+class FetchMessageController extends AbstractListController
 {
+
     /**
      * The serializer instance for this request.
      *
-     * @var ChatSerializer
+     * @var MessageSerializer
      */
-    public $serializer = ChatSerializer::class;
-
+    public $serializer = MessageSerializer::class;
 
     /**
      * @var Dispatcher
@@ -38,6 +38,7 @@ class EditChatController extends AbstractShowController
     {
         $this->bus = $bus;
     }
+
     /**
      * Get the data to be serialized and assigned to the response document.
      *
@@ -49,10 +50,9 @@ class EditChatController extends AbstractShowController
     {
         $id = Arr::get($request->getQueryParams(), 'id');
         $actor = $request->getAttribute('actor');
-        $data = Arr::get($request->getParsedBody(), 'attributes', []);
 
         return $this->bus->dispatch(
-            new EditChat($id, $actor, $data)
+            new FetchMessage($id, $actor)
         );
     }
 }

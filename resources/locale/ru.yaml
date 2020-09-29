@@ -9,6 +9,10 @@ pushedx-chat:
       minimize: Свернуть
       maximize: Развернуть
     chat:
+      list:
+        pin: Закрепить панель
+        unpin: Открепить панель
+        placeholder: Поиск
       placeholder: Напишите сообщение...
       message:
         actions:

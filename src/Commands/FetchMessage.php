@@ -10,7 +10,7 @@ namespace Xelson\Chat\Commands;
 
 use Flarum\User\User;
 
-class FetchChat
+class FetchMessage
 {
     /**
      * The chat message ID

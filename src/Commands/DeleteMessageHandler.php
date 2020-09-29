@@ -12,7 +12,7 @@ use Xelson\Chat\Message;
 use Xelson\Chat\MessageRepository;
 use Flarum\User\AssertPermissionTrait;
 
-class DeleteChatHandler
+class DeleteMessageHandler
 {
     use AssertPermissionTrait;
 
@@ -32,10 +32,10 @@ class DeleteChatHandler
     /**
      * Handles the command execution.
      *
-     * @param DeleteChat $command
+     * @param DeleteMessage $command
      * @return null|string
      */
-    public function handle(DeleteChat $command)
+    public function handle(DeleteMessage $command)
     {
         $messageId = $command->id;
         $actor = $command->actor;

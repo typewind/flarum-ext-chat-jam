@@ -9,6 +9,10 @@ pushedx-chat:
       minimize: Minimize
       maximize: Maximize
     chat:
+      list:
+        pin: Pin panel
+        unpin: Unpin panel
+        placeholder: Search
       placeholder: Type your message...
       message:
         actions:

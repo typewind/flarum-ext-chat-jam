@@ -14,7 +14,7 @@ use Flarum\Database\AbstractModel;
 
 class Message extends AbstractModel
 {
-    protected $table = 'pushedx_messages';
+    protected $table = 'neonchat_messages';
 
     protected $dates = ['created_at', 'edited_at'];
 
@@ -22,18 +22,18 @@ class Message extends AbstractModel
      * Create a new message.
      *
      * @param string    $message
-     * @param int       $actorId
+     * @param int       $user_id
      * @param Carbon    $created_at
      * @param Carbon    $edited_at
      * @param int       $deleted_by
      * 
      */
-    public static function build($message, $actorId, $created_at, $edited_at = null, $deleted_by = null)
+    public static function build($message, $user_id, $created_at, $edited_at = null, $deleted_by = null)
     {
         $msg = new static;
 
         $msg->message = $message;
-        $msg->actorId = $actorId;
+        $msg->user_id = $user_id;
         $msg->created_at = $created_at;
         $msg->edited_at = $edited_at;
         $msg->deleted_by = $deleted_by;
@@ -46,6 +46,6 @@ class Message extends AbstractModel
      */
     public function actor()
     {
-        return $this->belongsTo(User::class, 'actorId');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

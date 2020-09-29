@@ -319,7 +319,7 @@ export default class ChatMessage extends Component
     {
         app.request({
             method: 'PATCH',
-            url: app.forum.attribute('apiUrl') + '/chat/' + this.id,
+            url: app.forum.attribute('apiUrl') + '/chat/message/' + this.id,
             data: {attributes: attributes}
         })
 	}
@@ -328,7 +328,7 @@ export default class ChatMessage extends Component
 	{
         app.request({
             method: 'DELETE',
-            url: app.forum.attribute('apiUrl') + '/chat/' + this.id
+            url: app.forum.attribute('apiUrl') + '/chat/message/' + this.id
         })
 	}
 

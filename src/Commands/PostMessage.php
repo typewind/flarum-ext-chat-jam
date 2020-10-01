@@ -30,9 +30,11 @@ class PostMessage
      * @param int                          $postId The ID of the post to upload the image for.
      * @param User                         $actor  The user performing the action.
      */
-    public function __construct(/*\string*/ $msg, User $actor)
+    public function __construct(/*\string*/ $msg, User $actor, int $chat_id, string $ip_address)
     {
         $this->msg = $msg;
         $this->actor = $actor;
+        $this->chat_id = $chat_id;
+        $this->ip_address = $ip_address;
     }
 }

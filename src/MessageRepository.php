@@ -62,18 +62,20 @@ class MessageRepository
      * Fetching visible messages by message id
      * 
      * @param  int 		$id
+     * @param  User     $actor
+     * @param  int      $chat_id
      * @return array
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function fetch($id, User $actor)
+    public function fetch($id, User $actor, $chat_id)
     {
         $messages = $this->queryVisible($actor);
 
         $list = $id ? 
-            $messages->where('id', '<', $id)->orderBy('id', 'desc')->limit(20) 
+            $messages->where('id', '<', $id)->where('chat_id', $chat_id)->orderBy('id', 'desc')->limit(20) 
             :
-            $messages->orderBy('id', 'desc')->limit(20);
+            $messages->where('chat_id', $chat_id)->orderBy('id', 'desc')->limit(20);
 
         return $list->get()->reverse();
     }

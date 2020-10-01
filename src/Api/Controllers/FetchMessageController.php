@@ -48,11 +48,12 @@ class FetchMessageController extends AbstractListController
      */
     protected function data(ServerRequestInterface $request, Document $document)
     {
-        $id = Arr::get($request->getQueryParams(), 'id');
+        $chat_id = Arr::get($request->getQueryParams(), 'id');
         $actor = $request->getAttribute('actor');
+        $id = array_get($request->getParsedBody(), 'start_from');
 
         return $this->bus->dispatch(
-            new FetchMessage($id, $actor)
+            new FetchMessage($id, $actor, $chat_id)
         );
     }
 }

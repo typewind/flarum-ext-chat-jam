@@ -26,9 +26,12 @@ class Message extends AbstractModel
      * @param Carbon    $created_at
      * @param Carbon    $edited_at
      * @param int       $deleted_by
+     * @param int       $chat_id
+     * @param bool      $is_readed
      * 
      */
-    public static function build($message, $user_id, $created_at, $edited_at = null, $deleted_by = null)
+    public static function build($message, $user_id, $created_at, $chat_id = 1, 
+        $ip_address = null, $is_readed = false, $edited_at = null, $deleted_by = null)
     {
         $msg = new static;
 
@@ -37,6 +40,9 @@ class Message extends AbstractModel
         $msg->created_at = $created_at;
         $msg->edited_at = $edited_at;
         $msg->deleted_by = $deleted_by;
+        $msg->chat_id = $chat_id;
+        $msg->is_readed = $is_readed;
+        $msg->ip_address = $ip_address;
 
         return $msg;
     }
@@ -47,5 +53,13 @@ class Message extends AbstractModel
     public function actor()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function chat()
+    {
+        return $this->belongsTo(User::class, 'chat_id');
     }
 }

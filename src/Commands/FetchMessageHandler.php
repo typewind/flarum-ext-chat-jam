@@ -8,6 +8,7 @@
 
 namespace Xelson\Chat\Commands;
 
+use Xelson\Chat\ChatRepository;
 use Xelson\Chat\MessageRepository;
 
 class FetchMessageHandler
@@ -19,10 +20,14 @@ class FetchMessageHandler
 
     /**
      * @param MessageRepository             $messages
+     * @param ChatRepository                $chats
      */
-    public function __construct(MessageRepository $messages) 
+    public function __construct(
+        MessageRepository $messages,
+        ChatRepository $chats) 
     {
         $this->messages  = $messages;
+        $this->chats = $chats;
     }
 
     /**
@@ -35,7 +40,10 @@ class FetchMessageHandler
     {
         $actor = $command->actor;
         $messageId = $command->id;
-        $messages = $this->messages->fetch($messageId, $actor);
+       
+        $chat_id = $this->chats->findOrFail($command->chat_id, $actor);
+
+        $messages = $this->messages->fetch($messageId, $actor, $chat_id);
 
         return $messages;
     }

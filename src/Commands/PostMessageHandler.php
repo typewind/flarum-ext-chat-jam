@@ -9,6 +9,7 @@
 namespace Xelson\Chat\Commands;
 
 use Carbon\Carbon;
+use Xelson\Chat\ChatRepository;
 use Xelson\Chat\Message;
 use Xelson\Chat\MessageValidator;
 use Xelson\Chat\MessageFloodgate;
@@ -31,14 +32,17 @@ class PostMessageHandler
     /**
      * @param MessageValidator      $validator
      * @param MessageFloodgate      $floodgate
+     * @param ChatRepository        $chats
      */
     public function __construct(
         MessageValidator $validator,
-        MessageFloodgate $floodgate
+        MessageFloodgate $floodgate,
+        ChatRepository $chats
     ) 
     {
         $this->validator = $validator;
         $this->floodgate = $floodgate;
+        $this->chats = $chats;
     }
 
     /**
@@ -51,6 +55,9 @@ class PostMessageHandler
     {
         $actor = $command->actor;
         $content = $command->msg;
+        $ip_address = $command->ip_address;
+
+        $chat_id = $this->chats->findOrFail($command->chat_id, $actor);
 
         $this->assertCan(
             $actor,
@@ -62,7 +69,9 @@ class PostMessageHandler
         $message = Message::build(
             $content,
             $actor->id,
-            Carbon::now()
+            Carbon::now(),
+            $chat_id,
+            $ip_address
         );
 
         $this->validator->assertValid($message->getDirty());

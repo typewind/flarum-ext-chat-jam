@@ -37,6 +37,7 @@ return [
 			$table->integer('chat_id')->unsigned()->default(1);
 			$table->renameColumn('actorId', 'user_id');
 			$table->boolean('is_readed')->default(0);
+			$table->string('ip_address', 45)->nullable();
 			
 			$table->foreign('chat_id')->references('id')->on('neonchat_chats')->onDelete('cascade');
 			$table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

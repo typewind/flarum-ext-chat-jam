@@ -1,0 +1,74 @@
+<?php
+/*
+ * This file is part of xelson/flarum-ext-chat
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Xelson\Chat\Api\Serializers;
+
+use Flarum\User\User;
+use Flarum\Api\Serializer\AbstractSerializer;
+use Flarum\Settings\SettingsRepositoryInterface;
+use Flarum\Api\Serializer\BasicUserSerializer;
+
+class ChatSerializer extends AbstractSerializer
+{
+    /**
+     * @var string
+     */
+    protected $type = 'chat';
+
+    /**
+     * @var SettingsRepositoryInterface
+     */
+    protected $settings;
+
+    /**
+     * @var User
+     */
+    protected $actor;
+
+    /**
+     * @param PusherWrapper                 $pusher
+     */
+    public function __construct(
+        SettingsRepositoryInterface $settings,
+        User $actor
+    ) 
+    {
+        $this->settings = $settings;
+        $this->actor = $actor;
+    }
+
+    /**
+     * Get the default set of serialized attributes for a model.
+     *
+     * @param object|array $model
+     * @return array
+     */
+    protected function getDefaultAttributes($chat)
+    {
+        $attributes = $chat->getAttributes();
+        if($chat->created_at) $attributes['created_at'] = $this->formatDate($chat->created_at);
+
+        return $attributes;
+    }
+
+    /**
+     * @return \Tobscure\JsonApi\Relationship
+     */
+    protected function creator($chat)
+    {
+        return $this->hasOne($chat, BasicUserSerializer::class);
+    }
+
+    /**
+     * @return \Tobscure\JsonApi\Relationship
+     */
+    protected function users($chat)
+    {
+        return $this->hasMany($chat, BasicUserSerializer::class);
+    }
+}

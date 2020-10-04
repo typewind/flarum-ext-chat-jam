@@ -31,6 +31,11 @@ class DeleteMessageController extends AbstractShowController
     protected $bus;
 
     /**
+     * {@inheritdoc}
+     */
+    public $include = ['user'];
+
+    /**
      * @param Dispatcher $bus
      */
     public function __construct(Dispatcher $bus)

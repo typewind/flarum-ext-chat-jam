@@ -50,7 +50,7 @@ class AddChatApi
     {
         $event->get('/chats', 'pushedx.chat.get', ListChatsController::class);
         $event->get('/chats/{id}', 'pushedx.chat.fetch', FetchMessageController::class);
-        $event->post('/chatmessages/{id}', 'pushedx.chat.post', PostMessageController::class);
+        $event->post('/chats/{id}', 'pushedx.chat.post', PostMessageController::class);
         $event->patch('/chatmessages/{id}', 'pushedx.chat.edit', EditMessageController::class);
         $event->delete('/chatmessages/{id}', 'pushedx.chat.delete', DeleteMessageController::class);
 

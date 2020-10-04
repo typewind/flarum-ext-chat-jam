@@ -34,12 +34,10 @@ class ChatSerializer extends AbstractSerializer
      * @param PusherWrapper                 $pusher
      */
     public function __construct(
-        SettingsRepositoryInterface $settings,
-        User $actor
+        SettingsRepositoryInterface $settings
     ) 
     {
         $this->settings = $settings;
-        $this->actor = $actor;
     }
 
     /**

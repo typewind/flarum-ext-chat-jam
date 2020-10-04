@@ -2,7 +2,9 @@ import Component from 'flarum/Component';
 import ChatPreview from './ChatPreview';
 import ChatViewport from './ChatViewport';
 
-import createStore from '../store';
+import extendGlobalStore from '../store';
+import Chat from '../models/Chat';
+import Message from '../models/Message';
 
 export default class ChatFrame extends Component
 {
@@ -14,7 +16,10 @@ export default class ChatFrame extends Component
         let notify = localStorage.getItem('chat_notify');
         let transform = localStorage.getItem('chat_transform');
 
-        createStore(this);
+        extendGlobalStore({
+            chats: Chat,
+            chatmessages: Message
+        });
 
         this.beingShown = beingShown === null ? !app.forum.attribute('pushedx-chat.settings.display.minimize') : JSON.parse(beingShown);
         this.beingShownChatsList = beingShownChatsList === null ? 0 : JSON.parse(beingShownChatsList);
@@ -33,67 +38,12 @@ export default class ChatFrame extends Component
         window.addEventListener('blur', (() => this.active = false));
         window.addEventListener('focus', (() => this.active = true));
 
-        if(!app.forum.attribute('pushedx-chat.settings.censor') || app.session.user)
+        if(!app.pusher)
         {
-            if(app.pusher)
-            {
-                app.pusher.then(pusher => 
-                {
-                    this.pusher = pusher
-                    this.pusherAttach(this.pusher)
-                });
-            }
-            else alert("Please enable Pusher/WebSocket to use Neon Chat!");
+            alert("Please enable Pusher/WebSocket to use Neon Chat!");
+            return;
         }
-
         this.apiFetchChats();
-    }
-
-    pusherAttach(pusher)
-    {
-        function event(name, callback) {
-            return {name: name, callback: callback};
-        };
-
-        this.pusherEvents = 
-        [
-            event('pushedx-chat.socket.event.post', data =>
-            {
-                if(!app.session.user || data.user_id != app.session.user.id())
-                {
-                    this.messages.components.push(this.createMessage(data, {}, true));
-                    this.scroll.needToScroll = true;
-                    m.redraw();
-                }
-            }),
-            event('pushedx-chat.socket.event.edit', data =>
-            {
-                if(data.attributes.msg !== undefined)
-                {
-                    if(!app.session.user || data.user_id != app.session.user.id())
-                    {
-                        if(this.messages.instances[data.id])
-                            this.messages.instances[data.id].edit(data.attributes.msg, true);
-                    }
-                }
-                else if(data.attributes.hide !== undefined)
-                {
-                    if(!app.session.user || data.invoker != app.session.user.id())
-                        data.attributes.hide ? this.messageDelete(data) : this.messageRestore(data)
-                }
-            }),
-            event('pushedx-chat.socket.event.delete', data =>
-            {
-                if(!app.session.user || data.user_id != app.session.user.id())
-                    this.messageDelete(data)
-            })  
-        ]
-        this.pusherEvents.map(event => pusher.main.bind(event.name, event.callback));
-    }
-
-    pusherDetach(pusher)
-    {
-        this.pusherEvents.map(event => pusher.main.unbind(event.name));
     }
 
     getChat()
@@ -303,7 +253,7 @@ export default class ChatFrame extends Component
         this.moveLast = {x: e.clientX, y: e.clientY};
     }
 
-    onChatChanged(component, instance)
+    onChatChanged(instance)
     {
         if(this.viewportChat) 
         {
@@ -317,11 +267,23 @@ export default class ChatFrame extends Component
         m.redraw();
     }
 
+    apiFetchChats()
+    {
+        let self = this;
+
+        app.store.find('chats').then((chats) =>
+        {
+            let fetchedChats = chats.map((chat) => self.createChat(chat));
+            self.chats.components = fetchedChats.concat(self.chats.components);
+
+            m.redraw();
+        });
+    }
+
     createChat(model)
     {
         let chat = new ChatPreview({
             model: model,
-            store: this.store,
         });
 
         let chatViewport = new ChatViewport({
@@ -339,28 +301,9 @@ export default class ChatFrame extends Component
         chat.viewport = {component: chatViewportComponent, instance: chatViewport};
 
         return (
-            <div onclick={this.onChatChanged.bind(this, chatComponent, chat)}>
+            <div onclick={this.onChatChanged.bind(this, chat)}>
                 {chatComponent}
             </div>
         )
-    }
-
-    apiFetchChats()
-    {
-        let self = this;
-
-        this.store.find('chats').then((chats) =>
-        {  
-            let fetchedChats = chats.map((chat) => self.createChat(chat));
-            self.chats.components = fetchedChats.concat(self.chats.components);
-
-            m.redraw();
-        });
-    }
-
-    onunload()
-    {
-        // onunload() is calling each route change but chat is not redrawn (beacuse of 'diff' redraw strategy, check index.js) and init() is not called too. Bug?
-        // this.pusherDetach(this.pusher)
     }
 }

@@ -64,6 +64,6 @@ class Chat extends AbstractModel
 
     public function last_message()
     {
-        return $this->hasOne(Message::class)->orderBy('id', 'desc');
+        return $this->hasOne(Message::class)->orderBy('id', 'desc')->whereNull('deleted_by');
     }
 }

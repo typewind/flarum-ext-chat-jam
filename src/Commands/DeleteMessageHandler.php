@@ -24,8 +24,9 @@ class DeleteMessageHandler
     /**
      * @param MessageRepository             $messages
      */
-    public function __construct(MessageRepository $messages) 
-    {
+    public function __construct(
+        MessageRepository $messages
+    ) {
         $this->messages  = $messages;
     }
 
@@ -48,9 +49,9 @@ class DeleteMessageHandler
 		$message = $this->messages->findOrFail($messageId);
 		
         $message->delete();
-
         $message->deleted_forever = true;
-        $message->event = 'pushedx-chat.socket.event.delete';
+
+        $message->event = 'message.delete';
 
         return $message;
     }

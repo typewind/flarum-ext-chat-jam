@@ -50,7 +50,7 @@ class Message extends AbstractModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function actor()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
@@ -60,6 +60,6 @@ class Message extends AbstractModel
      */
     public function chat()
     {
-        return $this->belongsTo(User::class, 'chat_id');
+        return $this->belongsTo(Chat::class, 'chat_id');
     }
 }

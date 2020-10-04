@@ -1,28 +1,15 @@
 import Component from 'flarum/Component';
-import avatar from 'flarum/helpers/avatar';
-import username from 'flarum/helpers/username';
-import fullTime from 'flarum/helpers/fullTime';
-import humanTime from 'flarum/utils/humanTime';
-import LoadingIndicator from 'flarum/components/LoadingIndicator';
-import extractText from 'flarum/utils/extractText';
-
-import DropDown from 'flarum/components/Dropdown';
-import Button from 'flarum/components/Button';
-import Separator from 'flarum/components/Separator';
-
-import User from 'flarum/models/User';
 
 export default class ChatPreview extends Component
 {
 	init()
 	{
 		this.model = this.props.model;
-		this.store = this.props.store;
 		this.attrs = Object.assign(this.model.data.attributes, this.props);
 
 		this.attrs.textColor = this.pickTextColorBasedOnBgColorSimple(this.attrs.color, '#FFF', '#000');
 
-		let users = this.users();
+		let users = this.model.users();
 		if(app.session.user && this.attrs.type == 0 && users.length && users.length < 3)
 		{
 			for(const user of users)
@@ -37,18 +24,6 @@ export default class ChatPreview extends Component
 				}
 			}
 		}
-	}
-
-	users()
-	{
-		return this.model.data.relationships.users.data
-			.map(record => this.store.getById(record.type, record.id));
-	}
-
-	last_message()
-	{
-		let record = this.model.data.relationships.last_message.data;
-		return this.store.getById(record.type, record.id);
 	}
 
 	view()
@@ -111,12 +86,19 @@ export default class ChatPreview extends Component
 
 	componentTextPreview()
 	{
-		let formatResult = this.formatTextPreview(this.last_message().message());
-		let className = 'message ' + formatResult.type;
+		let formatResult = this.formatTextPreview(this.model.last_message().message());
+		let senderName, users = this.model.users(), sender = this.model.last_message().user();
+		if(app.session.user)
+		{
+			if(app.session.user.id() == sender.id()) senderName = 'You: '
+			else if(users.length > 2 || this.attrs.type) 
+				senderName = sender.displayName() + ': ';
+		}
 
 		return (
-			<div className={className}>
-				{formatResult.text}
+			<div className='message'>
+				<span className='sender'>{senderName}</span>
+				<span className={formatResult.type}>{formatResult.text}</span>
 			</div>
 		)
 	}

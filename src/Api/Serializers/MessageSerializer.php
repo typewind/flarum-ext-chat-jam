@@ -8,10 +8,12 @@
 
 namespace Xelson\Chat\Api\Serializers;
 
-use Xelson\Chat\PusherWrapper;
 use Flarum\User\User;
 use Flarum\Api\Serializer\AbstractSerializer;
+use Flarum\Api\Serializer\BasicUserSerializer;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Xelson\Chat\ChatSocket;
+use Xelson\Chat\Api\Serializers\ChatSerializer;
 
 class MessageSerializer extends AbstractSerializer
 {
@@ -19,11 +21,6 @@ class MessageSerializer extends AbstractSerializer
      * @var string
      */
     protected $type = 'chatmessages';
-
-    /**
-     * @var PusherWrapper
-     */
-    protected $pusher;
 
     /**
      * @var SettingsRepositoryInterface
@@ -39,14 +36,12 @@ class MessageSerializer extends AbstractSerializer
      * @param PusherWrapper                 $pusher
      */
     public function __construct(
-        PusherWrapper $pusher,
         SettingsRepositoryInterface $settings,
-        User $actor
+        ChatSocket $socket
     ) 
     {
-        $this->pusher = $pusher->pusher;
         $this->settings = $settings;
-        $this->actor = $actor;
+        $this->socket = $socket;
     }
 
     /**
@@ -65,8 +60,29 @@ class MessageSerializer extends AbstractSerializer
             $attributes['message'] = str_repeat("*", strlen($attributes['message']));
             $attributes['censored'] = true;
         }
-        if(array_key_exists('event', $attributes)) $this->pusher->trigger('public', $attributes['event'], $attributes);
+        if(array_key_exists('event', $attributes))
+        {
+            $this->socket->sendChatEvent($message->chat_id, $attributes['event'], [
+                'message' => $attributes
+            ]);
+        }
 
         return $attributes;
+    }
+    
+    /**
+     * @return \Tobscure\JsonApi\Relationship
+     */
+    public function user($message)
+    {
+        return $this->hasOne($message, BasicUserSerializer::class);
+    }
+
+    /**
+     * @return \Tobscure\JsonApi\Relationship
+     */
+    public function chat($message)
+    {
+        return $this->hasOne($message, ChatSerializer::class);
     }
 }

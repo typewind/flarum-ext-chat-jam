@@ -260,6 +260,13 @@ export default class ChatMessage extends Component
 
 	delete(e, forever)
 	{
+		if(!this.id)
+		{
+			this.deleted_forever = true;
+			this.elementWrapper.style.display = 'none';
+			return;
+		}
+
 		this.deleted_by = app.session.user.id();
 		if(forever) 
 		{
@@ -319,7 +326,7 @@ export default class ChatMessage extends Component
     {
         app.request({
             method: 'PATCH',
-            url: app.forum.attribute('apiUrl') + '/chat/message/' + this.id,
+            url: app.forum.attribute('apiUrl') + '/chatmessages/' + this.id,
             data: {attributes: attributes}
         })
 	}
@@ -328,7 +335,7 @@ export default class ChatMessage extends Component
 	{
         app.request({
             method: 'DELETE',
-            url: app.forum.attribute('apiUrl') + '/chat/message/' + this.id
+            url: app.forum.attribute('apiUrl') + '/chatmessages/' + this.id
         })
 	}
 

@@ -14,6 +14,7 @@ use Flarum\Api\Controller\AbstractShowController;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
+use Illuminate\Support\Arr;
 
 class PostMessageController extends AbstractShowController
 {
@@ -29,6 +30,11 @@ class PostMessageController extends AbstractShowController
      * @var Dispatcher
      */
     protected $bus;
+
+    /**
+     * {@inheritdoc}
+     */
+    public $include = ['user'];
 
     /**
      * @param Dispatcher $bus

@@ -68,8 +68,6 @@ class EditMessageHandler
             $this->validator->assertValid($message->getDirty());
     
             $message->save();
-    
-            $message->event = 'pushedx-chat.socket.event.edit';
         }
         else if(isset($data['hide']))
         {
@@ -104,9 +102,9 @@ class EditMessageHandler
             $message->save();
 
             $message->invoker = $actor->id;
-            $message->event = 'pushedx-chat.socket.event.edit';
         }
         $message->attributes = $data;
+        $message->event = 'message.edit';
 
         return $message;
     }

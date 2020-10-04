@@ -52,9 +52,64 @@ export default class ChatViewport extends Component
 
 		this.chatFrame = this.props.chatFrame;
 		this.chatPreview = this.props.chatPreview;
-		this.model = this.props.model;
-		this.messagesStorage = this.props.messagesStorage;
-	}
+        this.model = this.props.model;
+        
+        if(this.model) app.pusher.then(this.listenSocketChannels.bind(this));
+    }
+    
+    listenSocketChannels(socket)
+    {
+        socket.main.bind('neonchat.events', this.handleSocketEvent.bind(this));
+        if(socket.user) socket.user.bind('neonchat.events', this.handleSocketEvent.bind(this));
+    }
+
+    handleSocketEvent(response)
+    {
+        if(response.event.chat_id == this.model.id())
+        {
+            let message = response.attributes.message;
+            console.log(response);
+
+            switch(response.event.id)
+            {
+                case 'message.post':
+                {
+                    if(!app.session.user || message.user_id != app.session.user.id())
+                    {
+                        this.chatFrame.messagesStorage.push(this.createMessage(message, {}, true));
+                        this.scroll.needToScroll = true;
+
+                        m.redraw();
+                    }
+                    break;
+                }
+                case 'message.edit':
+                {
+                    if(message.attributes.msg !== undefined)
+                    {
+                        if(!app.session.user || message.user_id != app.session.user.id())
+                        {
+                            if(this.messages.instances[message.id])
+                                this.messages.instances[message.id].edit(message.attributes.msg, true);
+                        }
+                    }
+                    else if(message.attributes.hide !== undefined)
+                    {
+                        if(!app.session.user || message.invoker != app.session.user.id())
+                        message.attributes.hide ? this.messageDelete(message) : this.messageRestore(message)
+                    }
+                    break;
+                }
+                case 'message.delete':
+                {
+                    if(!app.session.user || message.user_id != app.session.user.id())
+                        this.messageDelete(message)
+
+                    break;
+                }
+            }
+        }
+    }
 
 	view()
 	{
@@ -106,7 +161,7 @@ export default class ChatViewport extends Component
 				</div>
 			</div>
 		)
-	}
+    }
 
 	getStoragedMessages()
 	{
@@ -161,11 +216,11 @@ export default class ChatViewport extends Component
 
         if(el.scrollTop <= 0 && this.scroll.oldScroll > 0 && !this.scroll.loadingFetch && !this.messageEditing) 
         {
-            this.scroll.loadingFetch = true;
             this.scroll.oldScroll = -currentHeight;
             m.redraw();
 
-           //this.apiFetch(Object.values(this.messages.instances)[0].id);
+            //this.scroll.loadingFetch = true;
+            //this.apiFetch(Object.values(this.messages.instances)[0].id);
         }
         else 
         {
@@ -276,7 +331,7 @@ export default class ChatViewport extends Component
                 message: ' '
             },
             {
-                instanceGetter: (instance) => this.input.preview.instance = instance
+                instanceGetter: (instance) => {this.input.preview.instance = instance; this.messages.instances[0] = instance}
             });
         }
         m.redraw();
@@ -301,7 +356,7 @@ export default class ChatViewport extends Component
                 message.created_at = new Date();
                 message.is_editing = false;
     
-                this.messages.components.push(this.input.preview.component);
+                this.chatFrame.messagesStorage.push(this.input.preview.component);
                 this.input.preview.component = null;
     
                 m.redraw();
@@ -340,12 +395,14 @@ export default class ChatViewport extends Component
     {
         let message = this.messageEditing;
 
-        message.is_editing = false;
-        this.inputClear();
-        message.textFormat();
-        m.redraw();
-
-        this.messageEditing = null;
+		if(message)
+		{
+			message.is_editing = false;
+			this.inputClear();
+			message.textFormat();
+			m.redraw();
+			this.messageEditing = null;
+		}
     }
 
     messageDelete(data)
@@ -358,7 +415,11 @@ export default class ChatViewport extends Component
                 message.hide(data.deleted_by);
                 m.redraw();
             }
-            else message.elementWrapper.style.display = 'none'; 
+            else 
+            {
+                message.elementWrapper.style.display = 'none'; 
+                message.deleted_forever = true;
+            }
         }
     }
 
@@ -369,6 +430,7 @@ export default class ChatViewport extends Component
         {
             message.elementWrapper.style.display = ''; 
             message.deleted_by = null;
+            message.deleted_forever = false;
             m.redraw();
         }
         else
@@ -377,7 +439,7 @@ export default class ChatViewport extends Component
             messageIds.some((value, index, array) => 
             {
                 if(array[index - 1] < data.id && data.id < array[index])
-                    return this.messages.components.splice(index, 0, this.createMessage(data));
+                    return this.chatFrame.messagesStorage.splice(index, 0, this.createMessage(data));
             })
             m.redraw();
         }
@@ -390,7 +452,7 @@ export default class ChatViewport extends Component
 			{
 				if(result)
 				{
-                    this.messages.components.some((value, index, array) => 
+                    this.chatFrame.messagesStorage.some((value, index, array) => 
                     {
                         if(value == instance.component)
                             return array.splice(index, 1) && array.push(instance.component) && this.scrollToBottom();
@@ -408,13 +470,18 @@ export default class ChatViewport extends Component
 
 	messagesUnload()
 	{
-		Object.values(this.messages.instances).map(c => c.elementWrapper ? c.elementWrapper.style.display = 'none' : null);
+        Object.values(this.messages.instances).map(c => c.elementWrapper ? c.elementWrapper.style.display = 'none' : null);
+
 		this.inputClear();
+		this.messageEditEnd();
 	}
 
 	messagesLoad()
 	{
-		if(this.messages.components.length) Object.values(this.messages.instances).map(c => c.elementWrapper ? c.elementWrapper.style.display = 'block' : null);
+        if(Object.keys(this.messages.instances).length) 
+            Object.values(this.messages.instances).map(
+                c => c.elementWrapper && !c.deleted_forever ? c.elementWrapper.style.display = 'block' : null
+            );
 		else this.apiFetchChatMessages();
 		this.inputSyncWithPreview();
 	}
@@ -436,9 +503,7 @@ export default class ChatViewport extends Component
                 self.scroll.autoScroll = false;
 
                 let fetchedMessages = response.data.map((data) => self.createMessage(data.attributes));
-				self.messages.components = fetchedMessages.concat(self.messages.components);
-				
-				self.chatFrame.messagesStorage = self.chatFrame.messagesStorage.concat(fetchedMessages);
+                self.chatFrame.messagesStorage = self.chatFrame.messagesStorage.concat(fetchedMessages);
 
                 m.redraw();
             },
@@ -453,11 +518,11 @@ export default class ChatViewport extends Component
     apiPost(text, targetInstance = this.input.preview.instance)
     {
         this.loading = true;
-        this.scroll.needToScroll = true;
+		this.scroll.needToScroll = true;
 
         return app.request({
             method: 'POST',
-            url: app.forum.attribute('apiUrl') + '/chat',
+            url: app.forum.attribute('apiUrl') + '/chats/' + this.model.id(),
             data: {msg: text}
         }).then(
             (result) =>

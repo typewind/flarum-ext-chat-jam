@@ -28,7 +28,12 @@ class ListChatsController extends AbstractListController
     /**
      * {@inheritdoc}
      */
-    public $include = ['creator', 'users', 'last_message'];
+    public $include = [
+        'creator', 
+        'users', 
+        'last_message', 
+        'last_message.user'
+    ];
 
     /**
      * @var Dispatcher

@@ -19,7 +19,7 @@ return [
 		$db = $schema->getConnection();
 		$db->table('neonchat_chats')->insert([
 			'title' => '#main',
-			'color' => '#FF4593',
+			'color' => '#FF94C1',
 			'type' => 1
 		]);
 

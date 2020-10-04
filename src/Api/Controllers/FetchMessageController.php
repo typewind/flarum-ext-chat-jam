@@ -32,6 +32,11 @@ class FetchMessageController extends AbstractListController
     protected $bus;
 
     /**
+     * {@inheritdoc}
+     */
+    public $include = ['user'];
+
+    /**
      * @param Dispatcher $bus
      */
     public function __construct(Dispatcher $bus)

@@ -38,8 +38,7 @@ class PostMessageHandler
         MessageValidator $validator,
         MessageFloodgate $floodgate,
         ChatRepository $chats
-    ) 
-    {
+    ) {
         $this->validator = $validator;
         $this->floodgate = $floodgate;
         $this->chats = $chats;
@@ -57,28 +56,27 @@ class PostMessageHandler
         $content = $command->msg;
         $ip_address = $command->ip_address;
 
-        $chat_id = $this->chats->findOrFail($command->chat_id, $actor);
+        $chat = $this->chats->findOrFail($command->chat_id, $actor);
 
         $this->assertCan(
             $actor,
             'pushedx-chat.permissions.chat'
         );
 
-        $this->floodgate->assertNotFlooding($actor);
+        $this->floodgate->assertNotFlooding($actor, $chat);
 
         $message = Message::build(
             $content,
             $actor->id,
             Carbon::now(),
-            $chat_id,
+            $chat->id,
             $ip_address
         );
 
         $this->validator->assertValid($message->getDirty());
 
         $message->save();
-
-        $message->event = 'pushedx-chat.socket.event.post';
+        $message->event = 'message.post';
 
         return $message;
     }

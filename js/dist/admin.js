@@ -82,29 +82,29 @@ module.exports =
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./admin.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "../../../workbench/flarum-ext-chat/js/admin.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./admin.js":
-/*!******************!*\
-  !*** ./admin.js ***!
-  \******************/
+/***/ "../../../workbench/flarum-ext-chat/js/admin.js":
+/*!*********************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/admin.js ***!
+  \*********************************************************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _src_admin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./src/admin */ "./src/admin/index.js");
+/* harmony import */ var _src_admin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./src/admin */ "../../../workbench/flarum-ext-chat/js/src/admin/index.js");
 /* empty/unused harmony star reexport */
 
 /***/ }),
 
-/***/ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js ***!
-  \******************************************************************/
+/***/ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js":
+/*!*********************************************************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js ***!
+  \*********************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -119,17 +119,17 @@ function _inheritsLoose(subClass, superClass) {
 
 /***/ }),
 
-/***/ "./src/admin/components/ChatSettingsModal.js":
-/*!***************************************************!*\
-  !*** ./src/admin/components/ChatSettingsModal.js ***!
-  \***************************************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/admin/components/ChatSettingsModal.js":
+/*!******************************************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/admin/components/ChatSettingsModal.js ***!
+  \******************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChatSettingsModal; });
-/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var flarum_components_SettingsModal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flarum/components/SettingsModal */ "flarum/components/SettingsModal");
 /* harmony import */ var flarum_components_SettingsModal__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_components_SettingsModal__WEBPACK_IMPORTED_MODULE_1__);
 
@@ -190,10 +190,10 @@ function (_SettingsModal) {
 
 /***/ }),
 
-/***/ "./src/admin/index.js":
-/*!****************************!*\
-  !*** ./src/admin/index.js ***!
-  \****************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/admin/index.js":
+/*!*******************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/admin/index.js ***!
+  \*******************************************************************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -205,7 +205,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var flarum_app__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_app__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var flarum_components_PermissionGrid__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/components/PermissionGrid */ "flarum/components/PermissionGrid");
 /* harmony import */ var flarum_components_PermissionGrid__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_components_PermissionGrid__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _components_ChatSettingsModal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/ChatSettingsModal */ "./src/admin/components/ChatSettingsModal.js");
+/* harmony import */ var _components_ChatSettingsModal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/ChatSettingsModal */ "../../../workbench/flarum-ext-chat/js/src/admin/components/ChatSettingsModal.js");
 
 
 

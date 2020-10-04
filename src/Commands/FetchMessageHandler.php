@@ -39,11 +39,10 @@ class FetchMessageHandler
     public function handle(FetchMessage $command)
     {
         $actor = $command->actor;
-        $messageId = $command->id;
-       
+        $start_from = $command->start_from;
+ 
         $chat_id = $this->chats->findOrFail($command->chat_id, $actor);
-
-        $messages = $this->messages->fetch($messageId, $actor, $chat_id);
+        $messages = $this->messages->fetch($start_from, $actor, $chat_id);
 
         return $messages;
     }

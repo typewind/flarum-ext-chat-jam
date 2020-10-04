@@ -73,7 +73,7 @@ export default class ChatMessage extends Component
 						}
 						<div className='message-block'>
 							<div className='toolbar'>
-								<a className='name' onclick={this.chatFrame.insertMention.bind(this.chatFrame, this)}>
+								<a className='name' onclick={this.chatViewport.insertMention.bind(this.chatViewport, this)}>
 									{username(this.user).children[0] + ': '}
 								</a>
 								{this.id ?
@@ -160,9 +160,9 @@ export default class ChatMessage extends Component
 				>
 					{this.user && this.user == app.session.user ?
 						[<Button 
-							onclick={this.chatFrame.messageEdit.bind(this.chatFrame, this)} 
+							onclick={this.chatViewport.messageEdit.bind(this.chatViewport, this)} 
 							icon='fas fa-pencil-alt'
-							disabled={this.deleted_by || this.chatFrame.messageEditing || !this.chatFrame.permissions.edit}
+							disabled={this.deleted_by || this.chatViewport.messageEditing || !this.chatViewport.permissions.edit}
 						>
 							{app.translator.trans('core.forum.post_controls.edit_button')}
 						</Button>, <Separator />] : <div></div>
@@ -175,20 +175,20 @@ export default class ChatMessage extends Component
 							{app.translator.trans('core.forum.post_controls.restore_button')}
 						</Button>, <Separator />] : <div></div>
 					}
-					{!this.deleted_by && this.chatFrame.permissions.delete ?
+					{!this.deleted_by && this.chatViewport.permissions.delete ?
 						<Button 
 							onclick={this.delete.bind(this)} 
 							icon='fas fa-trash-alt'
-							disabled={!this.chatFrame.permissions.delete}
+							disabled={!this.chatViewport.permissions.delete}
 						>
 							{app.translator.trans('core.forum.post_controls.delete_button')}
 						</Button> : <div></div>
 					}
-					{this.deleted_by && this.chatFrame.permissions.moderate.delete ?
+					{this.deleted_by && this.chatViewport.permissions.moderate.delete ?
 						<Button 
 							onclick={this.delete.bind(this, true)} 
 							icon='fas fa-trash-alt'
-							disabled={!this.chatFrame.permissions.delete}
+							disabled={!this.chatViewport.permissions.delete}
 						>
 							{app.translator.trans('core.forum.post_controls.delete_forever_button')}
 						</Button> : <div></div>
@@ -214,7 +214,7 @@ export default class ChatMessage extends Component
 						{app.translator.trans('pushedx-chat.forum.chat.message.actions.hide')}
 					</Button>
 					<Button 
-						onclick={this.chatFrame.messageResend.bind(this.chatFrame, this)}
+						onclick={this.chatViewport.messageResend.bind(this.chatViewport, this)}
 						icon='fas fa-reply'
 					>
 						{app.translator.trans('pushedx-chat.forum.chat.message.actions.resend')}
@@ -243,7 +243,7 @@ export default class ChatMessage extends Component
 		this.element = element;
 		this.textFormat();
 
-		if(this.chatFrame.chatOnResize) this.chatFrame.chatOnResize();
+		if(this.chatViewport.chatOnResize) this.chatViewport.chatOnResize();
 	}
 
 	textFormat(text)

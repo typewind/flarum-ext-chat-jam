@@ -68,14 +68,14 @@ class MessageRepository
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function fetch($id, User $actor, $chat_id)
+    public function fetch($id, User $actor, Chat $chat_id)
     {
         $messages = $this->queryVisible($actor);
 
         $list = $id ? 
-            $messages->where('id', '<', $id)->where('chat_id', $chat_id)->orderBy('id', 'desc')->limit(20) 
+            $messages->where('id', '<', $id)->where('chat_id', $chat_id->id)->orderBy('id', 'desc')->limit(20) 
             :
-            $messages->where('chat_id', $chat_id)->orderBy('id', 'desc')->limit(20);
+            $messages->where('chat_id', $chat_id->id)->orderBy('id', 'desc')->limit(20);
 
         return $list->get()->reverse();
     }

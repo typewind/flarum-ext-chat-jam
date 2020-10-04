@@ -50,10 +50,20 @@ class Chat extends AbstractModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\hasManyThrough
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function users()
     {
-        return $this->hasManyThrough(User::class, ChatUser::class, 'user_id', 'id', 'id', 'user_id');
+        return $this->belongsToMany(User::class, 'neonchat_chat_user');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    public function last_message()
+    {
+        return $this->hasOne(Message::class)->orderBy('id', 'desc');
     }
 }

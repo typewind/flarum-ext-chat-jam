@@ -35,13 +35,16 @@ class ChatRepository
     public function queryVisible(User $actor)
     {
         $query = $this->query();
-        $query->where('type', 1)->orWhereIn('id', ChatUser::select('chat_id')->where('user_id', $actor->id)->get()->toArray());
+        $query->where(function ($query) use ($actor) {
+            $query->where('type', 1)
+            ->orWhereIn('id', ChatUser::select('chat_id')->where('user_id', $actor->id)->get()->toArray());
+        });
 
         return $query;
     }
 
     /**
-     * Find a chat by ID (visible)
+     * Find a chat by ID (visible for actor)
      *
      * @param  int 		$id
      * @param  User 	$actor

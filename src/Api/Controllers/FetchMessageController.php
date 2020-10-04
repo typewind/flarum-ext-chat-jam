@@ -50,10 +50,10 @@ class FetchMessageController extends AbstractListController
     {
         $chat_id = Arr::get($request->getQueryParams(), 'id');
         $actor = $request->getAttribute('actor');
-        $id = array_get($request->getParsedBody(), 'start_from');
+        $start_from = array_get($request->getParsedBody(), 'start_from') ?? 0;
 
         return $this->bus->dispatch(
-            new FetchMessage($id, $actor, $chat_id)
+            new FetchMessage($start_from, $actor, $chat_id)
         );
     }
 }

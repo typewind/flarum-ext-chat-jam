@@ -48,11 +48,11 @@ class AddChatApi
      */
     public function configureApiRoutes(ConfigureApiRoutes $event)
     {
-        $event->get('/chat', 'pushedx.chat.get', ListChatsController::class);
-        $event->post('/chat/{id}', 'pushedx.chat.post', PostMessageController::class);
-        $event->get('/chat/{id}', 'pushedx.chat.fetch', FetchMessageController::class);
-        $event->patch('/chat/message/{id}', 'pushedx.chat.edit', EditMessageController::class);
-        $event->delete('/chat/message/{id}', 'pushedx.chat.delete', DeleteMessageController::class);
+        $event->get('/chats', 'pushedx.chat.get', ListChatsController::class);
+        $event->get('/chats/{id}', 'pushedx.chat.fetch', FetchMessageController::class);
+        $event->post('/chatmessages/{id}', 'pushedx.chat.post', PostMessageController::class);
+        $event->patch('/chatmessages/{id}', 'pushedx.chat.edit', EditMessageController::class);
+        $event->delete('/chatmessages/{id}', 'pushedx.chat.delete', DeleteMessageController::class);
 
         $event->get('/chat/user/{id}', 'pushedx.chat.user', ShowUserSafeController::class);
     }

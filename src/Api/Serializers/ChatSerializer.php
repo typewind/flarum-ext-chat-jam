@@ -18,7 +18,7 @@ class ChatSerializer extends AbstractSerializer
     /**
      * @var string
      */
-    protected $type = 'chat';
+    protected $type = 'chats';
 
     /**
      * @var SettingsRepositoryInterface
@@ -70,5 +70,21 @@ class ChatSerializer extends AbstractSerializer
     protected function users($chat)
     {
         return $this->hasMany($chat, BasicUserSerializer::class);
+    }
+
+    /**
+     * @return \Tobscure\JsonApi\Relationship
+     */
+    protected function messages($chat)
+    {
+        return $this->hasMany($chat, MessageSerializer::class);
+    }
+
+    /**
+     * @return \Tobscure\JsonApi\Relationship
+     */
+    protected function last_message($chat)
+    {
+        return $this->hasOne($chat, MessageSerializer::class);
     }
 }

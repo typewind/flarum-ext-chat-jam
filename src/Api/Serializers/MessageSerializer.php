@@ -18,7 +18,7 @@ class MessageSerializer extends AbstractSerializer
     /**
      * @var string
      */
-    protected $type = 'chatmessage';
+    protected $type = 'chatmessages';
 
     /**
      * @var PusherWrapper

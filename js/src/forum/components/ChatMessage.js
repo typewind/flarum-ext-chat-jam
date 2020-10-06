@@ -6,7 +6,7 @@ import humanTime from 'flarum/utils/humanTime';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
 import extractText from 'flarum/utils/extractText';
 
-import DropDown from 'flarum/components/Dropdown';
+import Dropdown from 'flarum/components/Dropdown';
 import Button from 'flarum/components/Button';
 import Separator from 'flarum/components/Separator';
 
@@ -153,7 +153,7 @@ export default class ChatMessage extends Component
 	{
 		return (
 			<div className='edit'>
-				<DropDown 
+				<Dropdown 
 					buttonClassName="Button Button--icon Button--flat"
 					menuClassName="Dropdown-menu--top Dropdown-menu--bottom Dropdown-menu--left Dropdown-menu--right"
 					icon="fas fa-ellipsis-h"
@@ -193,7 +193,7 @@ export default class ChatMessage extends Component
 							{app.translator.trans('core.forum.post_controls.delete_forever_button')}
 						</Button> : <div></div>
 					}
-				</DropDown>
+				</Dropdown>
 			</div>
 		)
 	}
@@ -202,7 +202,7 @@ export default class ChatMessage extends Component
 	{
 		return (
 			<div className='edit'>
-				<DropDown 
+				<Dropdown 
 					buttonClassName="Button Button--icon Button--flat"
 					menuClassName="Dropdown-menu--top Dropdown-menu--bottom Dropdown-menu--left Dropdown-menu--right"
 					icon="fas fa-ellipsis-h"
@@ -219,7 +219,7 @@ export default class ChatMessage extends Component
 					>
 						{app.translator.trans('pushedx-chat.forum.chat.message.actions.resend')}
 					</Button>
-				</DropDown>
+				</Dropdown>
 			</div>
 		)
 	}

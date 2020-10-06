@@ -1,4 +1,100 @@
-.chat
+.Modal-body--neonchat
+{
+    mark
+    {
+        background: none;
+        font-weight: bold;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+    }  
+
+    .UserMention
+    {
+        display: inline-block;
+        background: #d8dade;
+        color: #566888;
+        border-radius: 4px;
+        padding: 2px 5px;
+        margin: 5px 0px 0px 5px;
+        border: 0 !important;
+    }
+
+    .UsersTags
+    {
+        width: 225px;
+        border-radius: 4px;
+        margin: auto;
+        margin-bottom: 15px;
+
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+    }
+
+    .ButtonCreate
+    {
+        margin-top: 350px;
+    }
+
+    .UsersSearch
+    {
+        .SearchFailed
+        {
+            padding: 10px 15px;
+            color: #868686;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .SearchInput
+        {
+            &:before
+            {
+                margin-right: inherit;
+                width: 46px;
+                left: 42px;
+            }
+        }
+
+        .UserSearchResult
+        {
+            span
+            {
+                user-select: none;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+
+                &:hover
+                {
+                    background-color: #eaecf0;
+                }
+
+                &.selected:after
+                {
+                    content: "\f00c";
+                    font-family: 'Font Awesome 5 Free';
+                    font-weight: 900;
+                    display: inline-block;
+                    margin-left: 100px;
+                }
+            }
+        }
+
+        .Dropdown--Users
+        {
+            left: 46px;
+            width: 225px;
+        }
+
+        .ModalBody--Users
+        {
+            height: 400px;
+        }
+    }
+}
+
+.neonchat
 {
     position: fixed;
     bottom: 0;
@@ -134,23 +230,21 @@
 
                 .panel-add
                 {
-                    display: flex;
                     border-radius: 15px;
                     padding: 5px;
                     background-color: #ffffff;
                     user-select: none;
                     -webkit-user-select: none;
                     -moz-user-select: none;
-                    
-                    div
+
+                    &:after
                     {
-                        margin: auto;
-                        span
-                        {
-                            font-size: 48pt;
-                            color: #31394652;
-                            line-height: 0.5;
-                        }
+                        content: "+";
+                        font-size: 48pt;
+                        color: #31394652;
+                        line-height: 0.5;
+                        position: relative;
+                        left: 39%;
                     }
                 }
 
@@ -224,15 +318,12 @@
                 margin: 8px;
                 border-radius: 100px;
                 
-                div
+                &:after
                 {
-                    margin: auto;
-                    span
-                    {
-                        font-size: 48pt;
-                        color: #31394652;
-                        line-height: 0.5;
-                    }
+                    content: "+";
+                    font-size: 48pt;
+                    color: #31394652;
+                    line-height: 0.5;
                 }
 
                 &:hover
@@ -301,7 +392,6 @@
 
         #chat-viewport
         {
-            min-height: 400px;
             overflow: hidden;
         }
 
@@ -391,7 +481,6 @@
         {
             overflow-y: scroll;
             overflow-x: hidden;
-            min-height: 400px;
 
             .message-wrapper
             {

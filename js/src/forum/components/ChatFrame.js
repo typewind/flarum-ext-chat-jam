@@ -1,10 +1,9 @@
 import Component from 'flarum/Component';
 import ChatPreview from './ChatPreview';
 import ChatViewport from './ChatViewport';
+import ChatCreateModal from './ChatCreateModal';
+import Modal from 'flarum/components/Modal';
 
-import extendGlobalStore from '../store';
-import Chat from '../models/Chat';
-import Message from '../models/Message';
 
 export default class ChatFrame extends Component
 {
@@ -15,11 +14,6 @@ export default class ChatFrame extends Component
         let isMuted = localStorage.getItem('chat_isMuted');
         let notify = localStorage.getItem('chat_notify');
         let transform = localStorage.getItem('chat_transform');
-
-        extendGlobalStore({
-            chats: Chat,
-            chatmessages: Message
-        });
 
         this.beingShown = beingShown === null ? !app.forum.attribute('pushedx-chat.settings.display.minimize') : JSON.parse(beingShown);
         this.beingShownChatsList = beingShownChatsList === null ? 0 : JSON.parse(beingShownChatsList);
@@ -48,27 +42,27 @@ export default class ChatFrame extends Component
 
     getChat()
     {
-        return document.querySelector('.chat');
+        return document.querySelector('.neonchat');
     }
 
     getChatHeader()
     {
-        return document.querySelector('.chat #chat-header');
+        return document.querySelector('.neonchat #chat-header');
     }
     
     getChatWrapper()
     {
-        return document.querySelector('.chat .wrapper');
+        return document.querySelector('.neonchat .wrapper');
     }
 
     getChatInput()
     {
-        return document.querySelector('.chat #chat-input');
+        return document.querySelector('.neonchat #chat-input');
     }
 
     getChatsList()
     {
-        return document.querySelector('.chat #chats-list');
+        return document.querySelector('.neonchat #chats-list');
     }
 
     toggleChat(e)
@@ -133,7 +127,7 @@ export default class ChatFrame extends Component
     view() 
     {
         return (
-            <div className={'chat left container ' + (this.beingShown ? '' : 'hidden')} style={{right: this.transform.x + 'px'}}>
+            <div className={'neonchat left container ' + (this.beingShown ? '' : 'hidden')} style={{right: this.transform.x + 'px'}}>
                 <div tabindex='0' className='frame' id='chat'>
                     <div id='chats-list' className={(this.beingShownChatsList ? 'toggled' : '')}>
                         <div className='header'>
@@ -151,11 +145,7 @@ export default class ChatFrame extends Component
                             </p>
                         </div>
                         {this.chats.components}
-                        <div class="panel-add">
-                            <div>
-                                <span>+</span>
-                            </div>
-                        </div>
+                        <div class="panel-add" onclick={() =>app.modal.show(new ChatCreateModal)}></div>
                     </div>
 
                     <div id='chat-panel'>

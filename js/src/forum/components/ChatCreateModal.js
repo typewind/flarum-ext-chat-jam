@@ -1,6 +1,6 @@
 import Modal from 'flarum/components/Modal';
 import Button from 'flarum/components/Button';
-import username from 'flarum/helpers/username';
+import classList from 'flarum/utils/classList';
 
 import ChatSearchUser from './ChatSearchUser';
 
@@ -38,7 +38,10 @@ export default class ChatCreateModal extends Modal
 				<div className="UsersSearch">
 					<ChatSearchUser state={app.search} callback={this.userSelected.bind(this)}/>
 				</div>             
-				<Button className="Button Button--primary Button--block ButtonCreate" onclick={this.hide.bind(this)}>
+				<Button 
+					className={classList(['Button Button--primary Button--block ButtonCreate', !this.selectedUsers.length ? 'disabled' : null])} 
+					onclick={this.selectedUsers.length ? this.hide.bind(this) : null}
+				>
                 	{app.translator.trans('pushedx-chat.forum.chat.list.preview.add_modal.create')}
               	</Button>
 			</div>

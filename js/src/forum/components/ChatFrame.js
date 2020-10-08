@@ -145,7 +145,7 @@ export default class ChatFrame extends Component
                             </p>
                         </div>
                         {this.chats.components}
-                        <div class="panel-add" onclick={() =>app.modal.show(new ChatCreateModal)}></div>
+                        {app.session.user ? <div class="panel-add" onclick={() => app.modal.show(new ChatCreateModal)}></div> : null}
                     </div>
 
                     <div id='chat-panel'>

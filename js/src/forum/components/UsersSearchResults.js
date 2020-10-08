@@ -2,7 +2,6 @@ import avatar from 'flarum/helpers/avatar';
 import username from 'flarum/helpers/username';
 import highlight from 'flarum/helpers/highlight';
 
-import Separator from 'flarum/components/Separator';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
 
 export default class UsersSearchResults {
@@ -55,6 +54,8 @@ export default class UsersSearchResults {
 
 	view(query) {
 		query = query.toLowerCase();
+		let localUserId;
+		if(app.session.user) localUserId = app.session.user.id();
 
 		const usersList = (this.results[query] || [])
 		.concat(
@@ -94,11 +95,9 @@ export default class UsersSearchResults {
 				</li>
 				);
 			}),
-			resultsSelected.length ? [
-				<Separator />,
+			resultsSelected.length ? 
 				<li className="Dropdown-header">{app.translator.trans('pushedx-chat.forum.chat.list.preview.add_modal.search.invited')}</li>
-			]
-			: null,
+				: null,
 			resultsSelected.map((user) => {
 				const name = username(user);
 				name.children[0] = highlight(name.children[0], query);

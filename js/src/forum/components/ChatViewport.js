@@ -17,15 +17,7 @@ export default class ChatViewport extends Component
 {
     config(isInitialized, context)
     {
-        if(!isInitialized)
-        {
-			let input = this.getChatInput();
-			if(input)
-			{
-				input.baseScrollHeight = input.scrollHeight;
-				input.baseHeight = 19;
-			}
-        }
+
     }
 
 	init()
@@ -254,8 +246,11 @@ export default class ChatViewport extends Component
 	inputSyncWithPreview()
 	{
 		let input = this.getChatInput();
-		if(this.input.writing)
-			input.value = this.input.preview.instance.message;
+        if(this.input.writing)
+        {
+            input.value = this.input.preview.instance.message;
+            this.inputProcess();
+        }
 	}
 	
     inputProcess(e)
@@ -263,8 +258,14 @@ export default class ChatViewport extends Component
         let input = this.getChatInput();
         this.input.messageLength = input.value.length;
 
+        if(!input.baseScrollHeight)
+        {
+            input.baseScrollHeight = input.scrollHeight;
+            input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
+        }
+
         input.rows = 1;
-        let rows = Math.ceil((input.scrollHeight - input.baseScrollHeight) / input.baseHeight) + 1;
+        let rows = Math.ceil((input.scrollHeight - input.baseScrollHeight) / input.lineHeight) + 1;
         this.input.rows = rows;
         input.rows = rows;
 

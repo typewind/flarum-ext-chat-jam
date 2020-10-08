@@ -248,12 +248,22 @@ export default class ChatMessage extends Component
 
 	textFormat(text)
 	{
+		let self = this;
 		if(!text) text = this.message;
 		if(this.element) s9e.TextFormatter.preview(text, this.element);
 
 		setTimeout(() => {
-			$('.chat script').each(function() {
-				eval.call(window, $(this).text());
+			$('.neonchat script').each(function() {
+				if(!self.executedScripts) self.executedScripts = {};
+				let scriptURL = $(this).attr('src');
+				if(!self.executedScripts[scriptURL])
+				{
+					var scriptTag = document.createElement("script");
+					scriptTag.src = scriptURL;
+					document.head.appendChild(scriptTag);
+
+					self.executedScripts[scriptURL] = true;
+				}
 			});
 		}, 1000);
 	}

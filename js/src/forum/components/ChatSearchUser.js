@@ -47,7 +47,6 @@ export default class ChatSearchUser extends Search
 						value={this.value()}
 						oninput={m.withAttr('value', this.value)}
 						onfocus={() => this.hasFocus = true}
-						//onblur={() => this.hasFocus = false}
 					/>
 					{this.loadingSources
 					? LoadingIndicator.component({size: 'tiny', className: 'Button Button--icon Button--link'})

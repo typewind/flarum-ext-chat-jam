@@ -34,7 +34,7 @@ class EditMessageController extends AbstractShowController
     /**
      * {@inheritdoc}
      */
-    public $include = ['user'];
+    public $include = ['user', 'deleted_by'];
 
     /**
      * @param Dispatcher $bus
@@ -54,7 +54,7 @@ class EditMessageController extends AbstractShowController
     {
         $id = Arr::get($request->getQueryParams(), 'id');
         $actor = $request->getAttribute('actor');
-        $data = Arr::get($request->getParsedBody(), 'attributes', []);
+        $data = Arr::get($request->getParsedBody(), 'data', []);
 
         return $this->bus->dispatch(
             new EditMessage($id, $actor, $data)

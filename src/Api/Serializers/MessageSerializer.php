@@ -58,7 +58,7 @@ class MessageSerializer extends AbstractSerializer
         if($this->settings->get('pushedx-chat.settings.display.censor') && !$this->actor->id)
         {
             $attributes['message'] = str_repeat("*", strlen($attributes['message']));
-            $attributes['censored'] = true;
+            $attributes['is_censored'] = true;
         }
         if(array_key_exists('event', $attributes))
         {
@@ -74,6 +74,14 @@ class MessageSerializer extends AbstractSerializer
      * @return \Tobscure\JsonApi\Relationship
      */
     public function user($message)
+    {
+        return $this->hasOne($message, BasicUserSerializer::class);
+    }
+
+    /**
+     * @return \Tobscure\JsonApi\Relationship
+     */
+    public function deleted_by($message)
     {
         return $this->hasOne($message, BasicUserSerializer::class);
     }

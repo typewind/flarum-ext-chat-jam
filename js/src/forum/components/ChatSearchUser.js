@@ -43,7 +43,7 @@ export default class ChatSearchUser extends Search
 				<div className="Search-input SearchInput">
 					<input className="FormControl"
 						type="search"
-						placeholder={app.translator.trans('pushedx-chat.forum.chat.list.preview.add_modal.search.placeholder')}
+						placeholder={app.translator.trans('pushedx-chat.forum.chat.list.add_modal.search.placeholder')}
 						value={this.value()}
 						oninput={m.withAttr('value', this.value)}
 						onfocus={() => this.hasFocus = true}

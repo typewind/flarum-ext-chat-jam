@@ -13,6 +13,7 @@ use Xelson\Chat\Message;
 use Xelson\Chat\MessageRepository;
 use Xelson\Chat\MessageValidator;
 use Flarum\User\AssertPermissionTrait;
+use Illuminate\Support\Arr;
 
 class EditMessageHandler
 {
@@ -51,10 +52,12 @@ class EditMessageHandler
         $messageid = $command->id;
         $actor = $command->actor;
         $data = $command->data;
+        $attributes = Arr::get($data, 'attributes', []);
+        $actions = $attributes['actions'];
 
         $message = $this->messages->findOrFail($messageid);
 
-        if(isset($data['msg']))
+        if(isset($actions['msg']))
         {
             $this->assertCan(
                 $actor,
@@ -62,21 +65,21 @@ class EditMessageHandler
             );
             $this->assertPermission($actor->id == $message->user_id);
 
-            $message->message = $data['msg'];
+            $message->message = $actions['msg'];
             $message->edited_at = Carbon::now();
     
             $this->validator->assertValid($message->getDirty());
     
             $message->save();
         }
-        else if(isset($data['hide']))
+        else if(isset($actions['hide']))
         {
             $this->assertCan(
                 $actor,
                 'pushedx-chat.permissions.delete'
             );
 
-            if($data['hide'])
+            if($actions['hide'])
             {
                 if($message->user_id != $actor->id)
                 {
@@ -100,10 +103,9 @@ class EditMessageHandler
             }
 
             $message->save();
-
-            $message->invoker = $actor->id;
+            $actions['invoker'] = $actor->id;
         }
-        $message->attributes = $data;
+        $message->actions = $actions;
         $message->event = 'message.edit';
 
         return $message;

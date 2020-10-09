@@ -1,3 +1,5 @@
+import humanTime from 'flarum/utils/humanTime';
+import fullTime from 'flarum/helpers/fullTime';
 import Component from 'flarum/Component';
 
 export default class ChatPreview extends Component
@@ -31,11 +33,20 @@ export default class ChatPreview extends Component
 		return (
 			<div className={'panel-preview ' + (this.attrs.active ? 'active' : '')}>
 				{this.attrs.type ? 
-					this.componentPreviewPM() 
-					: this.componentPreviewChannel()
+					this.componentPreviewChannel() 
+					: this.componentPreviewPM()
 				}
 			</div>
 		)
+	}
+
+	componentMessageTime()
+	{
+		let time = new Date(this.model.last_message().created_at());
+		if(Date.now() - time.getTime() < 60 * 60 * 1000)
+			return time.toLocaleTimeString().slice(0, 5);
+		
+		return humanTime(this.model.last_message().created_at());
 	}
 
 	componentPreviewPM()
@@ -43,13 +54,15 @@ export default class ChatPreview extends Component
 		return ([
 			<div 
 				className={'avatar ' + (this.attrs.avatarUrl ? 'image' : '')} 
-				style={{'background-color': this.attrs.color, color: this.attrs.textColor, 'background-image': this.attrs.avatarUrl}}>
+				style={{'background-color': this.attrs.color, color: this.attrs.textColor, 'background-image': this.attrs.avatarUrl ? `url(${this.attrs.avatarUrl})` : null}}
+			>
 				{this.attrs.avatarUrl ? null : this.firstLetter(this.attrs.title).toUpperCase()}
 			</div>,
 			<div style="display: flex; flex-direction: column">
-				<div className='title'>{this.attrs.title}</div>
+				<div className='title' title={this.attrs.title}>{this.attrs.title}</div>
 				{this.componentTextPreview()}
-			</div>
+			</div>,
+			<div className='timestamp' title={fullTime(this.model.last_message().created_at()).children[0]}>{this.humanTime = this.componentMessageTime()}</div>
 		])
 	}
 
@@ -57,14 +70,16 @@ export default class ChatPreview extends Component
 	{
 		return ([
 			<div 
-				className={'avatar'} 
-				style={{'background-color': this.attrs.color, color: this.attrs.textColor}}>
-				{this.firstLetter(this.attrs.title).toUpperCase()}
+				className='avatar'
+				style={{'background-color': this.attrs.color, color: this.attrs.textColor}}
+			>
+				{this.attrs.avatarUrl ? null : this.firstLetter(this.attrs.title).toUpperCase()}
 			</div>,
 			<div style="display: flex; flex-direction: column">
-				<div className='title'>{this.attrs.title}</div>
+				<div className='title' title={this.attrs.title}>{this.attrs.title}</div>
 				{this.componentTextPreview()}
-			</div>
+			</div>,
+			<div className='timestamp' title={fullTime(this.model.last_message().created_at()).children[0]}>{this.humanTime = this.componentMessageTime()}</div>
 		])
 	}
 

@@ -34,7 +34,7 @@ class FetchMessageController extends AbstractListController
     /**
      * {@inheritdoc}
      */
-    public $include = ['user'];
+    public $include = ['user', 'deleted_by'];
 
     /**
      * @param Dispatcher $bus
@@ -53,9 +53,9 @@ class FetchMessageController extends AbstractListController
      */
     protected function data(ServerRequestInterface $request, Document $document)
     {
-        $chat_id = Arr::get($request->getQueryParams(), 'id');
         $actor = $request->getAttribute('actor');
-        $start_from = array_get($request->getParsedBody(), 'start_from') ?? 0;
+        $chat_id = array_get($request->getQueryParams(), 'chat_id');
+        $start_from = array_get($request->getQueryParams(), 'start_from') ?? 0;
 
         return $this->bus->dispatch(
             new FetchMessage($start_from, $actor, $chat_id)

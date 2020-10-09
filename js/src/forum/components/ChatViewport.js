@@ -77,18 +77,18 @@ export default class ChatViewport extends Component
                 }
                 case 'message.edit':
                 {
-                    if(message.attributes.msg !== undefined)
+                    if(message.actions.msg !== undefined)
                     {
                         if(!app.session.user || message.user_id != app.session.user.id())
                         {
                             if(this.messages.instances[message.id])
-                                this.messages.instances[message.id].edit(message.attributes.msg, true);
+                                this.messages.instances[message.id].edit(message.actions.msg, true);
                         }
                     }
-                    else if(message.attributes.hide !== undefined)
+                    else if(message.actions.hide !== undefined)
                     {
-                        if(!app.session.user || message.invoker != app.session.user.id())
-                        message.attributes.hide ? this.messageDelete(message) : this.messageRestore(message)
+                        if(!app.session.user || message.actions.invoker != app.session.user.id())
+                        message.actions.hide ? this.messageDelete(message) : this.messageRestore(message)
                     }
                     break;
                 }
@@ -325,16 +325,15 @@ export default class ChatViewport extends Component
         if(!this.input.preview.component) 
         {
             this.input.preview.component = this.createMessage(
-            {
-                id: 0, 
-                user_id: app.session.user.id(), 
-                is_editing: true,
-                message: ' '
-            },
-            {
-                instanceGetter: (instance) => {this.input.preview.instance = instance; this.messages.instances[0] = instance}
-            });
+                app.store.createRecord('chatmessages', {id: 0, message: ' ', relationships: {user: app.session.user}}), 
+                {
+                    is_editing: true,
+                    needToFlash: true,
+                    instanceGetter: (instance) => {this.input.preview.instance = instance; this.messages.instances[0] = instance}
+                }
+            );
         }
+        else this.input.preview.instance.needToFlash = true;
         m.redraw();
     }
 
@@ -483,7 +482,8 @@ export default class ChatViewport extends Component
             Object.values(this.messages.instances).map(
                 c => c.elementWrapper && !c.deleted_forever ? c.elementWrapper.style.display = 'block' : null
             );
-		else this.apiFetchChatMessages();
+        else this.apiFetchChatMessages();
+        
 		this.inputSyncWithPreview();
 	}
 
@@ -492,28 +492,18 @@ export default class ChatViewport extends Component
 		let self = this;
 		
 		self.scroll.loadingFetch = true;
-		m.redraw();
-
-        app.request({
-            method: 'GET',
-            url: app.forum.attribute('apiUrl') + '/chats/' + this.model.id()
-        }).then(
-            function(response)
-            {
+        m.redraw();
+        
+        app.store.find('chatmessages', {chat_id: this.model.id()})
+            .then(r => {
                 self.scroll.loadingFetch = false;
                 self.scroll.autoScroll = false;
 
-                let fetchedMessages = response.data.map((data) => self.createMessage(data.attributes));
+                let fetchedMessages = r.map((message) => self.createMessage(message));
                 self.chatFrame.messagesStorage = self.chatFrame.messagesStorage.concat(fetchedMessages);
 
                 m.redraw();
-            },
-            function()
-            {
-                self.scroll.loadingFetch = false;
-                m.redraw();
-            }
-        );
+            });
 	}
 
     apiPost(text, targetInstance = this.input.preview.instance)
@@ -523,8 +513,8 @@ export default class ChatViewport extends Component
 
         return app.request({
             method: 'POST',
-            url: app.forum.attribute('apiUrl') + '/chats/' + this.model.id(),
-            data: {msg: text}
+            url: app.forum.attribute('apiUrl') + '/chatsmessages',
+            data: {msg: text, 'chat_id': this.model.id()}
         }).then(
             (result) =>
             {
@@ -563,41 +553,26 @@ export default class ChatViewport extends Component
         }
 	}
 
-    createMessage(message, options = {}, notify = false) 
-    {
+    createMessage(model, options = {}, notify = false) 
+    {  
         let chatMessage = new ChatMessage(
-            Object.assign(message, 
+            Object.assign(    
             {
-                actor: message.user_id,
-                created_at: message.created_at || new Date(),
-				chatViewport: this,
-				chatFrame: this.chatFrame,
-                instanceGetter: (instance) => this.messages.instances[instance.id] = instance,
-                userResolved: this.messageUserResolved.bind(this, notify),
+                model: model,
+                chatViewport: this,
+                chatFrame: this.chatFrame,
+                instanceGetter: (instance) => this.messages.instances[instance.model.id()] = instance,
             }, options)
         );
+
+        this.messageNotify(notify);
+
         let component = m.component(chatMessage);
         chatMessage.component = component;
         return component;
-
-        /* Working with lists prepend and flarum's component wrapper is complete anomaly
-        If new components are added to the top of the list, new components get incorrect attributes (attrs of already existing components) when they are updated
-        
-        return (
-            <ChatMessage 
-                id={message.id} 
-                message={message.message} 
-                actor={message.user_id} 
-                created_at={message.created_at} 
-                chatFrame={this}
-                instanceGetter={((instance) => this.messages.instances[instance.id] = instance)}
-                userResolved={this.messageUserResolved.bind(this, notify)}
-            />
-        )
-        */
     }
 
-    messageUserResolved(notify, message)
+    messageNotify(notify, message)
     {
         if(notify && (!app.session.user || (message.user && message.user.id() != app.session.user.id()))) 
             this.notifyTry(message.message, message.user);

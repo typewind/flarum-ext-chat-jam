@@ -33,7 +33,7 @@ class DeleteMessageController extends AbstractShowController
     /**
      * {@inheritdoc}
      */
-    public $include = ['user'];
+    public $include = ['user', 'deleted_by'];
 
     /**
      * @param Dispatcher $bus

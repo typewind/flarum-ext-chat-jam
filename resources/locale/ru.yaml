@@ -13,14 +13,17 @@ pushedx-chat:
         pin: Закрепить панель
         unpin: Открепить панель
         placeholder: Поиск
-        preview:
-          add_modal: 
-            title: Выберите пользователей
-            create: Создать беседу
-            search:
-              placeholder: Поиск пользователей
-              failed: Ничего не найдено по запросу
-              invited: Приглашены
+        add_modal: 
+          title: Выберите пользователей
+          create: Создать беседу
+          form:
+            title: Название беседы
+            title.validator: Хотя бы один символ
+            users: Выбранные пользователи
+          search:
+            placeholder: Поиск пользователей
+            failed: Ничего не найдено по запросу
+            invited: Приглашены
       placeholder: Напишите сообщение...
       message:
         actions:

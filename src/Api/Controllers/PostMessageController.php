@@ -34,7 +34,7 @@ class PostMessageController extends AbstractShowController
     /**
      * {@inheritdoc}
      */
-    public $include = ['user'];
+    public $include = ['user', 'deleted_by'];
 
     /**
      * @param Dispatcher $bus
@@ -54,7 +54,7 @@ class PostMessageController extends AbstractShowController
     {
         $actor = $request->getAttribute('actor');
         $msg = array_get($request->getParsedBody(), 'msg');
-        $chat_id = Arr::get($request->getQueryParams(), 'id');
+        $chat_id = array_get($request->getParsedBody(), 'chat_id');
         $ip_address = Arr::get($request->getServerParams(), 'REMOTE_ADDR', '127.0.0.1');
 
         return $this->bus->dispatch(

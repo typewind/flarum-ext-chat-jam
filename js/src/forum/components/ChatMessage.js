@@ -2,8 +2,8 @@ import Component from 'flarum/Component';
 import avatar from 'flarum/helpers/avatar';
 import username from 'flarum/helpers/username';
 import fullTime from 'flarum/helpers/fullTime';
+import classList from 'flarum/utils/classList';
 import humanTime from 'flarum/utils/humanTime';
-import LoadingIndicator from 'flarum/components/LoadingIndicator';
 import extractText from 'flarum/utils/extractText';
 
 import Dropdown from 'flarum/components/Dropdown';
@@ -14,99 +14,66 @@ export default class ChatMessage extends Component
 {
 	init()
 	{
-		this.inited = false;
 		this.labels = [];
 		Object.assign(this, this.props);
-
-		this.user = app.store.getById('users', this.actor);
-        if(this.user == undefined)
-        {
-			app.store.find('chat/user', this.actor).then((user) =>
-			{
-				if(user.data.id != '') this.user = user;
-				this.initEvents();
-			});
-		}
-		else this.initEvents();
-
-		if(this.deleted_by) this.hide(this.deleted_by);
 		
+		this.message = this.model.message();
 		this.textFormat();
 		this.instanceGetter(this);
-	}
-
-	initEvents()
-	{
-		this.inited = true;
-
-		this.userResolved(this);
 		this.initLabels();
-
-		m.redraw();
 	}
 
 	view()
 	{
 		return (
 			<div 
-				className={[
-					'message-wrapper', 
-					this.deleted_by ? 'deleted' : '',
-					this.is_editing ? 'editing' : ''
-				].join(' ')}
-				data-id={this.id} 
+				className={classList({'message-wrapper': true, deleted: this.model.deleted_by(), editing: this.is_editing})}
+				data-id={this.model.id()} 
 				config={this.configWrapper.bind(this)}>
-				{this.inited ?
-					<div>
-						{this.user ? 
-							<a className='avatar-wrapper' href={app.route.user(this.user)} config={m.route}>
-								<span>
-									{avatar(this.user, {className: 'avatar'})}
-								</span>
+				<div>
+					{this.model.user() ? 
+						<a className='avatar-wrapper' href={app.route.user(this.model.user())} config={m.route}>
+							<span>{avatar(this.model.user(), {className: 'avatar'})}</span>
+						</a>
+						:
+						<div className='avatar-wrapper'>
+							<span>{avatar(this.model.user(), {className: 'avatar'})}</span>
+						</div>
+					}
+					<div className='message-block'>
+						<div className='toolbar'>
+							<a className='name' onclick={this.chatViewport.insertMention.bind(this.chatViewport, this)}>
+								{username(this.model.user()).children[0] + ': '}
 							</a>
-							:
-							<div className='avatar-wrapper'>
-								<span>
-									{avatar(this.user, {className: 'avatar'})}
-								</span>
-							</div>
-						}
-						<div className='message-block'>
-							<div className='toolbar'>
-								<a className='name' onclick={this.chatViewport.insertMention.bind(this.chatViewport, this)}>
-									{username(this.user).children[0] + ': '}
-								</a>
-								{this.id ?
-									<div style='display: inline'>
-										<a className='timestamp' title={fullTime(this.created_at).children[0]}>{this.humanTime = humanTime(this.created_at)}</a>
-										<div className='labels'>
-											{this.labels.map(label => label.condition() ? label.component() : null)}
-										</div>
-										{this.deleted_forever ? null : this.editDropDown()}
-									</div> : (this.timedOut ? 
-									<div style='display: inline'>	
-										<div className='labels'>
-											{this.labels.map(label => label.condition() ? label.component() : null)}
-										</div>
-										{this.editDropDownTimedOut()}
-									</div> : null)
-								}
-							</div>
-							<div className='message'>
-								{this.censored ?
-									<div className='censored' title={app.translator.trans('pushedx-chat.forum.chat.message.censored')}>
-										{this.message}
+							{this.model.id() ?
+								<div style='display: inline'>
+									<a className='timestamp' title={fullTime(this.model.created_at()).children[0]}>{this.humanTime = humanTime(this.model.created_at())}</a>
+									<div className='labels'>
+										{this.labels.map(label => label.condition() ? label.component() : null)}
 									</div>
-									:
-									<div config={this.configFormat.bind(this)}>
-
+									{this.deleted_forever ? null : this.editDropDown()}
+								</div> 
+								: 
+								(this.timedOut ? 
+								<div style='display: inline'>	
+									<div className='labels'>
+										{this.labels.map(label => label.condition() ? label.component() : null)}
 									</div>
-								}
-							</div>
+									{this.editDropDownTimedOut()}
+								</div> : null)
+							}
+						</div>
+						<div className='message'>
+							{this.model.is_censored() ?
+								<div className='censored' title={app.translator.trans('pushedx-chat.forum.chat.message.censored')}>
+									{this.message}
+								</div>
+								:
+								<div config={this.configFormat.bind(this)}></div>
+							}
 						</div>
 					</div>
-					: <LoadingIndicator className='loading-old Button-icon' />
-				}
+				</div>
 			</div>
 		)
 	}
@@ -114,11 +81,11 @@ export default class ChatMessage extends Component
 	initLabels()
 	{
 		this.labelBind(
-			() => this.edited_at, 
+			() => this.model.edited_at(), 
 			() => (
 				<div class='icon' title={extractText(app.translator.trans(
 					'core.forum.post.edited_tooltip',
-					{user: this.user, ago: humanTime(this.edited_at)}
+					{user: this.model.user(), ago: humanTime(this.model.edited_at())}
 				))}>
 					<i class="fas fa-pencil-alt"></i>
 				</div>
@@ -126,10 +93,12 @@ export default class ChatMessage extends Component
 		);
 
 		this.labelBind(
-			() => this.deleted_by, 
+			() => this.model.deleted_by(), 
 			() => (
 				<div class='icon'>
-					<i class="fas fa-trash-alt"></i> <span>{'(' + app.translator.trans('pushedx-chat.forum.chat.message.deleted' + (this.deleted_forever ? '_forever' : ''))} {this.user_deleted_by ? (username(this.user_deleted_by).children[0]  + ')') : null}</span>
+					<i class="fas fa-trash-alt"></i> <span>
+						{`(${app.translator.trans('pushedx-chat.forum.chat.message.deleted' + (this.deleted_forever ? '_forever' : ''))}`} {username(this.model.deleted_by())})
+					</span>
 				</div>
 			)
 		);
@@ -158,16 +127,16 @@ export default class ChatMessage extends Component
 					menuClassName="Dropdown-menu--top Dropdown-menu--bottom Dropdown-menu--left Dropdown-menu--right"
 					icon="fas fa-ellipsis-h"
 				>
-					{this.user && this.user == app.session.user ?
+					{this.model.user() && app.session.user && this.model.user().id() == app.session.user.id() ?
 						[<Button 
 							onclick={this.chatViewport.messageEdit.bind(this.chatViewport, this)} 
 							icon='fas fa-pencil-alt'
-							disabled={this.deleted_by || this.chatViewport.messageEditing || !this.chatViewport.permissions.edit}
+							disabled={this.model.deleted_by() || this.chatViewport.messageEditing || !this.chatViewport.permissions.edit}
 						>
 							{app.translator.trans('core.forum.post_controls.edit_button')}
 						</Button>, <Separator />] : <div></div>
 					}
-					{this.deleted_by ?
+					{this.model.deleted_by() ?
 						[<Button 
 							onclick={this.restore.bind(this)} 
 							icon='fas fa-reply'
@@ -175,7 +144,7 @@ export default class ChatMessage extends Component
 							{app.translator.trans('core.forum.post_controls.restore_button')}
 						</Button>, <Separator />] : <div></div>
 					}
-					{!this.deleted_by && this.chatViewport.permissions.delete ?
+					{!this.model.deleted_by() && this.chatViewport.permissions.delete ?
 						<Button 
 							onclick={this.delete.bind(this)} 
 							icon='fas fa-trash-alt'
@@ -184,7 +153,7 @@ export default class ChatMessage extends Component
 							{app.translator.trans('core.forum.post_controls.delete_button')}
 						</Button> : <div></div>
 					}
-					{this.deleted_by && this.chatViewport.permissions.moderate.delete ?
+					{this.model.deleted_by() && this.chatViewport.permissions.moderate.delete ?
 						<Button 
 							onclick={this.delete.bind(this, true)} 
 							icon='fas fa-trash-alt'
@@ -265,88 +234,45 @@ export default class ChatMessage extends Component
 					self.executedScripts[scriptURL] = true;
 				}
 			});
-		}, 1000);
+		}, 10);
 	}
 
 	delete(e, forever)
 	{
-		if(!this.id)
+		if(!this.model.id())
 		{
 			this.deleted_forever = true;
 			this.elementWrapper.style.display = 'none';
 			return;
 		}
 
-		this.deleted_by = app.session.user.id();
 		if(forever) 
 		{
 			this.deleted_forever = forever;
 			this.elementWrapper.style.display = 'none';
-			this.apiDelete(forever);
+			this.model.delete();
 		}
-		else 
-		{
-			this.apiEdit({hide: true});
-			this.hide(this.deleted_by);
-		}
+		else this.hide();
 	}
 
-	hide(deleted_by)
+	hide()
 	{
-		this.deleted_by = deleted_by;
-		if(this.deleted_by == app.session.user.id()) this.user_deleted_by = app.session.user;
-		else
-		{
-			this.user_deleted_by = app.store.getById('users', this.deleted_by);
-			if(this.user_deleted_by == undefined)
-			{
-				app.store.find('chat/user', this.deleted_by).then((user) =>
-				{
-					if(user.data.id != '') 
-					{
-						this.user_deleted_by = user;
-						m.redraw();
-					}
-				});
-			}
-		}
-		m.redraw();
+		this.model.save({actions: {hide: true}, relationships: {deleted_by: app.session.user}});
 	}
 
 	restore()
 	{
-		this.deleted_by = null;
-		this.apiEdit({hide: false});
+		this.model.save({actions: {hide: false}, deleted_by: 0});
+		delete this.model.data.relationships.deleted_by;
 	}
 
 	edit(newContent, outside = false)
 	{
-		this.edited_at = new Date();
-		this.message = newContent;
 		this.needToFlash = true;
-
 		this.textFormat();
 
-		if(!outside) this.apiEdit({msg: newContent});
-
-		m.redraw();
-	}
-
-    apiEdit(attributes)
-    {
-        app.request({
-            method: 'PATCH',
-            url: app.forum.attribute('apiUrl') + '/chatmessages/' + this.id,
-            data: {attributes: attributes}
-        })
-	}
-	
-	apiDelete()
-	{
-        app.request({
-            method: 'DELETE',
-            url: app.forum.attribute('apiUrl') + '/chatmessages/' + this.id
-        })
+		if(!outside) this.model.save({actions: {msg: newContent}, edited_at: new Date(), message: newContent});
+		else m.redraw();
 	}
 
 	flash()

@@ -61,7 +61,7 @@ export default class UsersSearchResults {
 		.concat(
 			app.store
 			.all('users')
-			.filter((user) => [user.username(), user.displayName()].some((value) => value.toLowerCase().substr(0, query.length) === query))
+			.filter((user) => user.id() != localUserId && [user.username(), user.displayName()].some((value) => value.toLowerCase().substr(0, query.length) === query))
 		)
 		const resultsFind = usersList
 		.filter((e, i, arr) => arr.lastIndexOf(e) === i)
@@ -71,7 +71,7 @@ export default class UsersSearchResults {
 
 		if (!resultsFind.length)
 		{
-			if(!this.searching) return <li className="SearchFailed">{app.translator.trans('pushedx-chat.forum.chat.list.preview.add_modal.search.failed')}</li>
+			if(!this.searching) return <li className="SearchFailed">{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.search.failed')}</li>
 			else LoadingIndicator.component({size: 'tiny', className: 'Button Button--icon Button--link'});
 		}
 
@@ -96,7 +96,7 @@ export default class UsersSearchResults {
 				);
 			}),
 			resultsSelected.length ? 
-				<li className="Dropdown-header">{app.translator.trans('pushedx-chat.forum.chat.list.preview.add_modal.search.invited')}</li>
+				<li className="Dropdown-header">{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.search.invited')}</li>
 				: null,
 			resultsSelected.map((user) => {
 				const name = username(user);

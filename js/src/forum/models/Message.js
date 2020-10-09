@@ -6,10 +6,11 @@ Object.assign(Message.prototype,
 {
 	message: Model.attribute('message'),
 	user: Model.hasOne('user'),
-	deletedBy: Model.hasOne('deleted_by'),
+	deleted_by: Model.hasOne('deleted_by'),
 	chat: Model.hasOne('chat'),
-	createdAt: Model.attribute('created_at', Model.transformDate),
-	editedAt: Model.attribute('edited_at', Model.transformDate),
-	isReaded: Model.attribute('is_readed'),
-	ipAddress: Model.attribute('ip_address'),
+	created_at: Model.attribute('created_at', Model.transformDate),
+	edited_at: Model.attribute('edited_at', Model.transformDate),
+	is_readed: Model.attribute('is_readed'),
+	ip_address: Model.attribute('ip_address'),
+	is_censored: Model.attribute('is_censored')
 });

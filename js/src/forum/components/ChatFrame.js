@@ -45,6 +45,11 @@ export default class ChatFrame extends Component
         return document.querySelector('.neonchat');
     }
 
+    getChatFrame()
+    {
+        return document.querySelector('.neonchat #chat');
+    }
+
     getChatHeader()
     {
         return document.querySelector('.neonchat #chat-header');
@@ -55,14 +60,19 @@ export default class ChatFrame extends Component
         return document.querySelector('.neonchat .wrapper');
     }
 
-    getChatInput()
+    getChatViewport()
     {
-        return document.querySelector('.neonchat #chat-input');
+        return document.querySelector('.neonchat #chat-viewport');
+    }
+
+    getChatsListPanel()
+    {
+        return document.querySelector('.neonchat #chats-list');
     }
 
     getChatsList()
     {
-        return document.querySelector('.neonchat #chats-list');
+        return document.querySelector('.neonchat #chats-list .list');
     }
 
     toggleChat(e)
@@ -85,7 +95,7 @@ export default class ChatFrame extends Component
 
     toggleChatsList(e)
     {
-        var chatLists = this.getChatsList();
+        var chatLists = this.getChatsListPanel();
         var showing = true;
 
         if(chatLists.classList.contains('toggled'))
@@ -144,13 +154,15 @@ export default class ChatFrame extends Component
                                 </div>
                             </p>
                         </div>
-                        {this.chats.components}
-                        {app.session.user ? <div class="panel-add" onclick={() => app.modal.show(new ChatCreateModal)}></div> : null}
+                        <div className='list' style={{'max-height': this.transform.y + 'px'}}>
+                            {this.chats.components}
+                            {app.session.user ? <div class="panel-add" onclick={() => app.modal.show(new ChatCreateModal)}></div> : null}
+                        </div>
                     </div>
 
                     <div id='chat-panel'>
                         <div id='chat-header' ondragstart={() => false}>
-                            <h2>{app.translator.trans('pushedx-chat.forum.toolbar.title')}</h2>
+                            <h2>{this.viewportChat ? this.viewportChat.attrs.title : app.translator.trans('pushedx-chat.forum.toolbar.title')}</h2>
                             <p data-title={app.translator.trans(this.beingShown ? 'pushedx-chat.forum.toolbar.minimize' : 'pushedx-chat.forum.toolbar.maximize')}>
                                 <div className='icon' onclick={this.toggleChat.bind(this)}>
                                     <i className={this.beingShown ? 'fas fa-window-minimize' : 'fas fa-window-maximize'}></i>
@@ -218,7 +230,8 @@ export default class ChatFrame extends Component
         document.removeEventListener('mousemove', this.mouseMoveEvent);
         document.body.classList.remove('moving');
 
-        localStorage.setItem('chat_transform', JSON.stringify({x: parseInt(this.getChat().style.right) || 0, y: this.getChatWrapper().offsetHeight}));
+        this.transform = {x: parseInt(this.getChat().style.right), y: this.getChatWrapper().offsetHeight};
+        localStorage.setItem('chat_transform', JSON.stringify(this.transform));
     }
 
     chatMoveProcess(e)
@@ -229,14 +242,15 @@ export default class ChatFrame extends Component
         let move = {x: e.clientX - this.moveLast.x, y: e.clientY - this.moveLast.y}
         let right = parseInt(chat.style.right) || 0;
         let wrapperHeight = chatWrapper.offsetHeight;
-        let nextMove = {x: right - move.x, y: wrapperHeight - move.y}; 
+        let nextPos = {x: right - move.x, y: wrapperHeight - move.y}; 
 
-        if(0 < nextMove.x && nextMove.x < (window.innerWidth - chat.offsetWidth))
-            chat.style.right = nextMove.x + 'px';
-
-        if(0 < nextMove.y && nextMove.y < (window.innerHeight - 100))
+        if((nextPos.x < (window.innerWidth - this.getChatFrame().offsetWidth) && move.x < 0) || (nextPos.x > 0 && move.x > 0))
+            chat.style.right = nextPos.x + 'px';
+    
+        if(0 < nextPos.y && nextPos.y < (window.innerHeight - 100))
         {
-            chatWrapper.style.height = nextMove.y + 'px';
+            chatWrapper.style.height = nextPos.y + 'px';
+            this.getChatsList().style.maxHeight = this.getChatViewport().scrollHeight + 'px';
             chatWrapper.scrollTop += move.y;
         }
 

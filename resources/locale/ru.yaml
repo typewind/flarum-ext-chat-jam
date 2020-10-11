@@ -13,6 +13,8 @@ pushedx-chat:
         pin: Закрепить панель
         unpin: Открепить панель
         placeholder: Поиск
+        preview:
+          empty: Нет сообщений
         add_modal: 
           title: Выберите пользователей
           create: Создать беседу

@@ -13,13 +13,6 @@ use Flarum\User\User;
 class PostMessage
 {
     /**
-     * The chat message
-     *
-     * @var string
-     */
-    public $msg;
-
-    /**
      * The user performing the action.
      *
      * @var User
@@ -27,14 +20,20 @@ class PostMessage
     public $actor;
 
     /**
+     * The chat message
+     *
+     * @var string
+     */
+    public $msg;
+
+    /**
      * @param int                          $postId The ID of the post to upload the image for.
      * @param User                         $actor  The user performing the action.
      */
-    public function __construct(/*\string*/ $msg, User $actor, int $chat_id, string $ip_address)
+    public function __construct(User $actor, $data, string $ip_address)
     {
-        $this->msg = $msg;
         $this->actor = $actor;
-        $this->chat_id = $chat_id;
+        $this->data = $data;
         $this->ip_address = $ip_address;
     }
 }

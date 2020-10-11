@@ -60,13 +60,6 @@ class MessageSerializer extends AbstractSerializer
             $attributes['message'] = str_repeat("*", strlen($attributes['message']));
             $attributes['is_censored'] = true;
         }
-        if(array_key_exists('event', $attributes))
-        {
-            $this->socket->sendChatEvent($message->chat_id, $attributes['event'], [
-                'message' => $attributes
-            ]);
-        }
-
         return $attributes;
     }
     

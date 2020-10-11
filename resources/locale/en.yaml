@@ -13,6 +13,8 @@ pushedx-chat:
         pin: Pin panel
         unpin: Unpin panel
         placeholder: Search
+        preview:
+          empty: No messages
         add_modal: 
           title: Select users
           create: Create a new chat

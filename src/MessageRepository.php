@@ -53,7 +53,11 @@ class MessageRepository
         $settings = app(SettingsRepositoryInterface::class);
 
         $query = $this->query();
-        if(!$actor->can('pushedx-chat.permissions.moderate.vision')) $query->whereNull('deleted_by');
+        if(!$actor->can('pushedx-chat.permissions.moderate.vision')) 
+            $query->where(function ($query) use ($actor) {
+                $query->whereNull('deleted_by')
+                ->orWhere('deleted_by', $actor->id);
+            });
 
         return $query;
     }

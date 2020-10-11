@@ -175,19 +175,23 @@
                 background-color: #ffffff00;
                 margin: 10px 8px;
                 border-radius: 100px;
+                box-shadow: none;
+                transition: box-shadow 0.1s;
 
                 user-select: none;
                 -webkit-user-select: none;
                 -moz-user-select: none;
 
-                &.active, &:hover
+
+                &:hover:not(.active)
                 {
-                    box-shadow: 0 0 0 3px #ff4593;
+                    box-shadow: 0 0 0 3px #ff94c1;
                 }
 
                 &.active
                 {
                     background-color: #ff4593;
+                    box-shadow: 0 0 0 3px #ff4593;
                 }
 
                 .avatar
@@ -235,6 +239,11 @@
                     {
                         color: #ff94c1;
                     }
+
+                    .empty
+                    {
+                        color: #bdbfc4;
+                    }
                 }
 
                 .timestamp
@@ -270,7 +279,7 @@
                     -webkit-user-select: none;
                     -moz-user-select: none;
 
-                    &:after
+                    &:before
                     {
                         content: "+";
                         font-size: 48pt;
@@ -355,8 +364,10 @@
                 background-color: #ffffff;
                 margin: 8px;
                 border-radius: 100px;
+                box-shadow: none;
+                transition: box-shadow .1s;
                 
-                &:after
+                &:before
                 {
                     content: "+";
                     font-size: 48pt;
@@ -366,7 +377,7 @@
 
                 &:hover
                 {
-                    box-shadow: 0 0 0 3px #ff4593;
+                    box-shadow: 0 0 0 3px #ff94c1;
                 }
             }
         }
@@ -534,13 +545,18 @@
                     }
                 }
 
-                &.deleted
+                &.hidden
                 {
                     .avatar-wrapper, .name, .labels, .message, .timestamp
                     {
                         opacity: 0.3
                     }
                 }    
+
+                &.delete
+                {
+                    display: none;
+                }
 
                 .avatar-wrapper
                 {
@@ -723,6 +739,11 @@
                         border-radius: 4px;
                         padding: 2px 5px;
                         border: 0 !important;
+                    }
+
+                    .UserMention:hover
+                    {
+                        color: #ff94c1 !important;
                     }
                 }
             }

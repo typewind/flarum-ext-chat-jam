@@ -27,7 +27,12 @@ export default class ChatMessage extends Component
 	{
 		return (
 			<div 
-				className={classList({'message-wrapper': true, deleted: this.model.deleted_by(), editing: this.is_editing})}
+				className={classList({
+					'message-wrapper': true, 
+					hidden: this.model.deleted_by(), 
+					editing: this.is_editing, 
+					deleted: !this.isVisible()}
+					)}
 				data-id={this.model.id()} 
 				config={this.configWrapper.bind(this)}>
 				<div>
@@ -138,7 +143,7 @@ export default class ChatMessage extends Component
 					}
 					{this.model.deleted_by() ?
 						[<Button 
-							onclick={this.restore.bind(this)} 
+							onclick={this.controlRestore.bind(this)} 
 							icon='fas fa-reply'
 						>
 							{app.translator.trans('core.forum.post_controls.restore_button')}
@@ -146,7 +151,7 @@ export default class ChatMessage extends Component
 					}
 					{!this.model.deleted_by() && this.chatViewport.permissions.delete ?
 						<Button 
-							onclick={this.delete.bind(this)} 
+							onclick={this.controlHide.bind(this)} 
 							icon='fas fa-trash-alt'
 							disabled={!this.chatViewport.permissions.delete}
 						>
@@ -155,7 +160,7 @@ export default class ChatMessage extends Component
 					}
 					{this.model.deleted_by() && this.chatViewport.permissions.moderate.delete ?
 						<Button 
-							onclick={this.delete.bind(this, true)} 
+							onclick={this.controlDelete.bind(this)} 
 							icon='fas fa-trash-alt'
 							disabled={!this.chatViewport.permissions.delete}
 						>
@@ -218,8 +223,8 @@ export default class ChatMessage extends Component
 	textFormat(text)
 	{
 		let self = this;
-		if(!text) text = this.message;
-		if(this.element) s9e.TextFormatter.preview(text, this.element);
+		this.message = text ?? this.message;
+		if(this.element) s9e.TextFormatter.preview(this.message, this.element);
 
 		setTimeout(() => {
 			$('.neonchat script').each(function() {
@@ -237,42 +242,69 @@ export default class ChatMessage extends Component
 		}, 10);
 	}
 
-	delete(e, forever)
+	isVisible()
 	{
-		if(!this.model.id())
-		{
-			this.deleted_forever = true;
-			this.elementWrapper.style.display = 'none';
-			return;
-		}
+		if(this.deleted_forever && (!this.chatViewport.permissions.moderate.vision || !this.model.id()))
+			return false;
 
-		if(forever) 
-		{
-			this.deleted_forever = forever;
-			this.elementWrapper.style.display = 'none';
-			this.model.delete();
-		}
-		else this.hide();
+		if(this.model.deleted_by() && (!this.chatViewport.permissions.moderate.vision || (app.session.user && this.model.deleted_by().id() != app.session.user.id())))
+			return false;
+
+		return true;
+	}
+
+	controlHide()
+	{
+		this.model.save({actions: {hide: true}, relationships: {deleted_by: app.session.user}});
+		this.hide();
 	}
 
 	hide()
 	{
-		this.model.save({actions: {hide: true}, relationships: {deleted_by: app.session.user}});
+		this.model.pushData({relationships: {deleted_by: app.session.user}});
+		m.redraw();
+	}
+
+	controlRestore()
+	{
+		this.model.save({actions: {hide: false}, deleted_by: 0});
+		this.restore();
 	}
 
 	restore()
 	{
-		this.model.save({actions: {hide: false}, deleted_by: 0});
+		this.model.pushAttributes({deleted_by: 0});
 		delete this.model.data.relationships.deleted_by;
+		m.redraw();
 	}
 
-	edit(newContent, outside = false)
+	controlDelete()
+	{
+		this.model.delete();
+		this.delete();
+	}
+
+	delete()
+	{
+		this.deleted_forever = true;
+		m.redraw();
+	}
+
+	controlEdit(content)
+	{
+		this.model.save({actions: {msg: content}, edited_at: new Date(), message: content});
+		this.edit(content);
+	}
+
+	edit(content)
 	{
 		this.needToFlash = true;
-		this.textFormat();
+		this.message = content;
 
-		if(!outside) this.model.save({actions: {msg: newContent}, edited_at: new Date(), message: newContent});
-		else m.redraw();
+		this.model.pushAttributes({message: content, edited_at: new Date()});
+		m.redraw();
+
+		this.textFormat();
 	}
 
 	flash()

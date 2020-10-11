@@ -11,7 +11,7 @@ audio.volume = 0.5;
 import Component from 'flarum/Component';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
 import ChatMessage from './ChatMessage';
-import ChatPreview from './ChatPreview';
+import Model from 'flarum/Model';
 
 export default class ChatViewport extends Component
 {
@@ -55,18 +55,22 @@ export default class ChatViewport extends Component
         if(socket.user) socket.user.bind('neonchat.events', this.handleSocketEvent.bind(this));
     }
 
-    handleSocketEvent(response)
+    handleSocketEvent(r)
     {
-        if(response.event.chat_id == this.model.id())
+        if(r.event.chat_id == this.model.id())
         {
-            let message = response.attributes.message;
-            console.log(response);
-
-            switch(response.event.id)
+            let message = r.response.message, messageInstance;
+            if(message) 
+            {
+                message = app.store.pushPayload(message);
+                messageInstance = this.messages.instances[message.id()];
+                m.redraw();
+            }
+            switch(r.event.id)
             {
                 case 'message.post':
                 {
-                    if(!app.session.user || message.user_id != app.session.user.id())
+                    if(!app.session.user || message.user().id() != app.session.user.id())
                     {
                         this.chatFrame.messagesStorage.push(this.createMessage(message, {}, true));
                         this.scroll.needToScroll = true;
@@ -77,24 +81,25 @@ export default class ChatViewport extends Component
                 }
                 case 'message.edit':
                 {
-                    if(message.actions.msg !== undefined)
+                    let actions = message.data.attributes.actions;
+                    if(actions.msg !== undefined)
                     {
-                        if(!app.session.user || message.user_id != app.session.user.id())
+                        if(!app.session.user || message.user().id() != app.session.user.id())
                         {
-                            if(this.messages.instances[message.id])
-                                this.messages.instances[message.id].edit(message.actions.msg, true);
+                            if(messageInstance)
+                                messageInstance.edit(actions.msg);
                         }
                     }
-                    else if(message.actions.hide !== undefined)
+                    else if(actions.hide !== undefined)
                     {
-                        if(!app.session.user || message.actions.invoker != app.session.user.id())
-                        message.actions.hide ? this.messageDelete(message) : this.messageRestore(message)
+                        if(!app.session.user || actions.invoker != app.session.user.id())
+                            actions.hide ? this.messageHide(message) : this.messageRestore(message);
                     }
                     break;
                 }
                 case 'message.delete':
                 {
-                    if(!app.session.user || message.user_id != app.session.user.id())
+                    if(!app.session.user || message.user().id() != app.session.user.id())
                         this.messageDelete(message)
 
                     break;
@@ -120,7 +125,7 @@ export default class ChatViewport extends Component
 						</div>
 						: null
 					}
-					{this.getStoragedMessages().concat(this.input.writing ? this.input.preview.component : null)}
+					{this.getStoragedMessages().concat(this.input.writingPreview ? this.input.preview.component : null)}
 				</div>
 				<div className='input-wrapper'>
 					<textarea
@@ -246,7 +251,7 @@ export default class ChatViewport extends Component
 	inputSyncWithPreview()
 	{
 		let input = this.getChatInput();
-        if(this.input.writing)
+        if(this.input.writingPreview)
         {
             input.value = this.input.preview.instance.message;
             this.inputProcess();
@@ -256,7 +261,8 @@ export default class ChatViewport extends Component
     inputProcess(e)
     {
         let input = this.getChatInput();
-        this.input.messageLength = input.value.length;
+        let inputValue = input.value.trim();
+        this.input.messageLength = inputValue.length;
 
         if(!input.baseScrollHeight)
         {
@@ -271,25 +277,20 @@ export default class ChatViewport extends Component
 
         if(this.input.messageLength)
         {
-            if(!this.input.writing && !this.messageEditing)
+            if(!this.input.writingPreview && !this.messageEditing)
                 this.inputPreviewStart();
         }
         else
         {
-            if(this.input.writing && !input.value.length)
+            if(this.input.writingPreview && !inputValue.length)
                 this.inputPreviewEnd();
         }
 
-        if(this.messageEditing) 
-        {
-            this.messageEditing.textFormatted = input.value;
-            this.messageEditing.textFormat(input.value);
-        }
-        else if(this.input.writing)
+        if(this.messageEditing) this.messageEditing.textFormat(inputValue);
+        else if(this.input.writingPreview)
         {
             let preview = this.input.preview.instance;
-            preview.message = input.value;
-            preview.textFormat(input.value);
+            preview.textFormat(inputValue);
         }
         this.timedRedraw(100, () => this.scroll.autoScroll && !this.messageEditing ? this.scrollToBottom() : null);
     }
@@ -320,12 +321,15 @@ export default class ChatViewport extends Component
 
     inputPreviewStart()
     {
-        this.input.writing = true;
+        this.input.writingPreview = true;
 
         if(!this.input.preview.component) 
         {
+            let model = app.store.createRecord('chatmessages');
+            model.pushData({attributes: {id: 0, message: ' ', created_at: 0}, relationships: {user: app.session.user, chat: this.model}});
+
             this.input.preview.component = this.createMessage(
-                app.store.createRecord('chatmessages', {id: 0, message: ' ', relationships: {user: app.session.user}}), 
+                model, 
                 {
                     is_editing: true,
                     needToFlash: true,
@@ -339,7 +343,7 @@ export default class ChatViewport extends Component
 
     inputPreviewEnd()
     {
-        this.input.writing = false;
+        this.input.writingPreview = false;
 
         m.redraw();
     }
@@ -348,30 +352,31 @@ export default class ChatViewport extends Component
     {
         if(text.trim().length > 0 && !this.loading)
         {
-            if(this.input.writing) 
+            if(this.input.writingPreview) 
             {
-                this.input.writing = false;
-    
+                this.input.writingPreview = false;
+
                 let message = this.input.preview.instance;
-                message.created_at = new Date();
+                message.model.save({message: message.message, created_at: new Date(), chat_id: this.model.id()}).then(r => {message.flash(); m.redraw()});
                 message.is_editing = false;
     
                 this.chatFrame.messagesStorage.push(this.input.preview.component);
                 this.input.preview.component = null;
     
-                m.redraw();
                 message.flash();
+                this.inputClear();
             }
-
-            this.inputClear();
-
-            let editingMsg = this.messageEditing;
-            if(editingMsg)
+            else if(this.messageEditing)
             {
-                if(editingMsg.message.trim() !== editingMsg.textFormatted.trim()) editingMsg.edit(editingMsg.textFormatted);
+                let editingMsg = this.messageEditing;
+                if(editingMsg.message.trim() !== editingMsg.oldContent.trim()) 
+                {
+                    editingMsg.controlEdit(editingMsg.message);
+                    editingMsg.oldContent = editingMsg.message;
+                }
                 this.messageEditEnd();
+                this.inputClear();
             }
-            else this.apiPost(text);
         }
     }
 
@@ -381,10 +386,10 @@ export default class ChatViewport extends Component
         this.inputPreviewEnd();
         
         message.is_editing = true;
-        message.textFormatted = message.message;
+        message.oldContent = message.model.message();
 
         this.messageEditing = message;
-        chatInput.value = message.message;
+        chatInput.value = message.oldContent;
         chatInput.focus();
         this.inputProcess();
 
@@ -399,47 +404,39 @@ export default class ChatViewport extends Component
 		{
 			message.is_editing = false;
 			this.inputClear();
-			message.textFormat();
+			message.textFormat(message.oldContent);
 			m.redraw();
 			this.messageEditing = null;
 		}
     }
 
-    messageDelete(data)
+    messageHide(message)
     {
-        let message = this.messages.instances[data.id];
-        if(message) 
-        {
-            if(this.permissions.moderate.vision) 
-            {
-                message.hide(data.deleted_by);
-                m.redraw();
-            }
-            else 
-            {
-                message.elementWrapper.style.display = 'none'; 
-                message.deleted_forever = true;
-            }
-        }
+        let instance = this.messages.instances[message.id()];
+
+        if(instance)
+            message.hide();
     }
 
-    messageRestore(data)
+    messageDelete(message)
     {
-        let message = this.messages.instances[data.id];
-        if(message) 
-        {
-            message.elementWrapper.style.display = ''; 
-            message.deleted_by = null;
-            message.deleted_forever = false;
-            m.redraw();
-        }
+        let instance = this.messages.instances[message.id()];
+
+        if(instance) 
+            message.delete();
+    }
+
+    messageRestore(message)
+    {
+        let instance = this.messages.instances[message.id()];
+
+        if(instance) message.restore();
         else
         {
-            let messageIds = Object.keys(this.messages.instances);
-            messageIds.some((value, index, array) => 
+            Object.keys(this.messages.instances).some((value, index, array) => 
             {
                 if(array[index - 1] < data.id && data.id < array[index])
-                    return this.chatFrame.messagesStorage.splice(index, 0, this.createMessage(data));
+                    return this.chatFrame.messagesStorage.splice(index, 0, this.createMessage(message));
             })
             m.redraw();
         }
@@ -565,27 +562,26 @@ export default class ChatViewport extends Component
             }, options)
         );
 
-        this.messageNotify(notify);
+        if(notify) this.messageNotify(chatMessage);
+        if(this.scroll.needToScroll || this.scroll.autoScroll)
+            this.scrollToBottom();
 
         let component = m.component(chatMessage);
         chatMessage.component = component;
         return component;
     }
 
-    messageNotify(notify, message)
+    messageNotify(message)
     {
-        if(notify && (!app.session.user || (message.user && message.user.id() != app.session.user.id()))) 
-            this.notifyTry(message.message, message.user);
+        if((!app.session.user || (message.user.id() != app.session.user.id()))) 
+            this.notifyTry(message);
 
-        if(this.scroll.needToScroll || this.scroll.autoScroll)
-            this.scrollToBottom();
-
-        if(notify) message.flash();
+        message.flash();
 	}
 	
-    insertMention(message)
+    insertMention(msgInstance)
     {
-        let user = message.user;
+        let user = msgInstance.model.user();
         if(!app.session.user) return;
 
         var input = this.getChatInput();
@@ -597,28 +593,30 @@ export default class ChatViewport extends Component
         m.redraw.strategy('none');
     }
 
-    messageIsMention(msg)
+    messageIsMention(message)
     {
-        return app.session.user && (msg.indexOf('@' + app.session.user.username()) >= 0);
+        return app.session.user && (message.message().indexOf('@' + app.session.user.username()) >= 0);
     }
 
-    notifyTry(msg, user) 
+    notifyTry(message)
     {
         if(!("Notification" in window)) return;
-        if(this.notify && this.messageIsMention(msg)) this.notifySend(msg, user.username(), user.avatarUrl())
-        this.notifySound(msg);
+
+        if(this.messageIsMention(msg)) this.notifySend(message)
+        this.notifySound(message);
     }
 
-    notifySend(msg, title, icon)
+    notifySend(message)
     {
-        return !this.active ? new Notification(title, {body: msg, icon: icon, silent: true}) : null;
+        if(this.notify)
+            !this.active ? new Notification(message.user().username(), {body: message.message(), icon: message.user().avatarUrl(), silent: true}) : null;
     }
 
-    notifySound(msg) 
+    notifySound(message) 
     {
         if(!this.isMuted) 
         {
-            let sound = this.messageIsMention(msg) ? refAudio : audio;
+            let sound = this.messageIsMention(message) ? refAudio : audio;
             sound.currentTime = 0;
             sound.play();
         }

@@ -32,10 +32,7 @@ export default class ChatPreview extends Component
 	{
 		return (
 			<div className={'panel-preview ' + (this.attrs.active ? 'active' : '')}>
-				{this.attrs.type ? 
-					this.componentPreviewChannel() 
-					: this.componentPreviewPM()
-				}
+				{this.componentPreview()}
 			</div>
 		)
 	}
@@ -49,20 +46,41 @@ export default class ChatPreview extends Component
 		return humanTime(this.model.last_message().created_at());
 	}
 
-	componentPreviewPM()
+	componentAvatarPM()
 	{
-		return ([
+		return (
 			<div 
 				className={'avatar ' + (this.attrs.avatarUrl ? 'image' : '')} 
 				style={{'background-color': this.attrs.color, color: this.attrs.textColor, 'background-image': this.attrs.avatarUrl ? `url(${this.attrs.avatarUrl})` : null}}
 			>
 				{this.attrs.avatarUrl ? null : this.firstLetter(this.attrs.title).toUpperCase()}
-			</div>,
+			</div>
+		)
+	}
+
+	componentAvatarChannel()
+	{
+		return (
+			<div 
+				className='avatar'
+				style={{'background-color': this.attrs.color, color: this.attrs.textColor}}
+			>
+				{this.attrs.avatarUrl ? null : this.firstLetter(this.attrs.title).toUpperCase()}
+			</div>
+		)
+	}
+
+	componentPreview()
+	{
+		return ([
+			this.attrs.type ? this.componentAvatarChannel() : this.componentAvatarPM(),
 			<div style="display: flex; flex-direction: column">
 				<div className='title' title={this.attrs.title}>{this.attrs.title}</div>
-				{this.componentTextPreview()}
+				{this.model.last_message() ? this.componentTextPreview() : this.componentTextEmpty()}
 			</div>,
-			<div className='timestamp' title={fullTime(this.model.last_message().created_at()).children[0]}>{this.humanTime = this.componentMessageTime()}</div>
+			this.model.last_message() ? 
+				<div className='timestamp' title={fullTime(this.model.last_message().created_at()).children[0]}>{this.humanTime = this.componentMessageTime()}</div>
+				: null
 		])
 	}
 
@@ -114,6 +132,15 @@ export default class ChatPreview extends Component
 			<div className='message'>
 				<span className='sender'>{senderName}</span>
 				<span className={formatResult.type}>{formatResult.text}</span>
+			</div>
+		)
+	}
+
+	componentTextEmpty()
+	{
+		return (
+			<div className='message'>
+				<span className='empty'>{app.translator.trans('pushedx-chat.forum.chat.list.preview.empty')}</span>
 			</div>
 		)
 	}

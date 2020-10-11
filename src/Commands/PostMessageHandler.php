@@ -53,10 +53,13 @@ class PostMessageHandler
     public function handle(PostMessage $command)
     {
         $actor = $command->actor;
-        $content = $command->msg;
+        $attributes = $command->data['attributes'];
         $ip_address = $command->ip_address;
 
-        $chat = $this->chats->findOrFail($command->chat_id, $actor);
+        $content = $attributes['message'];
+        $chat_id = $attributes['chat_id'];
+
+        $chat = $this->chats->findOrFail($chat_id, $actor);
 
         $this->assertCan(
             $actor,

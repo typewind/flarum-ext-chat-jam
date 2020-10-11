@@ -21,7 +21,7 @@ class ChatSocket extends PusherWrapper
 				'id' => $event_id,
 				'chat_id' => $chat_id
 			],
-			'attributes' => $options
+			'response' => $options
 		];
 		if($chat) $chat->type ? $this->sendPublic($attributes) : $this->sendPrivate($chat->id, $attributes);
 	}

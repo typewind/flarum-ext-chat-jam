@@ -14,6 +14,7 @@ use Xelson\Chat\MessageRepository;
 use Xelson\Chat\MessageValidator;
 use Flarum\User\AssertPermissionTrait;
 use Illuminate\Support\Arr;
+use Tobscure\JsonApi\Resource;
 
 class EditMessageHandler
 {

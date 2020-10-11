@@ -357,13 +357,13 @@ export default class ChatViewport extends Component
                 this.input.writingPreview = false;
 
                 let message = this.input.preview.instance;
-                message.model.save({message: message.message, created_at: new Date(), chat_id: this.model.id()}).then(r => {message.flash(); m.redraw()});
+                this.messagePost(message);
+
                 message.is_editing = false;
     
                 this.chatFrame.messagesStorage.push(this.input.preview.component);
                 this.input.preview.component = null;
     
-                message.flash();
                 this.inputClear();
             }
             else if(this.messageEditing)
@@ -444,26 +444,37 @@ export default class ChatViewport extends Component
 
     messageResend(instance)
     {
-		this.apiPost(instance.message, this).then(
-			(result) =>
-			{
-				if(result)
-				{
-                    this.chatFrame.messagesStorage.some((value, index, array) => 
-                    {
-                        if(value == instance.component)
-                            return array.splice(index, 1) && array.push(instance.component) && this.scrollToBottom();
-                    });
-                    instance.id = result.data.id;
-                    instance.created_at = new Date();
-                    instance.timedOut = false;
-                    instance.needToFlash = true;
+        this.messagePost(instance);
+    }
+    
+    messagePost(instance)
+    {
+        let self = this;
+        self.loading = true;
+        m.redraw();
 
-                    m.redraw();
-				}
-			}
-		);
-	}
+        return instance.model.save({message: instance.message, created_at: new Date(), chat_id: this.model.id()})
+        .then(
+            r => {
+                instance.timedOut = false;
+                self.chatPreview.model.pushData({relationships: {last_message: instance.model}});
+
+                self.input.preview.instance = null;
+                self.loading = false;
+                instance.flash();
+
+                m.redraw();
+            },
+            r => {
+                instance.timedOut = true;
+
+                self.input.preview.instance = null;
+                self.loading = false;
+
+                m.redraw();
+            }
+        );
+    }
 
 	messagesUnload()
 	{
@@ -502,39 +513,6 @@ export default class ChatViewport extends Component
                 m.redraw();
             });
 	}
-
-    apiPost(text, targetInstance = this.input.preview.instance)
-    {
-        this.loading = true;
-		this.scroll.needToScroll = true;
-
-        return app.request({
-            method: 'POST',
-            url: app.forum.attribute('apiUrl') + '/chatsmessages',
-            data: {msg: text, 'chat_id': this.model.id()}
-        }).then(
-            (result) =>
-            {
-                targetInstance.id = result.data.id;
-
-                this.messages.instances[targetInstance.id] = targetInstance;
-                if(targetInstance == this.input.preview.instance) this.input.preview.instance = null;
-            
-                this.loading = false;
-                m.redraw();
-
-                return result;
-            },
-            (error) =>
-            {
-                targetInstance.timedOut = true;
-                if(targetInstance == this.input.preview.instance) this.input.preview.instance = null;
-
-                this.loading = false;
-                m.redraw();
-            }
-        );
-	}
 	
 	timedRedraw(timeout, callback)
 	{
@@ -558,6 +536,7 @@ export default class ChatViewport extends Component
                 model: model,
                 chatViewport: this,
                 chatFrame: this.chatFrame,
+                chatPreview: this.chatPreview,
                 instanceGetter: (instance) => this.messages.instances[instance.model.id()] = instance,
             }, options)
         );

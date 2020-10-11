@@ -244,7 +244,7 @@ export default class ChatMessage extends Component
 
 	isVisible()
 	{
-		if(this.deleted_forever && (!this.chatViewport.permissions.moderate.vision || !this.model.id()))
+		if(this.deleted_forever && (!this.chatViewport.permissions.moderate.vision || !this.model.data.attributes.id))
 			return false;
 
 		if(this.model.deleted_by() && (!this.chatViewport.permissions.moderate.vision || (app.session.user && this.model.deleted_by().id() != app.session.user.id())))

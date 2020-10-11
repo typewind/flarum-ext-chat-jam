@@ -61,7 +61,7 @@ class PostMessageController extends AbstractShowController
         $ip_address = Arr::get($request->getServerParams(), 'REMOTE_ADDR', '127.0.0.1');
 
         $this->getEventDispatcher()->listen(EventWillSerializeData::class, [$this, 'onWillSerializeData']);
-
+        
         return $this->bus->dispatch(
             new PostMessage($actor, $data, $ip_address)
         );

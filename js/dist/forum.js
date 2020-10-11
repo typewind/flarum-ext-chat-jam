@@ -842,7 +842,7 @@ function (_Component) {
   };
 
   _proto.isVisible = function isVisible() {
-    if (this.deleted_forever && (!this.chatViewport.permissions.moderate.vision || !this.model.id())) return false;
+    if (this.deleted_forever && (!this.chatViewport.permissions.moderate.vision || !this.model.data.attributes.id)) return false;
     if (this.model.deleted_by() && (!this.chatViewport.permissions.moderate.vision || app.session.user && this.model.deleted_by().id() != app.session.user.id())) return false;
     return true;
   };
@@ -1609,18 +1609,10 @@ function (_Component) {
       if (this.input.writingPreview) {
         this.input.writingPreview = false;
         var message = this.input.preview.instance;
-        message.model.save({
-          message: message.message,
-          created_at: new Date(),
-          chat_id: this.model.id()
-        }).then(function (r) {
-          message.flash();
-          m.redraw();
-        });
+        this.messagePost(message);
         message.is_editing = false;
         this.chatFrame.messagesStorage.push(this.input.preview.component);
         this.input.preview.component = null;
-        message.flash();
         this.inputClear();
       } else if (this.messageEditing) {
         var editingMsg = this.messageEditing;
@@ -1683,20 +1675,33 @@ function (_Component) {
   };
 
   _proto.messageResend = function messageResend(instance) {
-    var _this4 = this;
+    this.messagePost(instance);
+  };
 
-    this.apiPost(instance.message, this).then(function (result) {
-      if (result) {
-        _this4.chatFrame.messagesStorage.some(function (value, index, array) {
-          if (value == instance.component) return array.splice(index, 1) && array.push(instance.component) && _this4.scrollToBottom();
-        });
-
-        instance.id = result.data.id;
-        instance.created_at = new Date();
-        instance.timedOut = false;
-        instance.needToFlash = true;
-        m.redraw();
-      }
+  _proto.messagePost = function messagePost(instance) {
+    var self = this;
+    self.loading = true;
+    m.redraw();
+    return instance.model.save({
+      message: instance.message,
+      created_at: new Date(),
+      chat_id: this.model.id()
+    }).then(function (r) {
+      instance.timedOut = false;
+      self.chatPreview.model.pushData({
+        relationships: {
+          last_message: instance.model
+        }
+      });
+      self.input.preview.instance = null;
+      self.loading = false;
+      instance.flash();
+      m.redraw();
+    }, function (r) {
+      instance.timedOut = true;
+      self.input.preview.instance = null;
+      self.loading = false;
+      m.redraw();
     });
   };
 
@@ -1732,39 +1737,8 @@ function (_Component) {
     });
   };
 
-  _proto.apiPost = function apiPost(text, targetInstance) {
-    var _this5 = this;
-
-    if (targetInstance === void 0) {
-      targetInstance = this.input.preview.instance;
-    }
-
-    this.loading = true;
-    this.scroll.needToScroll = true;
-    return app.request({
-      method: 'POST',
-      url: app.forum.attribute('apiUrl') + '/chatsmessages',
-      data: {
-        msg: text,
-        'chat_id': this.model.id()
-      }
-    }).then(function (result) {
-      targetInstance.id = result.data.id;
-      _this5.messages.instances[targetInstance.id] = targetInstance;
-      if (targetInstance == _this5.input.preview.instance) _this5.input.preview.instance = null;
-      _this5.loading = false;
-      m.redraw();
-      return result;
-    }, function (error) {
-      targetInstance.timedOut = true;
-      if (targetInstance == _this5.input.preview.instance) _this5.input.preview.instance = null;
-      _this5.loading = false;
-      m.redraw();
-    });
-  };
-
   _proto.timedRedraw = function timedRedraw(timeout, callback) {
-    var _this6 = this;
+    var _this4 = this;
 
     m.redraw.strategy('none');
 
@@ -1772,13 +1746,13 @@ function (_Component) {
       this.redrawTimeout = setTimeout(function () {
         m.redraw();
         callback();
-        _this6.redrawTimeout = null;
+        _this4.redrawTimeout = null;
       }, timeout);
     }
   };
 
   _proto.createMessage = function createMessage(model, options, notify) {
-    var _this7 = this;
+    var _this5 = this;
 
     if (options === void 0) {
       options = {};
@@ -1792,8 +1766,9 @@ function (_Component) {
       model: model,
       chatViewport: this,
       chatFrame: this.chatFrame,
+      chatPreview: this.chatPreview,
       instanceGetter: function instanceGetter(instance) {
-        return _this7.messages.instances[instance.model.id()] = instance;
+        return _this5.messages.instances[instance.model.id()] = instance;
       }
     }, options));
     if (notify) this.messageNotify(chatMessage);

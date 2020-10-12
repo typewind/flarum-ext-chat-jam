@@ -37,7 +37,7 @@ class PostMessageController extends AbstractShowController
     /**
      * {@inheritdoc}
      */
-    public $include = ['user', 'deleted_by'];
+    public $include = ['user', 'deleted_by', 'chat'];
 
     /**
      * @param Dispatcher $bus

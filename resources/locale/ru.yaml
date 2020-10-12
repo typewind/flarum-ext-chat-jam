@@ -17,9 +17,13 @@ pushedx-chat:
           empty: Нет сообщений
         add_modal: 
           title: Выберите пользователей
-          create: Создать беседу
+          chat: Чат
+          channel: Канал
+          create.chat: Создать чат
+          create.channel: Создать канал
           form:
-            title: Название беседы
+            title.chat: Название чата
+            title.channel: Название канала
             title.validator: Хотя бы один символ
             users: Выбранные пользователи
           search:

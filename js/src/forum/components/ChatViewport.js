@@ -11,7 +11,6 @@ audio.volume = 0.5;
 import Component from 'flarum/Component';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
 import ChatMessage from './ChatMessage';
-import Model from 'flarum/Model';
 
 export default class ChatViewport extends Component
 {
@@ -40,7 +39,10 @@ export default class ChatViewport extends Component
         }
 
 		let charLimit = app.forum.attribute('pushedx-chat.settings.charlimit');
-		this.messageCharLimit = charLimit === null ? 512 : charLimit;
+        this.messageCharLimit = charLimit === null ? 512 : charLimit;
+        
+        this.isReached = {start: true, end: true};
+        this.messagesFetched = false;
 
 		this.chatFrame = this.props.chatFrame;
 		this.chatPreview = this.props.chatPreview;
@@ -59,6 +61,8 @@ export default class ChatViewport extends Component
     {
         if(r.event.chat_id == this.model.id())
         {
+            console.log(r);
+            
             let message = r.response.message, messageInstance;
             if(message) 
             {
@@ -72,7 +76,7 @@ export default class ChatViewport extends Component
                 {
                     if(!app.session.user || message.user().id() != app.session.user.id())
                     {
-                        this.chatFrame.messagesStorage.push(this.createMessage(message, {}, true));
+                        this.messageInsertToViewport(message, {}, true);
                         this.scroll.needToScroll = true;
 
                         m.redraw();
@@ -119,6 +123,7 @@ export default class ChatViewport extends Component
 					onscroll={this.disableAutoScroll.bind(this)}
 					style={{height: this.chatFrame.transform.y + 'px'}}
 				>
+                    {!this.isReached.start ? <div style={{height: '600px'}}></div> : null}
 					{this.scroll.loadingFetch ?
 						<div className='message-wrapper'>
 							<LoadingIndicator className='loading-old Button-icon' />
@@ -126,6 +131,7 @@ export default class ChatViewport extends Component
 						: null
 					}
 					{this.getStoragedMessages().concat(this.input.writingPreview ? this.input.preview.component : null)}
+                    {!this.isReached.end ? <div style={{height: '600px'}}></div> : null}
 				</div>
 				<div className='input-wrapper'>
 					<textarea
@@ -160,9 +166,15 @@ export default class ChatViewport extends Component
 		)
     }
 
+    comporatorAscButZerosDesc(a, b)
+    {
+        return a == 0 ? 1 : (b == 0 ? -1 : a - b);
+    }
+
 	getStoragedMessages()
 	{
-		return this.chatFrame.messagesStorage;
+        let store = this.chatFrame.messagesStorage;
+		return store.sort((a, b) => this.comporatorAscButZerosDesc(a.instance.model.data.attributes.id, b.instance.model.data.attributes.id));
 	}
 
     getChat()
@@ -175,7 +187,7 @@ export default class ChatViewport extends Component
         return document.querySelector('.neonchat #chat-header');
     }
     
-    getchatFrame()
+    getChatFrame()
     {
         return document.querySelector('.neonchat .wrapper');
     }
@@ -188,7 +200,12 @@ export default class ChatViewport extends Component
     getChatsList()
     {
         return document.querySelector('.neonchat #chats-list');
-	}
+    }
+    
+    getChatWrapper()
+    {
+        return document.querySelector('.neonchat .wrapper');
+    }
 
     reachedLimit()
     {
@@ -210,6 +227,15 @@ export default class ChatViewport extends Component
         
         if(this.scroll.autoScroll) this.scroll.needToScroll = false;
         if(this.scroll.needToScroll) this.scrollToBottom();
+
+        if(!this.isReached.start && el.scrollTop < 600)
+        {
+            console.log('lets fetch a new messages from start');
+        }
+        else if(!this.isReached.end && el.scrollTop > currentHeight - el.offsetHeight - 600)
+        {
+            console.log('lets fetch a new messages from end');
+        }
 
         if(el.scrollTop <= 0 && this.scroll.oldScroll > 0 && !this.scroll.loadingFetch && !this.messageEditing) 
         {
@@ -234,7 +260,7 @@ export default class ChatViewport extends Component
 
     scrollToBottom()
     {
-        let chatFrame = this.getchatFrame();
+        let chatFrame = this.getChatFrame();
         if(chatFrame)
         {
             if(this.scroll.timeout) clearTimeout(this.scroll.timeout);
@@ -333,9 +359,9 @@ export default class ChatViewport extends Component
                 {
                     is_editing: true,
                     needToFlash: true,
-                    instanceGetter: (instance) => {this.input.preview.instance = instance; this.messages.instances[0] = instance}
                 }
             );
+            this.input.preview.instance = this.messages.instances[0];
         }
         else this.input.preview.instance.needToFlash = true;
         m.redraw();
@@ -431,13 +457,9 @@ export default class ChatViewport extends Component
         let instance = this.messages.instances[message.id()];
 
         if(instance) message.restore();
-        else
+        else 
         {
-            Object.keys(this.messages.instances).some((value, index, array) => 
-            {
-                if(array[index - 1] < data.id && data.id < array[index])
-                    return this.chatFrame.messagesStorage.splice(index, 0, this.createMessage(message));
-            })
+            this.messageInsertToViewport(message);
             m.redraw();
         }
     }
@@ -476,9 +498,27 @@ export default class ChatViewport extends Component
         );
     }
 
+    isMessageInStorage(model)
+    {
+        return this.chatFrame.messagesStorage.find(e => e.instance.model.id() == model.id())
+    }
+
+    messageInsertToViewport(model, options = {}, notify = false)
+    {
+        if(this.isMessageInStorage(model)) return;
+        let component = this.createMessage(model, options, notify);
+
+        if(model.chat().id() != this.model.id()) component.instance.viewportHidden = true;
+        this.chatFrame.messagesStorage.push(component);
+        let store = this.getStoragedMessages();
+        if(store[store.length - 1] == component)
+            this.chatPreview.model.pushData({relationships: {last_message: model}});
+    }
+
 	messagesUnload()
 	{
-        Object.values(this.messages.instances).map(c => c.elementWrapper ? c.elementWrapper.style.display = 'none' : null);
+        Object.values(this.messages.instances).map(c => c.viewportHidden = true);
+        m.redraw();
 
 		this.inputClear();
 		this.messageEditEnd();
@@ -486,12 +526,18 @@ export default class ChatViewport extends Component
 
 	messagesLoad()
 	{
-        if(Object.keys(this.messages.instances).length) 
-            Object.values(this.messages.instances).map(
-                c => c.elementWrapper && !c.deleted_forever ? c.elementWrapper.style.display = 'block' : null
-            );
-        else this.apiFetchChatMessages();
-        
+        let messages = Object.values(this.messages.instances)
+        if(messages.length) 
+        {
+            messages.map(c => c.viewportHidden = false);
+            m.redraw();
+            this.chatOnResize();
+        }
+        if(!this.messagesFetched) 
+        {
+            this.apiFetchChatMessages();
+            this.messagesFetched = true;
+        }
 		this.inputSyncWithPreview();
 	}
 
@@ -507,10 +553,13 @@ export default class ChatViewport extends Component
                 self.scroll.loadingFetch = false;
                 self.scroll.autoScroll = false;
 
-                let fetchedMessages = r.map((message) => self.createMessage(message));
+                let fetchedMessages = r.map((message) => self.createMessage(message)).filter(m => m);
                 self.chatFrame.messagesStorage = self.chatFrame.messagesStorage.concat(fetchedMessages);
 
+                //this.isReached.start = false;
                 m.redraw();
+
+                //this.getChatWrapper().scrollTop += 600;
             });
 	}
 	
@@ -530,6 +579,9 @@ export default class ChatViewport extends Component
 
     createMessage(model, options = {}, notify = false) 
     {  
+        let found = this.isMessageInStorage(model)
+        if(found) return null;
+
         let chatMessage = new ChatMessage(
             Object.assign(    
             {
@@ -537,9 +589,11 @@ export default class ChatViewport extends Component
                 chatViewport: this,
                 chatFrame: this.chatFrame,
                 chatPreview: this.chatPreview,
-                instanceGetter: (instance) => this.messages.instances[instance.model.id()] = instance,
+
             }, options)
         );
+
+        this.messages.instances[chatMessage.model.data.attributes.id] = chatMessage;
 
         if(notify) this.messageNotify(chatMessage);
         if(this.scroll.needToScroll || this.scroll.autoScroll)
@@ -547,17 +601,10 @@ export default class ChatViewport extends Component
 
         let component = m.component(chatMessage);
         chatMessage.component = component;
+        component.instance = chatMessage;
         return component;
     }
 
-    messageNotify(message)
-    {
-        if((!app.session.user || (message.user.id() != app.session.user.id()))) 
-            this.notifyTry(message);
-
-        message.flash();
-	}
-	
     insertMention(msgInstance)
     {
         let user = msgInstance.model.user();
@@ -572,30 +619,38 @@ export default class ChatViewport extends Component
         m.redraw.strategy('none');
     }
 
-    messageIsMention(message)
+    messageNotify(msgInstance)
     {
-        return app.session.user && (message.message().indexOf('@' + app.session.user.username()) >= 0);
-    }
+        if((!app.session.user || (msgInstance.model.user().id() != app.session.user.id()))) 
+            this.notifyTry(msgInstance);
 
-    notifyTry(message)
+        msgInstance.flash();
+    }
+    
+    notifyTry(msgInstance)
     {
         if(!("Notification" in window)) return;
 
-        if(this.messageIsMention(msg)) this.notifySend(message)
-        this.notifySound(message);
+        if(this.messageIsMention(msgInstance)) this.notifySend(msgInstance)
+        this.notifySound(msgInstance);
     }
 
-    notifySend(message)
+    messageIsMention(msgInstance)
+    {
+        return app.session.user && (msgInstance.model.message().indexOf('@' + app.session.user.username()) >= 0);
+    }
+
+    notifySend(msgInstance)
     {
         if(this.notify)
-            !this.active ? new Notification(message.user().username(), {body: message.message(), icon: message.user().avatarUrl(), silent: true}) : null;
+            !this.active ? new Notification(msgInstance.model.user().username(), {body: msgInstance.model.message(), icon: msgInstance.model.user().avatarUrl(), silent: true}) : null;
     }
 
-    notifySound(message) 
+    notifySound(msgInstance) 
     {
         if(!this.isMuted) 
         {
-            let sound = this.messageIsMention(message) ? refAudio : audio;
+            let sound = this.messageIsMention(msgInstance) ? refAudio : audio;
             sound.currentTime = 0;
             sound.play();
         }

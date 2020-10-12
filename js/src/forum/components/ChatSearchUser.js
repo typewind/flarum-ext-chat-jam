@@ -10,23 +10,22 @@ export default class ChatSearchUser extends Search
 	sourceItems() 
 	{
 		const items = new ItemList();
-		this.store = {};
+		this.store = this.props.store ?? {};
 		if (app.forum.attribute('canViewUserList')) items.add('users', new UsersSearchSource({callback: this.props.callback, store: this.store}));
 	
 		return items;
 	}
 
-	view() {
+	view() 
+	{
 		const currentSearch = this.getCurrentSearch();
 	
-		// Initialize search input value in the view rather than the constructor so
-		// that we have access to app.current.
-		if (typeof this.value() === 'undefined') {
+		if (!this.value().length) {
 			this.value(currentSearch || '');
 		}
+
+		app.current.searching = () => this.value();
 	
-		// Initialize search sources in the view rather than the constructor so
-		// that we have access to app.forum.
 		if (!this.sources) {
 			this.sources = this.sourceItems().toArray();
 		}
@@ -58,7 +57,7 @@ export default class ChatSearchUser extends Search
 					<ul className="Dropdown-menu Dropdown--Users">
 						{this.sources.map(source => source.view(this.value()))}
 					</ul> 
-					: null}
+				: null}
 			</div>
 		);
 	  }

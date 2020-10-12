@@ -9,6 +9,44 @@
         box-shadow: none;
     }  
 
+    .ChatType
+    {
+        margin-bottom: 15px;
+    }
+
+    .Tab
+    {
+        display: inline-block;
+        background-color: #FFF;
+        height: 36px;
+        text-align: center;
+        vertical-align: middle;
+        width: 50%;
+        padding: 7px;
+        .user-select(none);
+
+        &.Tab--active
+        {
+            background-color: #313946;
+            color: #FFF;
+        }
+
+        &.Tab--left
+        {
+            border-radius: 4px 0px 0px 4px;
+        }
+
+        &.Tab--right
+        {
+            border-radius: 0px 4px 4px 0px;
+        }
+
+        &:hover:not(.Tab--active)
+        {
+            background-color: #d0d3d8;
+        }
+    }
+
     .FormControl
     {
         margin: 5px 0px;
@@ -38,9 +76,7 @@
         margin: auto;
         margin-bottom: 10px;
 
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
+        .user-select(none);
     }
 
     .ButtonCreate
@@ -62,9 +98,7 @@
         {
             &:before
             {
-                margin-right: inherit;
-                width: 46px;
-                left: 42px;
+                top: 6px;
             }
         }
 
@@ -72,9 +106,8 @@
         {
             span
             {
-                user-select: none;
-                -webkit-user-select: none;
-                -moz-user-select: none;
+                .user-select(none);
+
                 span
                 {
                     max-width: 200px;
@@ -99,7 +132,6 @@
 
         .Dropdown--Users
         {
-            left: 46px;
             width: 225px;
         }
 
@@ -176,12 +208,10 @@
                 margin: 10px 8px;
                 border-radius: 100px;
                 box-shadow: none;
-                transition: box-shadow 0.1s;
+                position: relative;
+                .transition(box-shadow .1s);
 
-                user-select: none;
-                -webkit-user-select: none;
-                -moz-user-select: none;
-
+                .user-select(none);
 
                 &:hover:not(.active)
                 {
@@ -224,11 +254,10 @@
                 {
                     overflow: hidden;
                     text-overflow: ellipsis;
-                    max-width: 35px;
                     color: #929292;
                     white-space: nowrap;
                     margin-left: 7px;
-                    max-width: 100px;
+                    max-width: 150px;
 
                     .media
                     {
@@ -253,12 +282,15 @@
                     width: 100%;
                     line-height: 2;
                     color: #a1a1a1;
+                    position: absolute;
+                    right: 5px;
+                    opacity: 0;
                 }
             }
 
             &:hover, &.toggled
             {
-                width: 235px;
+                width: 255px;
 
                 .list
                 {
@@ -275,9 +307,7 @@
                     border-radius: 15px;
                     padding: 5px;
                     background-color: #ffffff;
-                    user-select: none;
-                    -webkit-user-select: none;
-                    -moz-user-select: none;
+                    .user-select(none);
 
                     &:before
                     {
@@ -285,8 +315,9 @@
                         font-size: 48pt;
                         color: #31394652;
                         line-height: 0.5;
-                        position: relative;
-                        left: 39%;
+                        display: block;
+                        text-align: center;
+                        height: 45px;
                     }
                 }
 
@@ -295,6 +326,11 @@
                     border-radius: 15px;
                     padding: 5px;
                     background-color: #fff;
+
+                    .timestamp
+                    {
+                        opacity: 1;
+                    }
 
                     .avatar
                     {
@@ -365,7 +401,7 @@
                 margin: 8px;
                 border-radius: 100px;
                 box-shadow: none;
-                transition: box-shadow .1s;
+                .transition(box-shadow .1s);
                 
                 &:before
                 {
@@ -392,9 +428,7 @@
             width: 100%;
             height: 35px;
             background-color: #313946;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
+            .user-select(none);
 
             .icon
             {
@@ -474,9 +508,7 @@
                 padding: 0px 3px;
                 cursor: pointer;
 
-                user-select: none;
-                -webkit-user-select: none;
-                -moz-user-select: none;
+                .user-select(none);
 
                 &.send
                 {
@@ -628,9 +660,7 @@
                             box-shadow: inset 0px 0px 0px 1000px #dedede;
                             color: #dedede;
                             cursor: pointer;
-                            user-select: none;
-                            -webkit-user-select: none;
-                            -moz-user-select: none;
+                            .user-select(none);
                         }
                     }
 
@@ -762,6 +792,8 @@
     *[data-title]:hover:after
     {
         content: attr(data-title);
+        .transition(opacity .3s);
+
         padding: 4px 8px;
         color: #FFF;
         position: absolute;
@@ -773,8 +805,7 @@
         -webkit-border-radius: 5px;
         border-radius: 5px;
         background-color: #000;
-        opacity: 1.0;
-        transition: opacity .3s;
+        opacity: 1.0; 
         font-size: 9pt;
     }
 }

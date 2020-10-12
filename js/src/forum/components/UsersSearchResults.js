@@ -10,8 +10,8 @@ export default class UsersSearchResults {
 		this.props = props;
 		this.searching = false;
 
-		this.props.store = {usersSelected: []};
-		this.usersSelected = this.props.store.usersSelected;
+		if(!props.store.usersSelected) props.store.usersSelected = [];
+		this.usersSelected = props.store.usersSelected;
 	}
 
 	search(query) {
@@ -61,8 +61,9 @@ export default class UsersSearchResults {
 		.concat(
 			app.store
 			.all('users')
-			.filter((user) => user.id() != localUserId && [user.username(), user.displayName()].some((value) => value.toLowerCase().substr(0, query.length) === query))
-		)
+			.filter(user => [user.username(), user.displayName()].some((value) => value.toLowerCase().substr(0, query.length) === query))
+		).filter(user => user.id() != localUserId);
+		
 		const resultsFind = usersList
 		.filter((e, i, arr) => arr.lastIndexOf(e) === i)
 		.sort((a, b) => a.displayName().localeCompare(b.displayName()));

@@ -19,7 +19,6 @@ export default class ChatMessage extends Component
 		
 		this.message = this.model.message();
 		this.textFormat();
-		this.instanceGetter(this);
 		this.initLabels();
 	}
 
@@ -244,6 +243,9 @@ export default class ChatMessage extends Component
 
 	isVisible()
 	{
+		if(this.viewportHidden)
+			return false;
+
 		if(this.deleted_forever && (!this.chatViewport.permissions.moderate.vision || !this.model.data.attributes.id))
 			return false;
 

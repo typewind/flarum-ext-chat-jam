@@ -17,8 +17,13 @@ pushedx-chat:
           empty: No messages
         add_modal: 
           title: Select users
-          create: Create a new chat
+          chat: Chat
+          channel: Channel
+          create.chat: Create a new chat
+          create.channel: Create a new channel
           form:
+            title.chat: Chat name
+            title.channel: Channel name
             title: Chat name
             title.validator: At least 1 symbol
             users: Selected users

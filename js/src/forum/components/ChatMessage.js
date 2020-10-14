@@ -49,23 +49,16 @@ export default class ChatMessage extends Component
 							<a className='name' onclick={this.chatViewport.insertMention.bind(this.chatViewport, this)}>
 								{username(this.model.user()).children[0] + ': '}
 							</a>
-							{this.model.id() ?
-								<div style='display: inline'>
+							<div className='labels'>
+								{this.labels.map(label => label.condition() ? label.component() : null)}
+							</div>
+							<div className='right'>
+								{this.model.id() ? [
+									this.deleted_forever ? null : this.editDropDown(),
 									<a className='timestamp' title={fullTime(this.model.created_at()).children[0]}>{this.humanTime = humanTime(this.model.created_at())}</a>
-									<div className='labels'>
-										{this.labels.map(label => label.condition() ? label.component() : null)}
-									</div>
-									{this.deleted_forever ? null : this.editDropDown()}
-								</div> 
-								: 
-								(this.timedOut ? 
-								<div style='display: inline'>	
-									<div className='labels'>
-										{this.labels.map(label => label.condition() ? label.component() : null)}
-									</div>
-									{this.editDropDownTimedOut()}
-								</div> : null)
-							}
+								] 
+								: this.timedOut ? this.editDropDownTimedOut() : null}
+							</div>
 						</div>
 						<div className='message'>
 							{this.model.is_censored() ?
@@ -249,7 +242,7 @@ export default class ChatMessage extends Component
 		if(this.deleted_forever && (!this.chatViewport.permissions.moderate.vision || !this.model.data.attributes.id))
 			return false;
 
-		if(this.model.deleted_by() && (!this.chatViewport.permissions.moderate.vision || (app.session.user && this.model.deleted_by().id() != app.session.user.id())))
+		if(this.model.deleted_by() && (!this.chatViewport.permissions.moderate.vision && (app.session.user && this.model.deleted_by().id() != app.session.user.id())))
 			return false;
 
 		return true;
@@ -258,12 +251,12 @@ export default class ChatMessage extends Component
 	controlHide()
 	{
 		this.model.save({actions: {hide: true}, relationships: {deleted_by: app.session.user}});
-		this.hide();
+		this.hide(app.session.user);
 	}
 
-	hide()
+	hide(user)
 	{
-		this.model.pushData({relationships: {deleted_by: app.session.user}});
+		if(user) this.model.pushData({relationships: {deleted_by: user}});
 		m.redraw();
 	}
 

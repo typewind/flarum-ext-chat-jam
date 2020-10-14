@@ -40,7 +40,7 @@ export default class ChatPreview extends Component
 	componentMessageTime()
 	{
 		let time = new Date(this.model.last_message().created_at());
-		if(Date.now() - time.getTime() < 60 * 60 * 1000)
+		if(Date.now() - time.getTime() < 60 * 60 * 12 * 1000)
 			return time.toLocaleTimeString().slice(0, 5);
 		
 		return humanTime(this.model.last_message().created_at());

@@ -49,6 +49,7 @@ class DeleteMessageHandler
 		$message = $this->messages->findOrFail($messageId);
 		
         $message->delete();
+        $message->deleted_by = $actor->id;
         $message->deleted_forever = true;
 
         $message->event = 'message.delete';

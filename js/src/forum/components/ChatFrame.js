@@ -2,8 +2,6 @@ import Component from 'flarum/Component';
 import ChatPreview from './ChatPreview';
 import ChatViewport from './ChatViewport';
 import ChatCreateModal from './ChatCreateModal';
-import Modal from 'flarum/components/Modal';
-
 
 export default class ChatFrame extends Component
 {

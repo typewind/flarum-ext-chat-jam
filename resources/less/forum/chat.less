@@ -152,6 +152,11 @@
     max-width: 100%;
     color: #000;
 
+    @media @phone
+    {
+        right: 0 !important;
+    }
+
     .frame
     {
         display: flex;
@@ -216,6 +221,10 @@
                 &:hover:not(.active)
                 {
                     box-shadow: 0 0 0 3px #ff94c1;
+                    @media @phone
+                    {
+                        background-color: #ff94c1;
+                    }
                 }
 
                 &.active
@@ -288,63 +297,66 @@
                 }
             }
 
-            &:hover, &.toggled
+            @media @tablet-up
             {
-                width: 255px;
-
-                .list
+                &:hover, &.toggled
                 {
-                    overflow: auto;
-                }
+                    width: 255px;
 
-                .header
-                {
-                    justify-content: space-between;
-                }
-
-                .panel-add
-                {
-                    border-radius: 15px;
-                    padding: 5px;
-                    background-color: #ffffff;
-                    .user-select(none);
-
-                    &:before
+                    .list
                     {
-                        content: "+";
-                        font-size: 48pt;
-                        color: #31394652;
-                        line-height: 0.5;
+                        overflow: auto;
+                    }
+
+                    .header
+                    {
+                        justify-content: space-between;
+                    }
+
+                    .panel-add
+                    {
+                        border-radius: 15px;
+                        padding: 5px;
+                        background-color: #ffffff;
+                        .user-select(none);
+
+                        &:before
+                        {
+                            content: "+";
+                            font-size: 48pt;
+                            color: #31394652;
+                            line-height: 0.5;
+                            display: block;
+                            text-align: center;
+                            height: 45px;
+                        }
+                    }
+
+                    .panel-preview
+                    {
+                        border-radius: 15px;
+                        padding: 5px;
+                        background-color: #fff;
+
+                        .timestamp
+                        {
+                            opacity: 1;
+                        }
+
+                        .avatar
+                        {
+                            margin-left: 2px;
+                            min-width: 45px;
+                            width: 45px;
+                            line-height: 45px;
+                            font-size: 24px;
+                        }
+                    }
+
+                    .input-wrapper
+                    {
                         display: block;
-                        text-align: center;
-                        height: 45px;
                     }
-                }
-
-                .panel-preview
-                {
-                    border-radius: 15px;
-                    padding: 5px;
-                    background-color: #fff;
-
-                    .timestamp
-                    {
-                        opacity: 1;
-                    }
-
-                    .avatar
-                    {
-                        margin-left: 2px;
-                        min-width: 45px;
-                        width: 45px;
-                        line-height: 45px;
-                        font-size: 24px;
-                    }
-                }
-
-                .input-wrapper
-                {
-                    display: block;
                 }
             }
 
@@ -409,6 +421,7 @@
                     font-size: 48pt;
                     color: #31394652;
                     line-height: 0.5;
+                    text-align: center;
                 }
 
                 &:hover
@@ -452,7 +465,7 @@
                 display: inline-block;
                 color: #fff;
                 font-size: 18px;
-                font-weight: 500;
+                font-weight: 100;
                 line-height: 35px;
                 vertical-align: middle;
                 margin: 0 15px;
@@ -568,6 +581,9 @@
             {
                 padding: 3px 3px 3px 15px;
                 white-space: nowrap;
+                position: relative;
+
+
 
                 &.editing
                 {
@@ -592,9 +608,7 @@
 
                 .avatar-wrapper
                 {
-                    display: inline-block;
-                    vertical-align: top;
-                    padding-right: 10px;
+                    position: absolute;
 
                     .avatar
                     {
@@ -631,12 +645,12 @@
 
                 .message-block
                 {
-                    display: inline-block;
-                    width: 94%;
+                    margin-left: 35px;
+                    position: relative;
 
                     .message 
                     {
-                        padding: 5px 10px 5px 0px;
+                        padding: 5px 0px;
                         word-break: break-word;
                         white-space: normal;
                         min-height: 30px;
@@ -674,9 +688,10 @@
                     
                     .toolbar
                     {
+                        position: relative;
+
                         .name
                         {
-                            position: relative;
                             display: inline;
                             color: #000;
                             font-weight: bold;
@@ -700,57 +715,62 @@
                                 }
                             }
                         }
-                    
-                        .edit
-                        {
-                            position: relative;
-                            display: inline;
-                            padding: 0px 5px;
-                            float: right;
-                            
-                            .ButtonGroup
-                            {
-                                width: unset;
-                            }
-    
-                            .ButtonGroup:not(.open)
-                            {
-                                opacity: 0;
-                            }
-    
-                            .Button:hover, .Button:focus
-                            {
-                                background: #d2d2d2;
-                                color: #666666;
-                            }
-    
-                            .open > .Button
-                            {
-                                background: #d2d2d2 !important;
-                                color: #666666 !important;
-                            }
-    
-                            .Button--icon
-                            {
-                                width: 24px !important;
-                                height: 24px !important;
-                                padding: 0;
-                                text-align: center;
-                            }
-                        }
-                    
-                        .timestamp
+
+                        .right
                         {
                             display: inline;
-                            color: #7c7c7c;
-                            cursor: pointer;
-                            padding-right: 5px;
-                            text-align: right;
-                            white-space: nowrap;
-                            font-size: 12px;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                            float: right;
+                            right: 0;
+                            position: absolute;
+
+
+                            .edit
+                            {
+                                display: inline;
+                                padding: 0px 5px;
+                                
+                                .ButtonGroup
+                                {
+                                    width: unset;
+                                }
+        
+                                .ButtonGroup:not(.open)
+                                {
+                                    opacity: 0;
+                                }
+        
+                                .Button:hover, .Button:focus
+                                {
+                                    background: #d2d2d2;
+                                    color: #666666;
+                                }
+        
+                                .open > .Button
+                                {
+                                    background: #d2d2d2 !important;
+                                    color: #666666 !important;
+                                }
+        
+                                .Button--icon
+                                {
+                                    width: 24px !important;
+                                    height: 24px !important;
+                                    padding: 0;
+                                    text-align: center;
+                                }
+                            }
+                        
+                            .timestamp
+                            {
+                                display: inline;
+                                color: #7c7c7c;
+                                cursor: pointer;
+                                padding-right: 5px;
+                                text-align: right;
+                                white-space: nowrap;
+                                font-size: 12px;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
                         }
                     }
                     

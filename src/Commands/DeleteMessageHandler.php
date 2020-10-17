@@ -52,8 +52,6 @@ class DeleteMessageHandler
         $message->deleted_by = $actor->id;
         $message->deleted_forever = true;
 
-        $message->event = 'message.delete';
-
         return $message;
     }
 }

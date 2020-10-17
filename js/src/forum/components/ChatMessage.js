@@ -215,8 +215,8 @@ export default class ChatMessage extends Component
 	textFormat(text)
 	{
 		let self = this;
-		this.message = text ?? this.message;
-		if(this.element) s9e.TextFormatter.preview(this.message, this.element);
+		self.message = text ?? self.message;
+		if(self.element) s9e.TextFormatter.preview(self.message, self.element);
 
 		setTimeout(() => {
 			$('.neonchat script').each(function() {

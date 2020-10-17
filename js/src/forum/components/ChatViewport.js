@@ -237,13 +237,11 @@ export default class ChatViewport extends Component
             console.log('lets fetch a new messages from end');
         }
 
-        if(el.scrollTop <= 0 && this.scroll.oldScroll > 0 && !this.scroll.loadingFetch && !this.messageEditing) 
+        if(el.scrollTop <= 0 && this.scroll.oldScroll > 0 && !this.scroll.loadingFetch && !this.messageEditing 
+        && this.chatFrame.viewportChat.model == this.model) 
         {
             this.scroll.oldScroll = -currentHeight;
-            m.redraw();
-
-            //this.scroll.loadingFetch = true;
-            //this.apiFetch(Object.values(this.messages.instances)[0].id);
+            this.apiFetchChatMessages(Object.values(this.messages.instances)[0].model.id());
         }
         else 
         {
@@ -518,10 +516,11 @@ export default class ChatViewport extends Component
 	messagesUnload()
 	{
         Object.values(this.messages.instances).map(c => c.viewportHidden = true);
-        m.redraw();
 
 		this.inputClear();
-		this.messageEditEnd();
+        this.messageEditEnd();
+        
+        m.redraw();
 	}
 
 	messagesLoad()
@@ -531,6 +530,7 @@ export default class ChatViewport extends Component
         {
             messages.map(c => c.viewportHidden = false);
             m.redraw();
+
             this.chatOnResize();
         }
         if(!this.messagesFetched) 
@@ -538,23 +538,22 @@ export default class ChatViewport extends Component
             this.apiFetchChatMessages();
             this.messagesFetched = true;
         }
-		this.inputSyncWithPreview();
+        this.inputSyncWithPreview();
 	}
 
-	apiFetchChatMessages()
+	apiFetchChatMessages(start_from)
 	{
 		let self = this;
 		
-		self.scroll.loadingFetch = true;
+        self.scroll.loadingFetch = true;
         m.redraw();
         
-        app.store.find('chatmessages', {chat_id: this.model.id()})
+        app.store.find('chatmessages', {chat_id: this.model.id(), start_from})
             .then(r => {
                 self.scroll.loadingFetch = false;
                 self.scroll.autoScroll = false;
 
-                let fetchedMessages = r.map((message) => self.createMessage(message)).filter(m => m);
-                self.chatFrame.messagesStorage = self.chatFrame.messagesStorage.concat(fetchedMessages);
+                r.map((message) => this.messageInsertToViewport(message));
 
                 //this.isReached.start = false;
                 m.redraw();

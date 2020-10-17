@@ -107,7 +107,6 @@ class EditMessageHandler
             $actions['invoker'] = $actor->id;
         }
         $message->actions = $actions;
-        $message->event = 'message.edit';
 
         return $message;
     }

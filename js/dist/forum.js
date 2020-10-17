@@ -82,29 +82,29 @@ module.exports =
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./forum.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "../../../workbench/flarum-ext-chat/js/forum.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./forum.js":
-/*!******************!*\
-  !*** ./forum.js ***!
-  \******************/
+/***/ "../../../workbench/flarum-ext-chat/js/forum.js":
+/*!*********************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/forum.js ***!
+  \*********************************************************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _src_forum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./src/forum */ "./src/forum/index.js");
+/* harmony import */ var _src_forum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./src/forum */ "../../../workbench/flarum-ext-chat/js/src/forum/index.js");
 /* empty/unused harmony star reexport */
 
 /***/ }),
 
-/***/ "./node_modules/@babel/runtime/helpers/esm/extends.js":
-/*!************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/esm/extends.js ***!
-  \************************************************************/
+/***/ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/extends.js":
+/*!***************************************************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/extends.js ***!
+  \***************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -131,10 +131,10 @@ function _extends() {
 
 /***/ }),
 
-/***/ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js ***!
-  \******************************************************************/
+/***/ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js":
+/*!*********************************************************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js ***!
+  \*********************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -149,24 +149,24 @@ function _inheritsLoose(subClass, superClass) {
 
 /***/ }),
 
-/***/ "./src/forum/components/ChatCreateModal.js":
-/*!*************************************************!*\
-  !*** ./src/forum/components/ChatCreateModal.js ***!
-  \*************************************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/forum/components/ChatCreateModal.js":
+/*!****************************************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/forum/components/ChatCreateModal.js ***!
+  \****************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChatCreateModal; });
-/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var flarum_components_Modal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flarum/components/Modal */ "flarum/components/Modal");
 /* harmony import */ var flarum_components_Modal__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Modal__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/components/Button */ "flarum/components/Button");
 /* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Button__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var flarum_utils_classList__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/utils/classList */ "flarum/utils/classList");
 /* harmony import */ var flarum_utils_classList__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_classList__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _ChatSearchUser__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatSearchUser */ "./src/forum/components/ChatSearchUser.js");
+/* harmony import */ var _ChatSearchUser__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatSearchUser */ "../../../workbench/flarum-ext-chat/js/src/forum/components/ChatSearchUser.js");
 
 
 
@@ -296,22 +296,22 @@ function (_Modal) {
 
 /***/ }),
 
-/***/ "./src/forum/components/ChatFrame.js":
-/*!*******************************************!*\
-  !*** ./src/forum/components/ChatFrame.js ***!
-  \*******************************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/forum/components/ChatFrame.js":
+/*!**********************************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/forum/components/ChatFrame.js ***!
+  \**********************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChatFrame; });
-/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flarum/Component */ "flarum/Component");
 /* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_Component__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _ChatPreview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ChatPreview */ "./src/forum/components/ChatPreview.js");
-/* harmony import */ var _ChatViewport__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ChatViewport */ "./src/forum/components/ChatViewport.js");
-/* harmony import */ var _ChatCreateModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatCreateModal */ "./src/forum/components/ChatCreateModal.js");
+/* harmony import */ var _ChatPreview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ChatPreview */ "../../../workbench/flarum-ext-chat/js/src/forum/components/ChatPreview.js");
+/* harmony import */ var _ChatViewport__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ChatViewport */ "../../../workbench/flarum-ext-chat/js/src/forum/components/ChatViewport.js");
+/* harmony import */ var _ChatCreateModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatCreateModal */ "../../../workbench/flarum-ext-chat/js/src/forum/components/ChatCreateModal.js");
 
 
 
@@ -594,6 +594,11 @@ function (_Component) {
   };
 
   _proto.onChatChanged = function onChatChanged(instance) {
+    if (this.viewportChat == instance) {
+      m.redraw.strategy('none');
+      return;
+    }
+
     if (this.viewportChat) {
       this.viewportChat.attrs.active = false;
       this.viewportChat.viewport.instance.messagesUnload();
@@ -602,7 +607,7 @@ function (_Component) {
     this.viewportChat = instance;
     this.viewportChat.attrs.active = true;
     this.viewportChat.viewport.instance.messagesLoad();
-    m.redraw();
+    m.redraw.strategy('none');
   };
 
   _proto.apiFetchChats = function apiFetchChats() {
@@ -646,18 +651,18 @@ function (_Component) {
 
 /***/ }),
 
-/***/ "./src/forum/components/ChatMessage.js":
-/*!*********************************************!*\
-  !*** ./src/forum/components/ChatMessage.js ***!
-  \*********************************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/forum/components/ChatMessage.js":
+/*!************************************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/forum/components/ChatMessage.js ***!
+  \************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChatMessage; });
-/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
-/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/extends.js");
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/Component */ "flarum/Component");
 /* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_Component__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var flarum_helpers_avatar__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/helpers/avatar */ "flarum/helpers/avatar");
@@ -862,8 +867,8 @@ function (_Component) {
 
   _proto.textFormat = function textFormat(text) {
     var self = this;
-    this.message = text != null ? text : this.message;
-    if (this.element) s9e.TextFormatter.preview(this.message, this.element);
+    self.message = text != null ? text : self.message;
+    if (self.element) s9e.TextFormatter.preview(self.message, self.element);
     setTimeout(function () {
       $('.neonchat script').each(function () {
         if (!self.executedScripts) self.executedScripts = {};
@@ -982,18 +987,18 @@ function (_Component) {
 
 /***/ }),
 
-/***/ "./src/forum/components/ChatPreview.js":
-/*!*********************************************!*\
-  !*** ./src/forum/components/ChatPreview.js ***!
-  \*********************************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/forum/components/ChatPreview.js":
+/*!************************************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/forum/components/ChatPreview.js ***!
+  \************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChatPreview; });
-/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
-/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/extends.js");
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var flarum_utils_humanTime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/utils/humanTime */ "flarum/utils/humanTime");
 /* harmony import */ var flarum_utils_humanTime__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_humanTime__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var flarum_helpers_fullTime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/helpers/fullTime */ "flarum/helpers/fullTime");
@@ -1182,17 +1187,17 @@ function (_Component) {
 
 /***/ }),
 
-/***/ "./src/forum/components/ChatSearchUser.js":
-/*!************************************************!*\
-  !*** ./src/forum/components/ChatSearchUser.js ***!
-  \************************************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/forum/components/ChatSearchUser.js":
+/*!***************************************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/forum/components/ChatSearchUser.js ***!
+  \***************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChatSearchUser; });
-/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var flarum_components_Search__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flarum/components/Search */ "flarum/components/Search");
 /* harmony import */ var flarum_components_Search__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Search__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/components/LoadingIndicator */ "flarum/components/LoadingIndicator");
@@ -1203,7 +1208,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var flarum_utils_classList__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_classList__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var flarum_helpers_icon__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! flarum/helpers/icon */ "flarum/helpers/icon");
 /* harmony import */ var flarum_helpers_icon__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(flarum_helpers_icon__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _UsersSearchResults__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./UsersSearchResults */ "./src/forum/components/UsersSearchResults.js");
+/* harmony import */ var _UsersSearchResults__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./UsersSearchResults */ "../../../workbench/flarum-ext-chat/js/src/forum/components/UsersSearchResults.js");
 
 
 
@@ -1291,24 +1296,24 @@ function (_Search) {
 
 /***/ }),
 
-/***/ "./src/forum/components/ChatViewport.js":
-/*!**********************************************!*\
-  !*** ./src/forum/components/ChatViewport.js ***!
-  \**********************************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/forum/components/ChatViewport.js":
+/*!*************************************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/forum/components/ChatViewport.js ***!
+  \*************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChatViewport; });
-/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
-/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/extends.js");
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/Component */ "flarum/Component");
 /* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_Component__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/components/LoadingIndicator */ "flarum/components/LoadingIndicator");
 /* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _ChatMessage__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatMessage */ "./src/forum/components/ChatMessage.js");
-/* harmony import */ var _resources__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../resources */ "./src/forum/resources.js");
+/* harmony import */ var _ChatMessage__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatMessage */ "../../../workbench/flarum-ext-chat/js/src/forum/components/ChatMessage.js");
+/* harmony import */ var _resources__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../resources */ "../../../workbench/flarum-ext-chat/js/src/forum/resources.js");
 
 
 
@@ -1545,10 +1550,9 @@ function (_Component) {
       console.log('lets fetch a new messages from end');
     }
 
-    if (el.scrollTop <= 0 && this.scroll.oldScroll > 0 && !this.scroll.loadingFetch && !this.messageEditing) {
+    if (el.scrollTop <= 0 && this.scroll.oldScroll > 0 && !this.scroll.loadingFetch && !this.messageEditing && this.chatFrame.viewportChat.model == this.model) {
       this.scroll.oldScroll = -currentHeight;
-      m.redraw(); //this.scroll.loadingFetch = true;
-      //this.apiFetch(Object.values(this.messages.instances)[0].id);
+      this.apiFetchChatMessages(Object.values(this.messages.instances)[0].model.id());
     } else {
       m.redraw.strategy('none');
       this.scroll.oldScroll = el.scrollTop;
@@ -1799,9 +1803,9 @@ function (_Component) {
     Object.values(this.messages.instances).map(function (c) {
       return c.viewportHidden = true;
     });
-    m.redraw();
     this.inputClear();
     this.messageEditEnd();
+    m.redraw();
   };
 
   _proto.messagesLoad = function messagesLoad() {
@@ -1823,28 +1827,28 @@ function (_Component) {
     this.inputSyncWithPreview();
   };
 
-  _proto.apiFetchChatMessages = function apiFetchChatMessages() {
+  _proto.apiFetchChatMessages = function apiFetchChatMessages(start_from) {
+    var _this3 = this;
+
     var self = this;
     self.scroll.loadingFetch = true;
     m.redraw();
     app.store.find('chatmessages', {
-      chat_id: this.model.id()
+      chat_id: this.model.id(),
+      start_from: start_from
     }).then(function (r) {
       self.scroll.loadingFetch = false;
       self.scroll.autoScroll = false;
-      var fetchedMessages = r.map(function (message) {
-        return self.createMessage(message);
-      }).filter(function (m) {
-        return m;
-      });
-      self.chatFrame.messagesStorage = self.chatFrame.messagesStorage.concat(fetchedMessages); //this.isReached.start = false;
+      r.map(function (message) {
+        return _this3.messageInsertToViewport(message);
+      }); //this.isReached.start = false;
 
       m.redraw(); //this.getChatWrapper().scrollTop += 600;
     });
   };
 
   _proto.timedRedraw = function timedRedraw(timeout, callback) {
-    var _this3 = this;
+    var _this4 = this;
 
     m.redraw.strategy('none');
 
@@ -1852,7 +1856,7 @@ function (_Component) {
       this.redrawTimeout = setTimeout(function () {
         m.redraw();
         callback();
-        _this3.redrawTimeout = null;
+        _this4.redrawTimeout = null;
       }, timeout);
     }
   };
@@ -1933,10 +1937,10 @@ function (_Component) {
 
 /***/ }),
 
-/***/ "./src/forum/components/UsersSearchResults.js":
-/*!****************************************************!*\
-  !*** ./src/forum/components/UsersSearchResults.js ***!
-  \****************************************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/forum/components/UsersSearchResults.js":
+/*!*******************************************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/forum/components/UsersSearchResults.js ***!
+  \*******************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -2069,10 +2073,10 @@ function () {
 
 /***/ }),
 
-/***/ "./src/forum/index.js":
-/*!****************************!*\
-  !*** ./src/forum/index.js ***!
-  \****************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/forum/index.js":
+/*!*******************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/forum/index.js ***!
+  \*******************************************************************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -2082,10 +2086,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var flarum_extend__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(flarum_extend__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var flarum_components_HeaderPrimary__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flarum/components/HeaderPrimary */ "flarum/components/HeaderPrimary");
 /* harmony import */ var flarum_components_HeaderPrimary__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_components_HeaderPrimary__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _components_ChatFrame__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/ChatFrame */ "./src/forum/components/ChatFrame.js");
-/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./store */ "./src/forum/store.js");
-/* harmony import */ var _models_Chat__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./models/Chat */ "./src/forum/models/Chat.js");
-/* harmony import */ var _models_Message__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./models/Message */ "./src/forum/models/Message.js");
+/* harmony import */ var _components_ChatFrame__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/ChatFrame */ "../../../workbench/flarum-ext-chat/js/src/forum/components/ChatFrame.js");
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./store */ "../../../workbench/flarum-ext-chat/js/src/forum/store.js");
+/* harmony import */ var _models_Chat__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./models/Chat */ "../../../workbench/flarum-ext-chat/js/src/forum/models/Chat.js");
+/* harmony import */ var _models_Message__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./models/Message */ "../../../workbench/flarum-ext-chat/js/src/forum/models/Message.js");
 
 
 
@@ -2105,18 +2109,18 @@ app.initializers.add('pushedx-chat', function (app) {
 
 /***/ }),
 
-/***/ "./src/forum/models/Chat.js":
-/*!**********************************!*\
-  !*** ./src/forum/models/Chat.js ***!
-  \**********************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/forum/models/Chat.js":
+/*!*************************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/forum/models/Chat.js ***!
+  \*************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Chat; });
-/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
-/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/extends.js");
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var flarum_Model__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/Model */ "flarum/Model");
 /* harmony import */ var flarum_Model__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_Model__WEBPACK_IMPORTED_MODULE_2__);
 
@@ -2149,18 +2153,18 @@ Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"
 
 /***/ }),
 
-/***/ "./src/forum/models/Message.js":
-/*!*************************************!*\
-  !*** ./src/forum/models/Message.js ***!
-  \*************************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/forum/models/Message.js":
+/*!****************************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/forum/models/Message.js ***!
+  \****************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Message; });
-/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
-/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/extends.js");
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var flarum_Model__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/Model */ "flarum/Model");
 /* harmony import */ var flarum_Model__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_Model__WEBPACK_IMPORTED_MODULE_2__);
 
@@ -2195,10 +2199,10 @@ Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"
 
 /***/ }),
 
-/***/ "./src/forum/resources.js":
-/*!********************************!*\
-  !*** ./src/forum/resources.js ***!
-  \********************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/forum/resources.js":
+/*!***********************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/forum/resources.js ***!
+  \***********************************************************************************************/
 /*! exports provided: base64AudioNotificationRef, base64AudioNotification, base64PlaceholderAvatarImage */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -2213,17 +2217,17 @@ var base64PlaceholderAvatarImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg
 
 /***/ }),
 
-/***/ "./src/forum/store.js":
-/*!****************************!*\
-  !*** ./src/forum/store.js ***!
-  \****************************/
+/***/ "../../../workbench/flarum-ext-chat/js/src/forum/store.js":
+/*!*******************************************************************************************!*\
+  !*** C:/laragon/www/forum.neonsky/vendor/workbench/flarum-ext-chat/js/src/forum/store.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return extendGlobalStore; });
-/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
+/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "../../../workbench/flarum-ext-chat/js/node_modules/@babel/runtime/helpers/esm/extends.js");
 
 function extendGlobalStore(models) {
   app.store.models = Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"])(app.store.models, models);

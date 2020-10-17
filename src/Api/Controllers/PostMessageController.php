@@ -47,6 +47,7 @@ class PostMessageController extends AbstractShowController
         $this->bus = $bus;
         $this->socket = $socket;
     }
+
     /**
      * Get the data to be serialized and assigned to the response document.
      *
@@ -82,7 +83,7 @@ class PostMessageController extends AbstractShowController
         $response = $document->setData($element)->jsonSerialize();
 
         $message = $data;
-        $this->socket->sendChatEvent($message->chat_id, $message->event, [
+        $this->socket->sendChatEvent($message->chat_id, 'message.post', [
             'message' => $response
         ]);
     }

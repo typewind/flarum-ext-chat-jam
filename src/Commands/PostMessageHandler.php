@@ -79,7 +79,6 @@ class PostMessageHandler
         $this->validator->assertValid($message->getDirty());
 
         $message->save();
-        $message->event = 'message.post';
 
         return $message;
     }

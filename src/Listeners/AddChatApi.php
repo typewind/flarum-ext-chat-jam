@@ -14,6 +14,7 @@ use Xelson\Chat\Api\Controllers\EditMessageController;
 use Xelson\Chat\Api\Controllers\DeleteMessageController;
 use Xelson\Chat\Api\Controllers\ShowUserSafeController;
 use Xelson\Chat\Api\Controllers\ListChatsController;
+use Xelson\Chat\Api\Controllers\CreateChatController;
 
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Event\ConfigureApiRoutes;
@@ -48,13 +49,14 @@ class AddChatApi
      */
     public function configureApiRoutes(ConfigureApiRoutes $event)
     {
-        $event->get('/chats', 'pushedx.chat.get', ListChatsController::class);
-        $event->get('/chatmessages', 'pushedx.chat.fetch', FetchMessageController::class);
-        $event->post('/chatmessages', 'pushedx.chat.post', PostMessageController::class);
-        $event->patch('/chatmessages/{id}', 'pushedx.chat.edit', EditMessageController::class);
-        $event->delete('/chatmessages/{id}', 'pushedx.chat.delete', DeleteMessageController::class);
+        $event->get('/chats', 'neonchat.chats.get', ListChatsController::class);
+        $event->get('/chats', 'neonchat.chats.post', CreateChatController::class);
+        $event->get('/chatmessages', 'neonchat.chatmessages.fetch', FetchMessageController::class);
+        $event->post('/chatmessages', 'neonchat.chatmessages.post', PostMessageController::class);
+        $event->patch('/chatmessages/{id}', 'neonchat.chatmessages.edit', EditMessageController::class);
+        $event->delete('/chatmessages/{id}', 'neonchat.chatmessages.delete', DeleteMessageController::class);
 
-        $event->get('/chat/user/{id}', 'pushedx.chat.user', ShowUserSafeController::class);
+        $event->get('/chat/user/{id}', 'neonchat.chat.user', ShowUserSafeController::class);
     }
 
     /**

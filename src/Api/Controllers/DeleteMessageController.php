@@ -77,7 +77,7 @@ class DeleteMessageController extends AbstractShowController
         $response = $document->setData($element)->jsonSerialize();
 
         $message = $data;
-        $this->socket->sendChatEvent($message->chat_id, $message->event, [
+        $this->socket->sendChatEvent($message->chat_id, 'message.delete', [
             'message' => $response
         ]);
     }

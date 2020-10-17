@@ -8,25 +8,30 @@
 
 namespace Xelson\Chat\Api\Controllers;
 
-use Xelson\Chat\Api\Serializers\MessageSerializer;
-use Xelson\Chat\Commands\EditMessage;
-use Flarum\Api\Controller\AbstractShowController;
+use Flarum\Api\Controller\AbstractCreateController;
+use Flarum\Api\Event\WillSerializeData as EventWillSerializeData;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
 use Illuminate\Support\Arr;
 
-use Flarum\Api\Event\WillSerializeData as EventWillSerializeData;
+use Xelson\Chat\Api\Serializers\ChatSerializer;
+use Xelson\Chat\Commands\CreateChat;
 use Xelson\Chat\ChatSocket;
 
-class EditMessageController extends AbstractShowController
+class ListChatsController extends AbstractCreateController 
 {
     /**
      * The serializer instance for this request.
      *
-     * @var MessageSerializer
+     * @var ChatSerializer
      */
-    public $serializer = MessageSerializer::class;
+	public $serializer = ChatSerializer::class;
+
+    /**
+     * {@inheritdoc}
+     */
+    public $include = ['creator', 'users'];
 
     /**
      * @var Dispatcher
@@ -34,18 +39,13 @@ class EditMessageController extends AbstractShowController
     protected $bus;
 
     /**
-     * {@inheritdoc}
+     * @param Dispatcher            $bus
      */
-    public $include = ['user', 'deleted_by', 'chat'];
-
-    /**
-     * @param Dispatcher $bus
-     */
-    public function __construct(Dispatcher $bus, ChatSocket $socket)
+    public function __construct(Dispatcher $bus)
     {
-        $this->bus = $bus;
-        $this->socket = $socket;
-    }
+		$this->bus = $bus;
+	}
+
     /**
      * Get the data to be serialized and assigned to the response document.
      *
@@ -55,23 +55,22 @@ class EditMessageController extends AbstractShowController
      */
     protected function data(ServerRequestInterface $request, Document $document)
     {
-        $id = Arr::get($request->getQueryParams(), 'id');
         $actor = $request->getAttribute('actor');
-        $data = Arr::get($request->getParsedBody(), 'data', []);
-
+		$data = Arr::get($request->getParsedBody(), 'data', []);
+		
         $this->getEventDispatcher()->listen(EventWillSerializeData::class, [$this, 'onWillSerializeData']);
 
         return $this->bus->dispatch(
-            new EditMessage($id, $actor, $data)
+            new CreateChat($actor, $data)
         );
-    }
-
+	}
+	
     public function onWillSerializeData(EventWillSerializeData $event)
     {
         $request = $event->request;
         $data = $event->data;
         $document = $event->document;
-        $serializer = AbstractShowController::getContainer()->make($this->serializer);
+        $serializer = AbstractCreateController::getContainer()->make($this->serializer);
         $serializer->setRequest($request);
 
         $element = $this->createElement($data, $serializer)
@@ -80,9 +79,9 @@ class EditMessageController extends AbstractShowController
 
         $response = $document->setData($element)->jsonSerialize();
 
-        $message = $data;
-        $this->socket->sendChatEvent($message->chat_id, 'message.edit', [
-            'message' => $response
+        $chat = $data;
+        $this->socket->sendChatEvent($chat->id, 'chat.create', [
+            'chat' => $response
         ]);
     }
 }

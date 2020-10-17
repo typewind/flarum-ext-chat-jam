@@ -257,6 +257,12 @@ export default class ChatFrame extends Component
 
     onChatChanged(instance)
     {
+        if(this.viewportChat == instance) 
+        {
+            m.redraw.strategy('none');
+            return;
+        }
+        
         if(this.viewportChat) 
         {
             this.viewportChat.attrs.active = false;
@@ -266,7 +272,7 @@ export default class ChatFrame extends Component
         this.viewportChat.attrs.active = true;
         this.viewportChat.viewport.instance.messagesLoad();
 
-        m.redraw();
+        m.redraw.strategy('none');
     }
 
     apiFetchChats()

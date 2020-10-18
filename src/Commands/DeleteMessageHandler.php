@@ -46,7 +46,11 @@ class DeleteMessageHandler
             'pushedx-chat.permissions.moderate.delete'
         );
 
-		$message = $this->messages->findOrFail($messageId);
+        $message = $this->messages->findOrFail($messageId);
+        
+        $this->assertPermission(
+            !$message->type
+        );
 		
         $message->delete();
         $message->deleted_by = $actor->id;

@@ -221,6 +221,8 @@ export default class ChatViewport extends Component
 
     disableAutoScroll(e)
     {
+        if(this.chatFrame.viewportChat.model != this.model) return
+
         let el = e.target;
         this.scroll.autoScroll = (el.scrollTop + el.offsetHeight >= el.scrollHeight);
         let currentHeight = el.scrollHeight;
@@ -237,8 +239,7 @@ export default class ChatViewport extends Component
             console.log('lets fetch a new messages from end');
         }
 
-        if(el.scrollTop <= 0 && this.scroll.oldScroll > 0 && !this.scroll.loadingFetch && !this.messageEditing 
-        && this.chatFrame.viewportChat.model == this.model) 
+        if(el.scrollTop <= 0 && this.scroll.oldScroll > 0 && !this.scroll.loadingFetch && !this.messageEditing) 
         {
             this.scroll.oldScroll = -currentHeight;
             this.apiFetchChatMessages(Object.values(this.messages.instances)[0].model.id());
@@ -539,6 +540,8 @@ export default class ChatViewport extends Component
             this.messagesFetched = true;
         }
         this.inputSyncWithPreview();
+
+        this.getChatWrapper().scrollTop = this.scroll.oldScroll;
 	}
 
 	apiFetchChatMessages(start_from)
@@ -645,7 +648,7 @@ export default class ChatViewport extends Component
         if(!avatar) avatar = resources.base64PlaceholderAvatarImage;
 
         if(this.chatFrame.notify && !this.chatFrame.active)
-            new Notification(this.chatPreview.attrs.title, {body: `${msgInstance.model.user().username()}: ${msgInstance.model.message()}`, icon: avatar, silent: true});
+            new Notification(this.chatPreview.attrs.finalTitle, {body: `${msgInstance.model.user().username()}: ${msgInstance.model.message()}`, icon: avatar, silent: true});
     }
 
     notifySound(msgInstance) 

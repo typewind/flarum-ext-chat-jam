@@ -9,7 +9,7 @@ export default class ChatCreateModal extends Modal
 	init()
 	{
 		this.selectedUsers = [];
-		this.input = {text: m.prop('')};
+		this.input = {title: m.prop('')};
 		this.isChannel = false;
 
 		app.search.neonchat = {modalInited: true};
@@ -33,19 +33,27 @@ export default class ChatCreateModal extends Modal
 
 	isCanCreateChat()
 	{
-		if(this.selectedUsers.length > 1 && !this.input.text().length) return false;
+		if(this.selectedUsers.length > 1 && !this.input.title().length) return false;
 		if(!this.selectedUsers.length) return false;
 		return true;
 	}
 
 	isCanCreateChannel()
 	{
-		return this.input.text().length;
+		return this.input.title().length;
 	}
 
 	onsubmit()
 	{
+		app.store.createRecord('chats').save({title: this.input.title(), relationships: {users: this.selectedUsers}})
+		.then(
+			r =>
+			{
 
+
+
+			}
+		);
 
 		this.hide();
 	}
@@ -57,7 +65,7 @@ export default class ChatCreateModal extends Modal
 			<label>{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat')}</label>,
 			<div>
 				<label>{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator')}</label>
-				<input class="FormControl" type="text" bidi={this.input.text} 
+				<input class="FormControl" type="text" bidi={this.input.title} 
 					placeholder={app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat')} />
 			</div>
 			] : null,
@@ -84,7 +92,7 @@ export default class ChatCreateModal extends Modal
 			<label>{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.channel')}</label>,
 			<div>
 				<label>{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator')}</label>
-				<input class="FormControl" type="text" bidi={this.input.text} 
+				<input class="FormControl" type="text" bidi={this.input.title} 
 					placeholder={app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.channel')} />
 			</div>,  
 			<Button 

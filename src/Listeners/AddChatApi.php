@@ -50,7 +50,7 @@ class AddChatApi
     public function configureApiRoutes(ConfigureApiRoutes $event)
     {
         $event->get('/chats', 'neonchat.chats.get', ListChatsController::class);
-        $event->get('/chats', 'neonchat.chats.post', CreateChatController::class);
+        $event->post('/chats', 'neonchat.chats.create', CreateChatController::class);
         $event->get('/chatmessages', 'neonchat.chatmessages.fetch', FetchMessageController::class);
         $event->post('/chatmessages', 'neonchat.chatmessages.post', PostMessageController::class);
         $event->patch('/chatmessages/{id}', 'neonchat.chatmessages.edit', EditMessageController::class);

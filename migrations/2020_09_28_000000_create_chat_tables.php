@@ -9,7 +9,7 @@ return [
 
 		$schema->create('neonchat_chats', function (Blueprint $table) {
 			$table->increments('id');
-			$table->string('title', 100);
+			$table->string('title', 100)->default('PM');
 			$table->string('color', 20)->nullable();
 			$table->tinyInteger('type')->default(0);
 			$table->integer('creator_id')->unsigned()->default(0);
@@ -36,6 +36,7 @@ return [
         $schema->table('neonchat_messages', function (Blueprint $table) {
 			$table->integer('chat_id')->unsigned()->default(1);
 			$table->renameColumn('actorId', 'user_id');
+			$table->tinyInteger('type')->default(0);
 			$table->boolean('is_readed')->default(0);
 			$table->string('ip_address', 45)->nullable();
 			

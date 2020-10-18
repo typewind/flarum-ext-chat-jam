@@ -19,7 +19,7 @@ use Xelson\Chat\Api\Serializers\ChatSerializer;
 use Xelson\Chat\Commands\CreateChat;
 use Xelson\Chat\ChatSocket;
 
-class ListChatsController extends AbstractCreateController 
+class CreateChatController extends AbstractCreateController 
 {
     /**
      * The serializer instance for this request.

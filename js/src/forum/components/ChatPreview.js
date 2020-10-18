@@ -10,6 +10,7 @@ export default class ChatPreview extends Component
 		this.attrs = Object.assign(this.model.data.attributes, this.props);
 
 		this.attrs.textColor = this.pickTextColorBasedOnBgColorSimple(this.attrs.color, '#FFF', '#000');
+		this.attrs.finalTitle = this.attrs.title;
 
 		let users = this.model.users();
 		if(app.session.user && this.attrs.type == 0 && users.length && users.length < 3)
@@ -18,7 +19,7 @@ export default class ChatPreview extends Component
 			{
 				if(user && user.id() != app.session.user.id())
 				{
-					this.attrs.title = user.displayName();
+					this.attrs.finalTitle = user.displayName();
 					this.attrs.avatarUrl = user.avatarUrl();
 					this.attrs.color = user.color();
 
@@ -53,7 +54,7 @@ export default class ChatPreview extends Component
 				className={'avatar ' + (this.attrs.avatarUrl ? 'image' : '')} 
 				style={{'background-color': this.attrs.color, color: this.attrs.textColor, 'background-image': this.attrs.avatarUrl ? `url(${this.attrs.avatarUrl})` : null}}
 			>
-				{this.attrs.avatarUrl ? null : this.firstLetter(this.attrs.title).toUpperCase()}
+				{this.attrs.avatarUrl ? null : this.firstLetter(this.attrs.finalTitle).toUpperCase()}
 			</div>
 		)
 	}
@@ -65,7 +66,7 @@ export default class ChatPreview extends Component
 				className='avatar'
 				style={{'background-color': this.attrs.color, color: this.attrs.textColor}}
 			>
-				{this.attrs.avatarUrl ? null : this.firstLetter(this.attrs.title).toUpperCase()}
+				{this.attrs.avatarUrl ? null : this.firstLetter(this.attrs.finalTitle).toUpperCase()}
 			</div>
 		)
 	}
@@ -75,7 +76,7 @@ export default class ChatPreview extends Component
 		return ([
 			this.attrs.type ? this.componentAvatarChannel() : this.componentAvatarPM(),
 			<div style="display: flex; flex-direction: column">
-				<div className='title' title={this.attrs.title}>{this.attrs.title}</div>
+				<div className='title' title={this.attrs.finalTitle}>{this.attrs.finalTitle}</div>
 				{this.model.last_message() ? this.componentTextPreview() : this.componentTextEmpty()}
 			</div>,
 			this.model.last_message() ? 
@@ -91,10 +92,10 @@ export default class ChatPreview extends Component
 				className='avatar'
 				style={{'background-color': this.attrs.color, color: this.attrs.textColor}}
 			>
-				{this.attrs.avatarUrl ? null : this.firstLetter(this.attrs.title).toUpperCase()}
+				{this.attrs.avatarUrl ? null : this.firstLetter(this.attrs.finalTitle).toUpperCase()}
 			</div>,
 			<div style="display: flex; flex-direction: column">
-				<div className='title' title={this.attrs.title}>{this.attrs.title}</div>
+				<div className='title' title={this.attrs.finalTitle}>{this.attrs.finalTitle}</div>
 				{this.componentTextPreview()}
 			</div>,
 			<div className='timestamp' title={fullTime(this.model.last_message().created_at()).children[0]}>{this.humanTime = this.componentMessageTime()}</div>

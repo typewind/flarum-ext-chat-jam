@@ -58,6 +58,10 @@ class EditMessageHandler
 
         $message = $this->messages->findOrFail($messageid);
 
+        $this->assertPermission(
+            !$message->type
+        );
+
         if(isset($actions['msg']))
         {
             $this->assertCan(

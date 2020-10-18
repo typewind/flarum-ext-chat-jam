@@ -30,8 +30,8 @@ class Message extends AbstractModel
      * @param bool      $is_readed
      * 
      */
-    public static function build($message, $user_id, $created_at, $chat_id = 1, 
-        $ip_address = null, $is_readed = false, $edited_at = null, $deleted_by = null)
+    public static function build($message, $user_id, $created_at, $chat_id = 1,
+        $ip_address = null, $type = 0, $is_readed = false, $edited_at = null, $deleted_by = null)
     {
         $msg = new static;
 
@@ -41,6 +41,7 @@ class Message extends AbstractModel
         $msg->edited_at = $edited_at;
         $msg->deleted_by = $deleted_by;
         $msg->chat_id = $chat_id;
+        $msg->type = $type;
         $msg->is_readed = $is_readed;
         $msg->ip_address = $ip_address;
 

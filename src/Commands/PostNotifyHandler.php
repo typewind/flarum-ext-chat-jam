@@ -15,32 +15,12 @@ use Xelson\Chat\MessageValidator;
 use Xelson\Chat\MessageFloodgate;
 use Flarum\User\AssertPermissionTrait;
 
-class PostMessageHandler
+class PostNotifyHandler
 {
-    use AssertPermissionTrait;
-
     /**
-     * @var MessageValidator
-     */
-    protected $validator;
-
-    /**
-     * @var MessageFloodgate
-     */
-    protected $floodgate;
-
-    /**
-     * @param MessageValidator      $validator
-     * @param MessageFloodgate      $floodgate
      * @param ChatRepository        $chats
      */
-    public function __construct(
-        MessageValidator $validator,
-        MessageFloodgate $floodgate,
-        ChatRepository $chats
-    ) {
-        $this->validator = $validator;
-        $this->floodgate = $floodgate;
+    public function __construct(ChatRepository $chats) {
         $this->chats = $chats;
     }
 
@@ -50,7 +30,7 @@ class PostMessageHandler
      * @param PostMessage $command
      * @return null|string
      */
-    public function handle(PostMessage $command)
+    public function handle(PostNotify $command)
     {
         $actor = $command->actor;
         $attributes = $command->data['attributes'];
@@ -61,23 +41,14 @@ class PostMessageHandler
 
         $chat = $this->chats->findOrFail($chat_id, $actor);
 
-        $this->assertCan(
-            $actor,
-            'pushedx-chat.permissions.chat'
-        );
-
-        if(!$command->bypassFloodgate)
-            $this->floodgate->assertNotFlooding($actor, $chat);
-
         $message = Message::build(
             $content,
             $actor->id,
             Carbon::now(),
             $chat->id,
-            $ip_address
+			$ip_address,
+			1
         );
-
-        $this->validator->assertValid($message->getDirty());
 
         $message->save();
 

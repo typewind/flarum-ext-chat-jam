@@ -160,7 +160,7 @@ export default class ChatFrame extends Component
 
                     <div id='chat-panel'>
                         <div id='chat-header' ondragstart={() => false}>
-                            <h2>{this.viewportChat ? this.viewportChat.attrs.title : app.translator.trans('pushedx-chat.forum.toolbar.title')}</h2>
+                            <h2>{this.viewportChat ? this.viewportChat.attrs.finalTitle : app.translator.trans('pushedx-chat.forum.toolbar.title')}</h2>
                             <p data-title={app.translator.trans(this.beingShown ? 'pushedx-chat.forum.toolbar.minimize' : 'pushedx-chat.forum.toolbar.maximize')}>
                                 <div className='icon' onclick={this.toggleChat.bind(this)}>
                                     <i className={this.beingShown ? 'fas fa-window-minimize' : 'fas fa-window-maximize'}></i>

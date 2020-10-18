@@ -9,8 +9,12 @@
 namespace Xelson\Chat\Commands;
 
 use Flarum\User\AssertPermissionTrait;
+use Flarum\User\User;
 use Illuminate\Support\Arr;
 use Xelson\Chat\ChatRepository;
+use Xelson\Chat\ChatUser;
+use Xelson\Chat\Chat;
+use Xelson\Chat\Exceptions\ChatEditException;
 
 class CreateChatHandler
 {
@@ -34,9 +38,40 @@ class CreateChatHandler
     {
 		$actor = $command->actor;
         $data = $command->data;
-        $attributes = Arr::get($data, 'attributes', []);
+        $users = Arr::get($data, 'relationships.users.data', []);
 
-		// Права на создание чата?
+        $this->assertCan(
+            $actor,
+            'pushedx-chat.permissions.chat'
+        );
+
+        foreach($users as $key => $user)
+        {
+            if($user['id'] == $actor->id)
+                unset($users[$key]);
+        }
+        array_push($users, ['id' => $actor->id, 'type' => 'users']);
+
+        if(count($users) < 2)
+            throw new ChatEditException;
+
+        if(count($users) == 2)
+        {
+            $chats = $this->chats->query()->whereIn(ChatUser::select('chat_id')->where('user_id', $actor->id)->get()->toArray())->with('users')->get();
+            foreach($chats as $chat)
+            {
+                $users = $chat->users();
+
+                echo json_encode($users);
+                exit();
+            }
+        }
+        else
+        {
+
+
+        }
+
 		// Личный чат между двумя пользователями не существует (валидация на фронте тоже должна быть)
 		// Хендлим список айдишников пользователей для добавления в чат. В конце чат должен быть создан и данные
 		// отосланы по сокету. Но сообщение сокета может прийти раньше чем http ответ (надо учесть)

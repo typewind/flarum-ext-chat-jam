@@ -12,25 +12,34 @@ use Flarum\User\User;
 
 class PostMessage
 {
+
     /**
-     * The user performing the action.
-     *
      * @var User
      */
     public $actor;
 
     /**
-     * The chat message
-     *
-     * @var string
+     * @var array
      */
-    public $msg;
+    public $data;
 
     /**
-     * @param int                          $postId The ID of the post to upload the image for.
-     * @param User                         $actor  The user performing the action.
+     * @var string
      */
-    public function __construct(User $actor, $data, string $ip_address, bool $bypassFloodgate)
+    public $ip_address;
+
+    /**
+     * @var int
+     */
+    public $bypassFloodgate;
+
+    /**
+     * @param User $actor
+     * @param mixed $data
+     * @param string $ip_address
+     * @param int $bypassFloodgate
+     */
+    public function __construct(User $actor, $data, string $ip_address, $bypassFloodgate)
     {
         $this->actor = $actor;
         $this->data = $data;

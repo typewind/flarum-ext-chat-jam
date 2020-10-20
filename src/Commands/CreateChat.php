@@ -18,11 +18,11 @@ class CreateChat
      * @var User
      */
     public $actor;
-
+ 
     /**
-     * A data from post request
-     *
-     * @var string
+     * Data from request
+     * 
+     * @var [type]
      */
     public $data;
 

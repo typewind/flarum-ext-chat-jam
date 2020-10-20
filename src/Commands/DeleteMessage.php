@@ -30,7 +30,7 @@ class DeleteMessage
      * @param int		$id
      * @param User		$actor
      */
-    public function __construct($id, User $actor)
+    public function __construct(int $id, User $actor)
     {
         $this->id = $id;
 		$this->actor = $actor;

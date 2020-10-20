@@ -21,17 +21,19 @@ class CreateChatHandler
 	use AssertPermissionTrait;
 
 	/**
-     * @param ChatRepository             $ctats
+     * @param ChatRepository $chats
+     * @param ChatSocket $socket
      */
-	public function __construct(ChatRepository $chats) 
+	public function __construct(ChatRepository $chats, ChatSocket $socket) 
 	{
         $this->chats  = $chats;
+        $this->socket = $socket;
 	}
 	
     /**
      * Handles the command execution.
      *
-     * @param CreateChat 	$command
+     * @param CreateChat $command
      * @return null|string
      */
     public function handle(CreateChat $command)
@@ -48,7 +50,7 @@ class CreateChatHandler
         foreach($users as $key => $user)
         {
             if($user['id'] == $actor->id)
-                unset($users[$key]);
+                array_splice($users, $key, 1);
         }
         array_push($users, ['id' => $actor->id, 'type' => 'users']);
 
@@ -57,13 +59,14 @@ class CreateChatHandler
 
         if(count($users) == 2)
         {
-            $chats = $this->chats->query()->whereIn(ChatUser::select('chat_id')->where('user_id', $actor->id)->get()->toArray())->with('users')->get();
+            $chats = $this->chats->query()->where('type', 0)->whereIn('id', ChatUser::select('chat_id')->where('user_id', $actor->id)->get()->toArray())->with('users')->get();
+
             foreach($chats as $chat)
             {
-                $users = $chat->users();
+                $chatUsers = $chat->users;
 
-                echo json_encode($users);
-                exit();
+                if(count($chatUsers) == 2 && ($chatUsers[0]->id == $users[0]['id'] || $chatUsers[1]->id == $users[0]['id']))
+                    throw new ChatEditException;
             }
         }
         else
@@ -79,6 +82,6 @@ class CreateChatHandler
 		// По-хорошему код на изменение чата (тайтл, участники) должен быть переиспользован, т.к у нас еще будет команда EditChat
 		// Необходимо ввести тип сообщений для служебных уведомлений об событиях (создание чата, добавление юзеров) 
 
-        return $data;
+        return null;
     }
 }

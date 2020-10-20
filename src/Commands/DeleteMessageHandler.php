@@ -24,9 +24,8 @@ class DeleteMessageHandler
     /**
      * @param MessageRepository             $messages
      */
-    public function __construct(
-        MessageRepository $messages
-    ) {
+    public function __construct(MessageRepository $messages) 
+    {
         $this->messages  = $messages;
     }
 

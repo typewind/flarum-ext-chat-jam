@@ -29,16 +29,16 @@ class EditMessage
     /**
      * Chat message attributes
      *
-     * @var string
+     * @var array
      */
     public $data;
 
     /**
      * @param int		$id
      * @param User		$actor
-	 * @param string	$data
+	 * @param array	$data
      */
-    public function __construct($id, User $actor, $data)
+    public function __construct(int $id, User $actor, $data)
     {
         $this->id = $id;
 		$this->actor = $actor;

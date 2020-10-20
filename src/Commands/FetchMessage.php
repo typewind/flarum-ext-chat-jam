@@ -13,16 +13,26 @@ use Flarum\User\User;
 class FetchMessage
 {
     /**
-     * The chat message ID
-     *
      * @var int
      */
-    public $id;
+    public $start_from;
 
     /**
-     * @param int     $id
+     * @var User
      */
-    public function __construct($start_from, $actor, $chat_id)
+    public $actor;
+
+    /**
+     * @var int
+     */
+    public $chat_id;
+
+    /**
+     * @param int $start_from
+     * @param User $actor
+     * @param int $chat_id
+     */
+    public function __construct(int $start_from, User $actor, int $chat_id)
     {
         $this->start_from = $start_from;
         $this->actor = $actor;

@@ -1,6 +1,7 @@
 import humanTime from 'flarum/utils/humanTime';
 import fullTime from 'flarum/helpers/fullTime';
 import Component from 'flarum/Component';
+import classList from 'flarum/utils/classList';
 
 export default class ChatPreview extends Component
 {
@@ -120,8 +121,9 @@ export default class ChatPreview extends Component
 
 	componentTextPreview()
 	{
-		let formatResult = this.formatTextPreview(this.model.last_message().message());
-		let senderName, users = this.model.users(), sender = this.model.last_message().user();
+		let lastMessage = this.model.last_message();
+		let formatResult = this.formatTextPreview(lastMessage.message());
+		let senderName, users = this.model.users(), sender = lastMessage.user();
 		if(app.session.user)
 		{
 			if(app.session.user.id() == sender.id()) senderName = 'You: '
@@ -130,7 +132,8 @@ export default class ChatPreview extends Component
 		}
 
 		return (
-			<div className='message'>
+			<div className={classList({message: true, censored: lastMessage.is_censored()})}
+				title={lastMessage.is_censored() ? app.translator.trans('pushedx-chat.forum.chat.message.censored') : null}>
 				<span className='sender'>{senderName}</span>
 				<span className={formatResult.type}>{formatResult.text}</span>
 			</div>

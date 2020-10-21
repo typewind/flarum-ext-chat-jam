@@ -168,6 +168,14 @@
         outline: none;
         height: 100%;
 
+        .censored
+        {
+            box-shadow: inset 0px 0px 0px 1000px #dedede;
+            color: #dedede !important;
+            cursor: pointer;
+            .user-select(none);
+        }
+
         #chats-list
         {
             width: 70px;
@@ -668,14 +676,6 @@
                             color: #2b384c;
                             text-decoration: none;
                             font-weight: 600;
-                        }
-
-                        div.censored
-                        {
-                            box-shadow: inset 0px 0px 0px 1000px #dedede;
-                            color: #dedede;
-                            cursor: pointer;
-                            .user-select(none);
                         }
                     }
 

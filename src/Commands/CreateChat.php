@@ -22,7 +22,7 @@ class CreateChat
     /**
      * Data from request
      * 
-     * @var [type]
+     * @var array
      */
     public $data;
 

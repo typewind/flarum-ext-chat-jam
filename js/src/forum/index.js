@@ -7,9 +7,11 @@ import Chat from './models/Chat';
 import Message from './models/Message';
 
 app.initializers.add('pushedx-chat', app =>
-{
+{    
     extend(HeaderPrimary.prototype, 'items', function(items) 
     {
+        if(!app.forum.attribute('pushedx-chat.permissions.enabled')) return;
+        
         extendGlobalStore({
             chats: Chat,
             chatmessages: Message

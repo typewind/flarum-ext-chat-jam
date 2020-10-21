@@ -45,7 +45,7 @@ export default class ChatCreateModal extends Modal
 
 	onsubmit()
 	{
-		app.store.createRecord('chats').save({title: this.input.title(), relationships: {users: this.selectedUsers}})
+		app.store.createRecord('chats').save({title: this.input.title(), isChannel: this.isChannel, relationships: {users: this.selectedUsers}})
 		.then(
 			r =>
 			{

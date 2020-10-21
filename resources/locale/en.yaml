@@ -47,6 +47,9 @@ pushedx-chat:
       post: Post chat messages
       edit: Edit chat messages
       delete: Delete chat messages
+      enabled: Enable chat
+      create: Start chats
+      create.channel: Start channels
       moderate:
         delete: Delete chat messages
         vision: See deleted messages

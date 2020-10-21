@@ -223,6 +223,7 @@ function (_Modal) {
   _proto.onsubmit = function onsubmit() {
     app.store.createRecord('chats').save({
       title: this.input.title(),
+      isChannel: this.isChannel,
       relationships: {
         users: this.selectedUsers
       }
@@ -1011,6 +1012,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var flarum_helpers_fullTime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(flarum_helpers_fullTime__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! flarum/Component */ "flarum/Component");
 /* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(flarum_Component__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var flarum_utils_classList__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! flarum/utils/classList */ "flarum/utils/classList");
+/* harmony import */ var flarum_utils_classList__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_classList__WEBPACK_IMPORTED_MODULE_5__);
+
 
 
 
@@ -1141,17 +1145,22 @@ function (_Component) {
   };
 
   _proto.componentTextPreview = function componentTextPreview() {
-    var formatResult = this.formatTextPreview(this.model.last_message().message());
+    var lastMessage = this.model.last_message();
+    var formatResult = this.formatTextPreview(lastMessage.message());
     var senderName,
         users = this.model.users(),
-        sender = this.model.last_message().user();
+        sender = lastMessage.user();
 
     if (app.session.user) {
       if (app.session.user.id() == sender.id()) senderName = 'You: ';else if (users.length > 2 || this.attrs.type) senderName = sender.displayName() + ': ';
     }
 
     return m("div", {
-      className: "message"
+      className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_5___default()({
+        message: true,
+        censored: lastMessage.is_censored()
+      }),
+      title: lastMessage.is_censored() ? app.translator.trans('pushedx-chat.forum.chat.message.censored') : null
     }, m("span", {
       className: "sender"
     }, senderName), m("span", {
@@ -2107,6 +2116,7 @@ __webpack_require__.r(__webpack_exports__);
 
 app.initializers.add('pushedx-chat', function (app) {
   Object(flarum_extend__WEBPACK_IMPORTED_MODULE_0__["extend"])(flarum_components_HeaderPrimary__WEBPACK_IMPORTED_MODULE_1___default.a.prototype, 'items', function (items) {
+    if (!app.forum.attribute('pushedx-chat.permissions.enabled')) return;
     Object(_store__WEBPACK_IMPORTED_MODULE_3__["default"])({
       chats: _models_Chat__WEBPACK_IMPORTED_MODULE_4__["default"],
       chatmessages: _models_Message__WEBPACK_IMPORTED_MODULE_5__["default"]

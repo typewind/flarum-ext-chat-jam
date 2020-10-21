@@ -41,10 +41,13 @@ class CreateChatHandler
 		$actor = $command->actor;
         $data = $command->data;
         $users = Arr::get($data, 'relationships.users.data', []);
+        $attributes = Arr::get($data, 'attributes', []);
+
+        $isChannel = $attributes['isChannel'];
 
         $this->assertCan(
             $actor,
-            'pushedx-chat.permissions.chat'
+            $isChannel ? 'pushedx-chat.permissions.create.channel' : 'pushedx-chat.permissions.create'
         );
 
         foreach($users as $key => $user)

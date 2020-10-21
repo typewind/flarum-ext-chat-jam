@@ -215,6 +215,26 @@ flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.initializers.add('pushedx-chat
     return app.modal.show(new _components_ChatSettingsModal__WEBPACK_IMPORTED_MODULE_3__["default"]());
   };
 
+  Object(flarum_extend__WEBPACK_IMPORTED_MODULE_0__["extend"])(flarum_components_PermissionGrid__WEBPACK_IMPORTED_MODULE_2___default.a.prototype, 'viewItems', function (items) {
+    items.add('pushedx-chat.permissions.enabled', {
+      icon: 'fas fa-eye',
+      label: app.translator.trans('pushedx-chat.admin.permissions.enabled'),
+      permission: 'pushedx-chat.permissions.enabled',
+      allowGuest: true
+    });
+  });
+  Object(flarum_extend__WEBPACK_IMPORTED_MODULE_0__["extend"])(flarum_components_PermissionGrid__WEBPACK_IMPORTED_MODULE_2___default.a.prototype, 'startItems', function (items) {
+    items.add('pushedx-chat.permissions.create', {
+      icon: 'fas fa-comment-medical',
+      label: app.translator.trans('pushedx-chat.admin.permissions.create'),
+      permission: 'pushedx-chat.permissions.create'
+    });
+    items.add('pushedx-chat.permissions.create.channel', {
+      icon: 'fas fa-comment-medical',
+      label: app.translator.trans('pushedx-chat.admin.permissions.create.channel'),
+      permission: 'pushedx-chat.permissions.create.channel'
+    });
+  });
   Object(flarum_extend__WEBPACK_IMPORTED_MODULE_0__["extend"])(flarum_components_PermissionGrid__WEBPACK_IMPORTED_MODULE_2___default.a.prototype, 'replyItems', function (items) {
     items.add('pushedx-chat.permissions.chat', {
       icon: 'fas fa-comments',

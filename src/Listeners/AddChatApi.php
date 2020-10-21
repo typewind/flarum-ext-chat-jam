@@ -70,6 +70,9 @@ class AddChatApi
         {
             $permissions = [
                 'pushedx-chat.permissions.chat', 
+                'pushedx-chat.permissions.create',
+                'pushedx-chat.permissions.create.channel',
+                'pushedx-chat.permissions.enabled',
                 'pushedx-chat.permissions.edit',
                 'pushedx-chat.permissions.delete', 
                 'pushedx-chat.permissions.moderate.delete',

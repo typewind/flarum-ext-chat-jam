@@ -8,7 +8,8 @@
 
 namespace Xelson\Chat;
 use Flarum\Settings\SettingsRepositoryInterface;
-use Pusher;
+use Pusher\Pusher;
+use Pusher as PusherLegacy;
 
 class PusherWrapper
 {
@@ -22,6 +23,7 @@ class PusherWrapper
      */
 	public function __construct(SettingsRepositoryInterface $settings)
 	{
+        $this->settings = $settings;
         $this->pusher = $this->getPusher();
     }
     
@@ -31,11 +33,7 @@ class PusherWrapper
      */
     private function getPusher()
     {
-        if (!class_exists(Pusher::class)) {
-            return false;
-        }
-
-        if (app()->bound(Pusher::class)) return app(Pusher::class);
+        if(class_exists(Pusher::class) && app()->bound(Pusher::class)) return app(Pusher::class);
         else
         {
             $settings = app('flarum.settings');
@@ -46,7 +44,7 @@ class PusherWrapper
                 $options['cluster'] = $cluster;
             }
 
-            return new Pusher(
+            return new PusherLegacy(
                 $settings->get('flarum-pusher.app_key'),
                 $settings->get('flarum-pusher.app_secret'),
                 $settings->get('flarum-pusher.app_id'),

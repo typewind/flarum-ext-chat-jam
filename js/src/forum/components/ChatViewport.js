@@ -27,7 +27,7 @@ export default class ChatViewport extends Component
         super.onbeforeupdate(vnode);
         
         this.model = this.attrs.model;
-        if(this.model) Object.assign(this, ChatState.getViewportState(this.model))
+        if(this.model) this.state = ChatState.getViewportState(this.model);
     }
   
 	view(vnode)
@@ -51,12 +51,12 @@ export default class ChatViewport extends Component
 					onscroll={this.disableAutoScroll.bind(this)}
 					style={{height: ChatState.getFrameState('transform').y + 'px'}}
 				>
-					{this.scroll.loadingFetch ?
+					{this.state.scroll.loadingFetch ?
 						<div className='message-wrapper'>
 							<LoadingIndicator className='loading-old Button-icon' />
 						</div> : null
 					}
-					{ChatState.componentsChatMessages().concat(this.input.previewModel ? ChatState.componentChatMessage(this.input.previewModel) : null)}
+					{ChatState.componentsChatMessages()}
 				</div>
 				<div className='input-wrapper'>
 					<textarea
@@ -68,9 +68,9 @@ export default class ChatViewport extends Component
 						oninput = {this.inputProcess.bind(this)}
 						onpaste = {this.inputProcess.bind(this)}
 
-						rows = {this.input.rows}
+						rows = {this.state.input.rows}
 					/>
-					{this.messageEditing ?
+					{this.state.messageEditing ?
 						<div className='icon edit' onclick={this.messageEditEnd.bind(this)}>
 							<i class="fas fa-times"></i>
 						</div>    
@@ -83,7 +83,7 @@ export default class ChatViewport extends Component
 						className={this.reachedLimit() ? 'reaching-limit' : ''}
 						style={{display: !ChatState.getPermissions().post ? 'none' : ''}}
 					>
-						{(this.messageCharLimit - (this.input.messageLength || 0)) + '/' + this.messageCharLimit}
+						{(this.messageCharLimit - (this.state.input.messageLength || 0)) + '/' + this.messageCharLimit}
 					</div>
 				</div>
 			</div>
@@ -122,7 +122,7 @@ export default class ChatViewport extends Component
 
     reachedLimit()
     {
-        this.oldReached = (this.messageCharLimit - (this.input.messageLength || 0)) < 100;
+        this.oldReached = (this.messageCharLimit - (this.state.input.messageLength || 0)) < 100;
         return this.oldReached;
     }
 
@@ -131,8 +131,8 @@ export default class ChatViewport extends Component
         super.oncreate(vnode);
         let e = vnode.dom;
 
-        if(this.scroll.oldScroll >= 0) e.scrollTop = this.scroll.oldScroll;
-        else e.scrollTop = e.scrollHeight + this.scroll.oldScroll - 30;
+        if(this.state.scroll.oldScroll >= 0) e.scrollTop = this.state.scroll.oldScroll;
+        else e.scrollTop = e.scrollHeight + this.state.scroll.oldScroll - 30;
 
         this.chatOnResize(vnode);
     }
@@ -143,24 +143,24 @@ export default class ChatViewport extends Component
         if(ChatState.getCurrentChat() != this.model) return
 
         let el = e.target;
-        this.scroll.autoScroll = (el.scrollTop + el.offsetHeight >= el.scrollHeight);
+        this.state.scroll.autoScroll = (el.scrollTop + el.offsetHeight >= el.scrollHeight);
         let currentHeight = el.scrollHeight;
         
-        if(this.scroll.autoScroll) this.scroll.needToScroll = false;
-        if(this.scroll.needToScroll) this.scrollToBottom();
+        if(this.state.scroll.autoScroll) this.state.scroll.needToScroll = false;
+        if(this.state.scroll.needToScroll) this.scrollToBottom();
 
-        if(el.scrollTop <= 0 && this.scroll.oldScroll > 0 && !this.scroll.loadingFetch && !this.messageEditing) 
+        if(el.scrollTop <= 0 && this.state.scroll.oldScroll > 0 && !this.state.scroll.loadingFetch && !this.state.messageEditing) 
         {
-            this.scroll.oldScroll = -currentHeight;
+            this.state.scroll.oldScroll = -currentHeight;
             let topMessage = ChatState.getChatMessages(model => model.chat() == this.model)[0];
-            if(topMessage) this.apiFetchChatMessages(topMessage.id());
+            if(topMessage) ChatState.apiFetchChatMessages(this.model, topMessage.id());
         }
-        else this.scroll.oldScroll = el.scrollTop;
+        else this.state.scroll.oldScroll = el.scrollTop;
 	}
 	
     chatOnResize(vnode)
     {
-        if(this.model && this.scroll.autoScroll) 
+        if(this.model && this.state.scroll.autoScroll) 
             this.scrollToBottom();
     }
 
@@ -169,9 +169,9 @@ export default class ChatViewport extends Component
         let chatFrame = this.getChatFrame();
         if(chatFrame)
         {
-            if(this.scroll.timeout) clearTimeout(this.scroll.timeout);
-            this.scroll.timeout = setTimeout(() => chatFrame.scroll({top: chatFrame.scrollHeight, behavior: 'smooth'}), 100);
-            if(!this.scroll.autoScroll) this.scroll.needToScroll = true;
+            if(this.state.scroll.timeout) clearTimeout(this.state.scroll.timeout);
+            this.state.scroll.timeout = setTimeout(() => chatFrame.scroll({top: chatFrame.scrollHeight, behavior: 'smooth'}), 100);
+            if(!this.state.scroll.autoScroll) this.state.scroll.needToScroll = true;
         }
 	}
 
@@ -183,10 +183,10 @@ export default class ChatViewport extends Component
 	inputSyncWithPreview()
 	{
 		let input = this.getChatInput();
-        if(this.input.writingPreview)
+        if(this.state.input.writingPreview)
         {
-            input.value = this.input.content;
-            this.inputProcess();
+            input.value = this.state.input.content;
+            this.state.inputProcess();
         }
 	}
 	
@@ -196,8 +196,8 @@ export default class ChatViewport extends Component
 
         let input = this.getChatInput();
         let inputValue = input.value.trim();
-        this.input.messageLength = inputValue.length;
-        this.input.content = inputValue;
+        this.state.input.messageLength = inputValue.length;
+        this.state.input.content = inputValue;
 
         if(!input.baseScrollHeight)
         {
@@ -207,23 +207,23 @@ export default class ChatViewport extends Component
 
         input.rows = 1;
         let rows = Math.ceil((input.scrollHeight - input.baseScrollHeight) / input.lineHeight) + 1;
-        this.input.rows = rows;
+        this.state.input.rows = rows;
         input.rows = rows;
 
-        if(this.input.messageLength)
+        if(this.state.input.messageLength)
         {
-            if(!this.input.writingPreview && !this.messageEditing)
-                this.inputPreviewStart();
+            if(!this.state.input.writingPreview && !this.state.messageEditing)
+                this.state.inputPreviewStart();
         }
         else
         {
-            if(this.input.writingPreview && !inputValue.length)
-                this.inputPreviewEnd();
+            if(this.state.input.writingPreview && !inputValue.length)
+                this.state.inputPreviewEnd();
         }
 
-        if(this.messageEditing) ChatState.renderChatMessage(this.messageEditing, inputValue)
-        else if(this.input.writingPreview) ChatState.renderChatMessage(this.input.previewModel, inputValue)
-        this.timedRedraw(100, () => this.scroll.autoScroll && !this.messageEditing ? this.scrollToBottom() : null);
+        if(this.state.messageEditing) ChatState.renderChatMessage(this.state.messageEditing, inputValue)
+        else if(this.state.input.writingPreview) ChatState.renderChatMessage(this.state.input.previewModel, inputValue)
+        this.timedRedraw(100, () => this.state.scroll.autoScroll && !this.state.messageEditing ? this.scrollToBottom() : null);
     }
 
     inputPressEnter(e)
@@ -245,26 +245,26 @@ export default class ChatViewport extends Component
 
     inputClear()
     {
-        this.input.messageLength = 0;
-        this.input.rows = 1;
+        this.state.input.messageLength = 0;
+        this.state.input.rows = 1;
         this.getChatInput().value = '';
     }
 
     inputPreviewStart()
     {
-        this.input.writingPreview = true;
+        this.state.input.writingPreview = true;
 
-        if(!this.input.previewModel) 
+        if(!this.state.input.previewModel) 
         {
-            this.input.previewModel = app.store.createRecord('chatmessages');
-            this.input.previewModel.pushData({id: 0, attributes: {message: ' ', created_at: 0}, relationships: {user: app.session.user, chat: this.model}});
+            this.state.input.previewModel = app.store.createRecord('chatmessages');
+            this.state.input.previewModel.pushData({id: 0, attributes: {message: ' ', created_at: 0}, relationships: {user: app.session.user, chat: this.model}});
         }
         m.redraw();
     }
 
     inputPreviewEnd()
     {
-        this.input.writingPreview = false;
+        this.state.input.writingPreview = false;
 
         m.redraw();
     }
@@ -273,18 +273,18 @@ export default class ChatViewport extends Component
     {
         if(text.trim().length > 0 && !this.loading)
         {
-            if(this.input.writingPreview) 
+            if(this.state.input.writingPreview) 
             {
-                this.input.writingPreview = false;
+                this.state.input.writingPreview = false;
                 
-                this.messagePost(this.input.previewModel);
-                ChatState.insertChatMessage(Object.assign(this.input.previewModel, {}));
+                this.messagePost(this.state.input.previewModel);
+                ChatState.insertChatMessage(Object.assign(this.state.input.previewModel, {}));
     
                 this.inputClear();
             }
-            else if(this.messageEditing)
+            else if(this.state.messageEditing)
             {
-                let editingMsg = this.messageEditing;
+                let editingMsg = this.state.messageEditing;
                 if(editingMsg.message().trim() !== editingMsg.oldContent.trim()) 
                 {
                     editingMsg.controlEdit(editingMsg.message());
@@ -299,22 +299,22 @@ export default class ChatViewport extends Component
     messageEdit(model)
     {
         let chatInput = this.getChatInput();
-        if(this.input.writingPreview) this.inputPreviewEnd();
+        if(this.state.input.writingPreview) this.state.inputPreviewEnd();
         
         model.is_editing = true;
         model.oldContent = model.message();
 
-        this.messageEditing = model;
+        this.state.messageEditing = model;
         chatInput.value = model.oldContent;
         chatInput.focus();
-        this.inputProcess();
+        this.state.inputProcess();
 
         m.redraw();
     }
 
     messageEditEnd()
     {
-        let message = this.messageEditing;
+        let message = this.state.messageEditing;
 
 		if(message)
 		{
@@ -323,7 +323,7 @@ export default class ChatViewport extends Component
 			m.redraw();
             ChatState.renderChatMessage(message, message.oldContent);
 
-            this.messageEditing = null;
+            this.state.messageEditing = null;
 		}
     }
 
@@ -355,7 +355,7 @@ export default class ChatViewport extends Component
     messagePost(instance)
     {
         let self = this;
-        self.loading = true;
+        self.state.loading = true;
         m.redraw();
 
         return instance.model.save({message: instance.message, created_at: new Date(), chat_id: this.model.id()})
@@ -365,7 +365,7 @@ export default class ChatViewport extends Component
                 self.chatPreview.model.pushData({relationships: {last_message: instance.model}});
 
                 self.input.preview.instance = null;
-                self.loading = false;
+                self.state.loading = false;
                 instance.flash();
 
                 m.redraw();
@@ -373,8 +373,8 @@ export default class ChatViewport extends Component
             r => {
                 instance.timedOut = true;
 
-                self.input.preview.instance = null;
-                self.loading = false;
+                self.state.input.preview.instance = null;
+                self.state.loading = false;
 
                 m.redraw();
             }
@@ -396,31 +396,14 @@ export default class ChatViewport extends Component
 
 	messagesLoad()
 	{
-        if(!this.messagesFetched) 
+        if(!this.state.messagesFetched) 
         {
-            this.apiFetchChatMessages();
-            this.messagesFetched = true;
+            ChatState.apiFetchChatMessages(this.model);
+            this.state.messagesFetched = true;
         }
         this.inputSyncWithPreview();
 
-        this.getChatWrapper().scrollTop = this.scroll.oldScroll;
-	}
-
-	apiFetchChatMessages(start_from)
-	{
-		let self = this;
-		
-        self.scroll.loadingFetch = true;
-        m.redraw();
-        
-        app.store.find('chatmessages', {chat_id: self.model.id(), start_from})
-            .then(r => {
-                self.scroll.loadingFetch = false;
-                self.scroll.autoScroll = false;
-
-                r.map((model) => ChatState.insertChatMessage(model));
-                m.redraw();
-            });
+        this.getChatWrapper().scrollTop = this.state.scroll.oldScroll;
 	}
 	
 	timedRedraw(timeout, callback)
@@ -444,6 +427,6 @@ export default class ChatViewport extends Component
         input.value = input.value + " @" + user.username() + " ";
 		input.focus();
 		
-		this.inputProcess();
+		this.state.inputProcess();
     }
 }

@@ -22,7 +22,8 @@ export default class ChatFrame extends Component
             alert('Please enable Pusher/WebSocket to use Neon Chat!');
             return;
         }
-        this.apiFetchChats();
+
+        ChatState.apiFetchChats();
     }
 
     getChat()
@@ -229,15 +230,5 @@ export default class ChatFrame extends Component
         }
 
         this.moveLast = {x: e.clientX, y: e.clientY};
-    }
-
-    apiFetchChats()
-    {
-        app.store.find('chats').then((chats) =>
-        {
-            chats.map(model => ChatState.addChat(model));
-
-            m.redraw();
-        });
     }
 }

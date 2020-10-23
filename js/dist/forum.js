@@ -355,7 +355,7 @@ function (_Component) {
       return;
     }
 
-    this.apiFetchChats();
+    _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].apiFetchChats();
   };
 
   _proto.getChat = function getChat() {
@@ -568,15 +568,6 @@ function (_Component) {
     };
   };
 
-  _proto.apiFetchChats = function apiFetchChats() {
-    app.store.find('chats').then(function (chats) {
-      chats.map(function (model) {
-        return _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].addChat(model);
-      });
-      m.redraw();
-    });
-  };
-
   return ChatFrame;
 }(flarum_Component__WEBPACK_IMPORTED_MODULE_1___default.a);
 
@@ -669,6 +660,7 @@ function (_Component) {
         deleted: !this.isVisible()
       }),
       "data-id": this.model.id(),
+      key: this.model.id(),
       onupdate: this.configWrapper.bind(this)
     }, m("div", null, this.model.user() ? m(flarum_components_Link__WEBPACK_IMPORTED_MODULE_11___default.a, {
       className: "avatar-wrapper",
@@ -1282,7 +1274,7 @@ function (_Component) {
     _Component.prototype.onbeforeupdate.call(this, vnode);
 
     this.model = this.attrs.model;
-    if (this.model) Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"])(this, _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getViewportState(this.model));
+    if (this.model) this.state = _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getViewportState(this.model);
   };
 
   _proto.view = function view(vnode) {
@@ -1303,11 +1295,11 @@ function (_Component) {
       style: {
         height: _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('transform').y + 'px'
       }
-    }, this.scroll.loadingFetch ? m("div", {
+    }, this.state.scroll.loadingFetch ? m("div", {
       className: "message-wrapper"
     }, m(flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_3___default.a, {
       className: "loading-old Button-icon"
-    })) : null, _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentsChatMessages().concat(this.input.previewModel ? _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentChatMessage(this.input.previewModel) : null)), m("div", {
+    })) : null, _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentsChatMessages()), m("div", {
       className: "input-wrapper"
     }, m("textarea", {
       id: "chat-input",
@@ -1317,8 +1309,8 @@ function (_Component) {
       onkeypress: this.inputPressEnter.bind(this),
       oninput: this.inputProcess.bind(this),
       onpaste: this.inputProcess.bind(this),
-      rows: this.input.rows
-    }), this.messageEditing ? m("div", {
+      rows: this.state.input.rows
+    }), this.state.messageEditing ? m("div", {
       className: "icon edit",
       onclick: this.messageEditEnd.bind(this)
     }, m("i", {
@@ -1334,7 +1326,7 @@ function (_Component) {
       style: {
         display: !_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getPermissions().post ? 'none' : ''
       }
-    }, this.messageCharLimit - (this.input.messageLength || 0) + '/' + this.messageCharLimit)));
+    }, this.messageCharLimit - (this.state.input.messageLength || 0) + '/' + this.messageCharLimit)));
   };
 
   _proto.getChat = function getChat() {
@@ -1362,7 +1354,7 @@ function (_Component) {
   };
 
   _proto.reachedLimit = function reachedLimit() {
-    this.oldReached = this.messageCharLimit - (this.input.messageLength || 0) < 100;
+    this.oldReached = this.messageCharLimit - (this.state.input.messageLength || 0) < 100;
     return this.oldReached;
   };
 
@@ -1370,7 +1362,7 @@ function (_Component) {
     _Component.prototype.oncreate.call(this, vnode);
 
     var e = vnode.dom;
-    if (this.scroll.oldScroll >= 0) e.scrollTop = this.scroll.oldScroll;else e.scrollTop = e.scrollHeight + this.scroll.oldScroll - 30;
+    if (this.state.scroll.oldScroll >= 0) e.scrollTop = this.state.scroll.oldScroll;else e.scrollTop = e.scrollHeight + this.state.scroll.oldScroll - 30;
     this.chatOnResize(vnode);
   };
 
@@ -1380,36 +1372,36 @@ function (_Component) {
     e.redraw = false;
     if (_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat() != this.model) return;
     var el = e.target;
-    this.scroll.autoScroll = el.scrollTop + el.offsetHeight >= el.scrollHeight;
+    this.state.scroll.autoScroll = el.scrollTop + el.offsetHeight >= el.scrollHeight;
     var currentHeight = el.scrollHeight;
-    if (this.scroll.autoScroll) this.scroll.needToScroll = false;
-    if (this.scroll.needToScroll) this.scrollToBottom();
+    if (this.state.scroll.autoScroll) this.state.scroll.needToScroll = false;
+    if (this.state.scroll.needToScroll) this.scrollToBottom();
 
-    if (el.scrollTop <= 0 && this.scroll.oldScroll > 0 && !this.scroll.loadingFetch && !this.messageEditing) {
-      this.scroll.oldScroll = -currentHeight;
+    if (el.scrollTop <= 0 && this.state.scroll.oldScroll > 0 && !this.state.scroll.loadingFetch && !this.state.messageEditing) {
+      this.state.scroll.oldScroll = -currentHeight;
       var topMessage = _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getChatMessages(function (model) {
         return model.chat() == _this.model;
       })[0];
-      if (topMessage) this.apiFetchChatMessages(topMessage.id());
-    } else this.scroll.oldScroll = el.scrollTop;
+      if (topMessage) _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].apiFetchChatMessages(this.model, topMessage.id());
+    } else this.state.scroll.oldScroll = el.scrollTop;
   };
 
   _proto.chatOnResize = function chatOnResize(vnode) {
-    if (this.model && this.scroll.autoScroll) this.scrollToBottom();
+    if (this.model && this.state.scroll.autoScroll) this.scrollToBottom();
   };
 
   _proto.scrollToBottom = function scrollToBottom() {
     var chatFrame = this.getChatFrame();
 
     if (chatFrame) {
-      if (this.scroll.timeout) clearTimeout(this.scroll.timeout);
-      this.scroll.timeout = setTimeout(function () {
+      if (this.state.scroll.timeout) clearTimeout(this.state.scroll.timeout);
+      this.state.scroll.timeout = setTimeout(function () {
         return chatFrame.scroll({
           top: chatFrame.scrollHeight,
           behavior: 'smooth'
         });
       }, 100);
-      if (!this.scroll.autoScroll) this.scroll.needToScroll = true;
+      if (!this.state.scroll.autoScroll) this.state.scroll.needToScroll = true;
     }
   };
 
@@ -1420,9 +1412,9 @@ function (_Component) {
   _proto.inputSyncWithPreview = function inputSyncWithPreview() {
     var input = this.getChatInput();
 
-    if (this.input.writingPreview) {
-      input.value = this.input.content;
-      this.inputProcess();
+    if (this.state.input.writingPreview) {
+      input.value = this.state.input.content;
+      this.state.inputProcess();
     }
   };
 
@@ -1432,8 +1424,8 @@ function (_Component) {
     if (e) e.redraw = false;
     var input = this.getChatInput();
     var inputValue = input.value.trim();
-    this.input.messageLength = inputValue.length;
-    this.input.content = inputValue;
+    this.state.input.messageLength = inputValue.length;
+    this.state.input.content = inputValue;
 
     if (!input.baseScrollHeight) {
       input.baseScrollHeight = input.scrollHeight;
@@ -1442,18 +1434,18 @@ function (_Component) {
 
     input.rows = 1;
     var rows = Math.ceil((input.scrollHeight - input.baseScrollHeight) / input.lineHeight) + 1;
-    this.input.rows = rows;
+    this.state.input.rows = rows;
     input.rows = rows;
 
-    if (this.input.messageLength) {
-      if (!this.input.writingPreview && !this.messageEditing) this.inputPreviewStart();
+    if (this.state.input.messageLength) {
+      if (!this.state.input.writingPreview && !this.state.messageEditing) this.state.inputPreviewStart();
     } else {
-      if (this.input.writingPreview && !inputValue.length) this.inputPreviewEnd();
+      if (this.state.input.writingPreview && !inputValue.length) this.state.inputPreviewEnd();
     }
 
-    if (this.messageEditing) _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].renderChatMessage(this.messageEditing, inputValue);else if (this.input.writingPreview) _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].renderChatMessage(this.input.previewModel, inputValue);
+    if (this.state.messageEditing) _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].renderChatMessage(this.state.messageEditing, inputValue);else if (this.state.input.writingPreview) _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].renderChatMessage(this.state.input.previewModel, inputValue);
     this.timedRedraw(100, function () {
-      return _this2.scroll.autoScroll && !_this2.messageEditing ? _this2.scrollToBottom() : null;
+      return _this2.state.scroll.autoScroll && !_this2.state.messageEditing ? _this2.scrollToBottom() : null;
     });
   };
 
@@ -1474,17 +1466,17 @@ function (_Component) {
   };
 
   _proto.inputClear = function inputClear() {
-    this.input.messageLength = 0;
-    this.input.rows = 1;
+    this.state.input.messageLength = 0;
+    this.state.input.rows = 1;
     this.getChatInput().value = '';
   };
 
   _proto.inputPreviewStart = function inputPreviewStart() {
-    this.input.writingPreview = true;
+    this.state.input.writingPreview = true;
 
-    if (!this.input.previewModel) {
-      this.input.previewModel = app.store.createRecord('chatmessages');
-      this.input.previewModel.pushData({
+    if (!this.state.input.previewModel) {
+      this.state.input.previewModel = app.store.createRecord('chatmessages');
+      this.state.input.previewModel.pushData({
         id: 0,
         attributes: {
           message: ' ',
@@ -1501,19 +1493,19 @@ function (_Component) {
   };
 
   _proto.inputPreviewEnd = function inputPreviewEnd() {
-    this.input.writingPreview = false;
+    this.state.input.writingPreview = false;
     m.redraw();
   };
 
   _proto.messageSend = function messageSend(text) {
     if (text.trim().length > 0 && !this.loading) {
-      if (this.input.writingPreview) {
-        this.input.writingPreview = false;
-        this.messagePost(this.input.previewModel);
-        _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].insertChatMessage(Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"])(this.input.previewModel, {}));
+      if (this.state.input.writingPreview) {
+        this.state.input.writingPreview = false;
+        this.messagePost(this.state.input.previewModel);
+        _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].insertChatMessage(Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"])(this.state.input.previewModel, {}));
         this.inputClear();
-      } else if (this.messageEditing) {
-        var editingMsg = this.messageEditing;
+      } else if (this.state.messageEditing) {
+        var editingMsg = this.state.messageEditing;
 
         if (editingMsg.message().trim() !== editingMsg.oldContent.trim()) {
           editingMsg.controlEdit(editingMsg.message());
@@ -1528,25 +1520,25 @@ function (_Component) {
 
   _proto.messageEdit = function messageEdit(model) {
     var chatInput = this.getChatInput();
-    if (this.input.writingPreview) this.inputPreviewEnd();
+    if (this.state.input.writingPreview) this.state.inputPreviewEnd();
     model.is_editing = true;
     model.oldContent = model.message();
-    this.messageEditing = model;
+    this.state.messageEditing = model;
     chatInput.value = model.oldContent;
     chatInput.focus();
-    this.inputProcess();
+    this.state.inputProcess();
     m.redraw();
   };
 
   _proto.messageEditEnd = function messageEditEnd() {
-    var message = this.messageEditing;
+    var message = this.state.messageEditing;
 
     if (message) {
       message.is_editing = false;
       this.inputClear();
       m.redraw();
       _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].renderChatMessage(message, message.oldContent);
-      this.messageEditing = null;
+      this.state.messageEditing = null;
     }
   };
 
@@ -1571,7 +1563,7 @@ function (_Component) {
 
   _proto.messagePost = function messagePost(instance) {
     var self = this;
-    self.loading = true;
+    self.state.loading = true;
     m.redraw();
     return instance.model.save({
       message: instance.message,
@@ -1585,13 +1577,13 @@ function (_Component) {
         }
       });
       self.input.preview.instance = null;
-      self.loading = false;
+      self.state.loading = false;
       instance.flash();
       m.redraw();
     }, function (r) {
       instance.timedOut = true;
-      self.input.preview.instance = null;
-      self.loading = false;
+      self.state.input.preview.instance = null;
+      self.state.loading = false;
       m.redraw();
     });
   };
@@ -1607,30 +1599,13 @@ function (_Component) {
   };
 
   _proto.messagesLoad = function messagesLoad() {
-    if (!this.messagesFetched) {
-      this.apiFetchChatMessages();
-      this.messagesFetched = true;
+    if (!this.state.messagesFetched) {
+      _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].apiFetchChatMessages(this.model);
+      this.state.messagesFetched = true;
     }
 
     this.inputSyncWithPreview();
-    this.getChatWrapper().scrollTop = this.scroll.oldScroll;
-  };
-
-  _proto.apiFetchChatMessages = function apiFetchChatMessages(start_from) {
-    var self = this;
-    self.scroll.loadingFetch = true;
-    m.redraw();
-    app.store.find('chatmessages', {
-      chat_id: self.model.id(),
-      start_from: start_from
-    }).then(function (r) {
-      self.scroll.loadingFetch = false;
-      self.scroll.autoScroll = false;
-      r.map(function (model) {
-        return _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].insertChatMessage(model);
-      });
-      m.redraw();
-    });
+    this.getChatWrapper().scrollTop = this.state.scroll.oldScroll;
   };
 
   _proto.timedRedraw = function timedRedraw(timeout, callback) {
@@ -1651,7 +1626,7 @@ function (_Component) {
     var input = this.getChatInput();
     input.value = input.value + " @" + user.username() + " ";
     input.focus();
-    this.inputProcess();
+    this.state.inputProcess();
   };
 
   return ChatViewport;
@@ -1989,13 +1964,7 @@ function () {
   var _proto = ChatState.prototype;
 
   _proto.init = function init() {
-    var _JSON$parse,
-        _neonchatState$beingS,
-        _neonchatState$beingS2,
-        _neonchatState$isMute,
-        _neonchatState$notify,
-        _neonchatState$transf,
-        _this = this;
+    var _JSON$parse, _neonchatState$beingS, _neonchatState$beingS2, _neonchatState$isMute, _neonchatState$notify, _neonchatState$transf;
 
     this.chats = [];
     this.chatmessages = [];
@@ -2010,7 +1979,8 @@ function () {
       transform: (_neonchatState$transf = neonchatState.transform) != null ? _neonchatState$transf : {
         x: 0,
         y: 400
-      }
+      },
+      isActive: true
     };
     this.permissions = {
       post: app.forum.attribute('pushedx-chat.permissions.chat'),
@@ -2022,12 +1992,6 @@ function () {
       }
     };
     this.viewportState = {};
-    window.addEventListener('blur', function () {
-      return _this.frameState.isActive = false;
-    });
-    window.addEventListener('focus', function () {
-      return _this.frameState.isActive = true;
-    });
     app.pusher.then(this.listenSocketChannels.bind(this));
   };
 
@@ -2078,7 +2042,7 @@ function () {
           var actions = message.data.attributes.actions;
 
           if (actions.msg !== undefined) {
-            if (!app.session.user || message.user().id() != app.session.user.id()) ChatState.evented.trigger('messageEdit', message, actions.msg);
+            if (!app.session.user || message.user().id() != app.session.user.id()) this.evented.trigger('messageEdit', message, actions.msg);
           } else if (actions.hide !== undefined) {
             if (!app.session.user || actions.invoker != app.session.user.id()) actions.hide ? this.messageHide(message) : this.messageRestore(message);
           }
@@ -2111,20 +2075,16 @@ function () {
     return this.permissions;
   };
 
-  _proto.comporatorAscButZerosDesc = function comporatorAscButZerosDesc(a, b) {
-    return a == 0 ? 1 : b == 0 ? -1 : a - b;
-  };
-
   _proto.getChats = function getChats() {
     return this.chats;
   };
 
   _proto.componentsChats = function componentsChats() {
-    var _this2 = this;
+    var _this = this;
 
     return this.getChats().map(function (model) {
       return m("div", {
-        onclick: _this2.onChatChanged.bind(_this2, model)
+        onclick: _this.onChatChanged.bind(_this, model)
       }, m(_components_ChatPreview__WEBPACK_IMPORTED_MODULE_0__["default"], {
         key: model.id(),
         model: model
@@ -2145,26 +2105,48 @@ function () {
     this.evented.trigger('onChatChanged', model);
   };
 
+  _proto.comporatorAscButZerosDesc = function comporatorAscButZerosDesc(a, b) {
+    return a == 0 ? 1 : b == 0 ? -1 : a - b;
+  };
+
   _proto.getChatMessages = function getChatMessages(filter) {
-    var _this3 = this;
+    var _this2 = this;
 
     var list = this.chatmessages.sort(function (a, b) {
-      return _this3.comporatorAscButZerosDesc(a.id(), b.id());
+      return _this2.comporatorAscButZerosDesc(a.id(), b.id());
     });
     return filter ? list.filter(filter) : list;
   };
 
+  _proto.apiFetchChatMessages = function apiFetchChatMessages(model, start_from) {
+    var viewport = this.getViewportState(model);
+    var self = this;
+    viewport.scroll.loadingFetch = true;
+    m.redraw();
+    return app.store.find('chatmessages', {
+      chat_id: model.id(),
+      start_from: start_from
+    }).then(function (r) {
+      viewport.scroll.loadingFetch = false;
+      r.map(function (model) {
+        return self.insertChatMessage(model);
+      });
+      m.redraw();
+    });
+  };
+
   _proto.componentChatMessage = function componentChatMessage(model) {
     return m(_components_ChatMessage__WEBPACK_IMPORTED_MODULE_2__["default"], {
+      key: model.id(),
       model: model
     });
   };
 
   _proto.componentsChatMessages = function componentsChatMessages() {
-    var _this4 = this;
+    var _this3 = this;
 
     return this.getChatMessages().map(function (model) {
-      return _this4.componentChatMessage(model);
+      return _this3.componentChatMessage(model);
     });
   };
 
@@ -2224,6 +2206,16 @@ function () {
     return this.curChat;
   };
 
+  _proto.apiFetchChats = function apiFetchChats() {
+    var self = this;
+    return app.store.find('chats').then(function (chats) {
+      chats.map(function (model) {
+        return self.addChat(model);
+      });
+      m.redraw();
+    });
+  };
+
   _proto.componentCurViewport = function componentCurViewport() {
     var model = this.getCurrentChat();
     return model ? m(_components_ChatViewport__WEBPACK_IMPORTED_MODULE_1__["default"], {
@@ -2248,10 +2240,11 @@ function () {
   _proto.notifySend = function notifySend(model) {
     var avatar = model.user().avatarUrl();
     if (!avatar) avatar = _resources__WEBPACK_IMPORTED_MODULE_5__["base64PlaceholderAvatarImage"];
-    if (this.getFrameState('notify') && !this.getFrameState('isActive')) new Notification(this.chatPreview.attrs.finalTitle, {
+    if (this.getFrameState('notify') && document.hidden) new Notification(model.chat().finalTitle, {
       body: model.user().username() + ": " + model.message(),
       icon: avatar,
-      silent: true
+      silent: true,
+      timestamp: new Date()
     });
   };
 

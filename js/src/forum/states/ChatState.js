@@ -32,7 +32,8 @@ class ChatState
 			beingShownChatsList: neonchatState.beingShownChatsList ?? 0,
 			isMuted: neonchatState.isMuted ?? false,
 			notify: neonchatState.notify ?? false,
-			transform: neonchatState.transform ?? {x: 0, y: 400}
+			transform: neonchatState.transform ?? {x: 0, y: 400},
+			isActive: true
 		}
 		
 		this.permissions =
@@ -48,9 +49,6 @@ class ChatState
 		}
 
 		this.viewportState = {};
-
-		window.addEventListener('blur', (() => this.frameState.isActive = false));
-		window.addEventListener('focus', (() => this.frameState.isActive = true));
 		app.pusher.then(this.listenSocketChannels.bind(this));
 	}
 
@@ -97,7 +95,7 @@ class ChatState
 				if(actions.msg !== undefined)
 				{
 					if(!app.session.user || message.user().id() != app.session.user.id())
-						ChatState.evented.trigger('messageEdit', message, actions.msg)
+						this.evented.trigger('messageEdit', message, actions.msg)
 				}
 				else if(actions.hide !== undefined)
 				{
@@ -135,11 +133,6 @@ class ChatState
 		return this.permissions;
 	}
 
-    comporatorAscButZerosDesc(a, b)
-    {
-        return a == 0 ? 1 : (b == 0 ? -1 : a - b);
-    }
-
 	getChats()
 	{
 		return this.chats;
@@ -171,15 +164,37 @@ class ChatState
 		this.evented.trigger('onChatChanged', model);
 	}
 
+    comporatorAscButZerosDesc(a, b)
+    {
+        return a == 0 ? 1 : (b == 0 ? -1 : a - b);
+    }
+
 	getChatMessages(filter)
 	{
 		let list = this.chatmessages.sort((a, b) => this.comporatorAscButZerosDesc(a.id(), b.id()));
 		return filter ? list.filter(filter) : list;
 	}
 
+	apiFetchChatMessages(model, start_from)
+	{
+		let viewport = this.getViewportState(model);
+		let self = this;
+
+		viewport.scroll.loadingFetch = true;
+		m.redraw();
+		
+        return app.store.find('chatmessages', {chat_id: model.id(), start_from})
+            .then(r => {
+                viewport.scroll.loadingFetch = false;
+
+                r.map(model => self.insertChatMessage(model));
+                m.redraw();
+            });
+	}
+
 	componentChatMessage(model)
 	{
-		return <ChatMessage  model={model} />
+		return <ChatMessage key={model.id()} model={model} />
 	}
 
 	componentsChatMessages()
@@ -247,6 +262,17 @@ class ChatState
 		return this.curChat;
 	}
 
+    apiFetchChats()
+    {
+		let self = this;
+
+        return app.store.find('chats').then((chats) =>
+        {
+            chats.map(model => self.addChat(model));
+            m.redraw();
+        });
+    }
+
 	componentCurViewport()
 	{
 		let model = this.getCurrentChat();
@@ -275,10 +301,15 @@ class ChatState
     notifySend(model)
     {
         let avatar = model.user().avatarUrl();
-        if(!avatar) avatar = resources.base64PlaceholderAvatarImage;
+		if(!avatar) avatar = resources.base64PlaceholderAvatarImage;
 
-        if(this.getFrameState('notify') && !this.getFrameState('isActive'))
-            new Notification(this.chatPreview.attrs.finalTitle, {body: `${model.user().username()}: ${model.message()}`, icon: avatar, silent: true});
+        if(this.getFrameState('notify') && document.hidden)
+            new Notification(model.chat().finalTitle, {
+				body: `${model.user().username()}: ${model.message()}`, 
+				icon: avatar, 
+				silent: true, 
+				timestamp: new Date()
+			});
     }
 
     notifySound(model) 

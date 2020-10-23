@@ -42,6 +42,7 @@ export default class ChatMessage extends Component
 					deleted: !this.isVisible()}
 					)}
 				data-id={this.model.id()} 
+				key={this.model.id()} 
 				onupdate={this.configWrapper.bind(this)}>
 				<div>
 					{this.model.user() ? 

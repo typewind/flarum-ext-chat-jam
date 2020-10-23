@@ -9,36 +9,45 @@ import extractText from 'flarum/utils/extractText';
 import Dropdown from 'flarum/components/Dropdown';
 import Button from 'flarum/components/Button';
 import Separator from 'flarum/components/Separator';
+import Link from 'flarum/components/Link';
+
+import ChatState from '../states/ChatState';
 
 export default class ChatMessage extends Component
 {
-	init()
+	oninit(vnode)
 	{
+		super.oninit(vnode);
+
 		this.labels = [];
-		Object.assign(this, this.props);
+		this.model = this.attrs.model;
 		
 		this.message = this.model.message();
-		this.textFormat();
 		this.initLabels();
 	}
 
-	view()
+	modelEvent(name, ...args)
+	{
+		ChatState.evented.trigger('onClickMessage', name, this.model, args)
+	}
+
+	view(vnode)
 	{
 		return (
 			<div 
 				className={classList({
 					'message-wrapper': true, 
 					hidden: this.model.deleted_by(), 
-					editing: this.is_editing, 
+					editing: this.model.is_editing, 
 					deleted: !this.isVisible()}
 					)}
 				data-id={this.model.id()} 
-				config={this.configWrapper.bind(this)}>
+				onupdate={this.configWrapper.bind(this)}>
 				<div>
 					{this.model.user() ? 
-						<a className='avatar-wrapper' href={app.route.user(this.model.user())} config={m.route}>
+						<Link className='avatar-wrapper' href={app.route.user(this.model.user())}>
 							<span>{avatar(this.model.user(), {className: 'avatar'})}</span>
-						</a>
+						</Link>
 						:
 						<div className='avatar-wrapper'>
 							<span>{avatar(this.model.user(), {className: 'avatar'})}</span>
@@ -46,8 +55,8 @@ export default class ChatMessage extends Component
 					}
 					<div className='message-block'>
 						<div className='toolbar'>
-							<a className='name' onclick={this.chatViewport.insertMention.bind(this.chatViewport, this)}>
-								{username(this.model.user()).children[0] + ': '}
+							<a className='name' onclick={this.modelEvent.bind(this, 'insertMention')}>
+								{extractText(username(this.model.user())) + ': '}
 							</a>
 							<div className='labels'>
 								{this.labels.map(label => label.condition() ? label.component() : null)}
@@ -55,18 +64,16 @@ export default class ChatMessage extends Component
 							<div className='right'>
 								{this.model.id() ? [
 									this.deleted_forever ? null : this.editDropDown(),
-									<a className='timestamp' title={fullTime(this.model.created_at()).children[0]}>{this.humanTime = humanTime(this.model.created_at())}</a>
+									<a className='timestamp' title={extractText(fullTime(this.model.created_at()))}>{this.humanTime = humanTime(this.model.created_at())}</a>
 								] 
-								: this.timedOut ? this.editDropDownTimedOut() : null}
+								: this.model.timedOut ? this.editDropDownTimedOut() : null}
 							</div>
 						</div>
 						<div className='message'>
 							{this.model.is_censored() ?
 								<div className='censored' title={app.translator.trans('pushedx-chat.forum.chat.message.censored')}>
 									{this.message}
-								</div>
-								:
-								<div config={this.configFormat.bind(this)}></div>
+								</div> : <div oncreate={this.configFormat.bind(this)} onupdate={this.configFormat.bind(this)}></div>
 							}
 						</div>
 					</div>
@@ -101,7 +108,7 @@ export default class ChatMessage extends Component
 		);
 
 		this.labelBind(
-			() => this.timedOut, 
+			() => this.model.timedOut, 
 			() => (
 				<div class='icon' style='color: #ff4063'>
 					<i class="fas fa-exclamation-circle"></i>
@@ -126,35 +133,35 @@ export default class ChatMessage extends Component
 				>
 					{this.model.user() && app.session.user && this.model.user().id() == app.session.user.id() ?
 						[<Button 
-							onclick={this.chatViewport.messageEdit.bind(this.chatViewport, this)} 
+							onclick={this.modelEvent.bind(this, 'dropdownEditStart')} 
 							icon='fas fa-pencil-alt'
-							disabled={this.model.deleted_by() || this.chatViewport.messageEditing || !this.chatViewport.permissions.edit}
+							disabled={this.model.deleted_by() || !ChatState.getPermissions().edit}
 						>
 							{app.translator.trans('core.forum.post_controls.edit_button')}
 						</Button>, <Separator />] : <div></div>
 					}
 					{this.model.deleted_by() ?
 						[<Button 
-							onclick={this.controlRestore.bind(this)} 
+							onclick={this.modelEvent.bind(this, 'dropdownRestore')} 
 							icon='fas fa-reply'
 						>
 							{app.translator.trans('core.forum.post_controls.restore_button')}
 						</Button>, <Separator />] : <div></div>
 					}
-					{!this.model.deleted_by() && this.chatViewport.permissions.delete ?
+					{!this.model.deleted_by() && ChatState.getPermissions().delete ?
 						<Button 
-							onclick={this.controlHide.bind(this)} 
+							onclick={this.modelEvent.bind(this, 'dropdownHide')} 
 							icon='fas fa-trash-alt'
-							disabled={!this.chatViewport.permissions.delete}
+							disabled={!ChatState.getPermissions().delete}
 						>
 							{app.translator.trans('core.forum.post_controls.delete_button')}
 						</Button> : <div></div>
 					}
-					{this.model.deleted_by() && this.chatViewport.permissions.moderate.delete ?
+					{this.model.deleted_by() && ChatState.getPermissions().moderate.delete ?
 						<Button 
-							onclick={this.controlDelete.bind(this)} 
+							onclick={this.modelEvent.bind(this, 'dropdownDelete')} 
 							icon='fas fa-trash-alt'
-							disabled={!this.chatViewport.permissions.delete}
+							disabled={!ChatState.getPermissions().delete}
 						>
 							{app.translator.trans('core.forum.post_controls.delete_forever_button')}
 						</Button> : <div></div>
@@ -174,13 +181,13 @@ export default class ChatMessage extends Component
 					icon="fas fa-ellipsis-h"
 				>
 					<Button 
-						onclick={this.delete.bind(this)} 
+						onclick={this.modelEvent.bind(this, 'dropdownDelete')} 
 						icon='fas fa-trash-alt'
 					>
 						{app.translator.trans('pushedx-chat.forum.chat.message.actions.hide')}
 					</Button>
 					<Button 
-						onclick={this.chatViewport.messageResend.bind(this.chatViewport, this)}
+						onclick={this.modelEvent.bind(this, 'dropdownResend')}
 						icon='fas fa-reply'
 					>
 						{app.translator.trans('pushedx-chat.forum.chat.message.actions.resend')}
@@ -190,59 +197,33 @@ export default class ChatMessage extends Component
 		)
 	}
 
-	configWrapper(element)
+	configWrapper(vnode)
 	{
+		let element = vnode.dom;
 		this.elementWrapper = element;
 
-		if(this.needToFlash) 
-		{
-			this.flash();
-			this.needToFlash = false;
-		}
+		if(this.needToFlash) this.needToFlash = false;
 	}
 
-	configFormat(element, isInitialized)
+	configFormat(vnode)
 	{
-		if(element.chatMessage == this.message) return;
+		let element = vnode.dom;
+		if(element.oldContent == this.message) return;
+		element.oldContent = this.message;
 
-		element.chatMessage = this.message;
 		this.element = element;
-		this.textFormat();
-
-		if(this.chatViewport.chatOnResize) this.chatViewport.chatOnResize();
-	}
-
-	textFormat(text)
-	{
-		let self = this;
-		self.message = text ?? self.message;
-		if(self.element) s9e.TextFormatter.preview(self.message, self.element);
-
-		setTimeout(() => {
-			$('.neonchat script').each(function() {
-				if(!self.executedScripts) self.executedScripts = {};
-				let scriptURL = $(this).attr('src');
-				if(!self.executedScripts[scriptURL])
-				{
-					var scriptTag = document.createElement("script");
-					scriptTag.src = scriptURL;
-					document.head.appendChild(scriptTag);
-
-					self.executedScripts[scriptURL] = true;
-				}
-			});
-		}, 10);
+		ChatState.renderChatMessage(element, this.message);
 	}
 
 	isVisible()
 	{
-		if(this.viewportHidden)
+		if(this.model.chat() != ChatState.getCurrentChat())
 			return false;
 
-		if(this.deleted_forever && (!this.chatViewport.permissions.moderate.vision || !this.model.data.attributes.id))
+		if(this.deleted_forever && (!ChatState.getPermissions().moderate.vision || !this.model.id()))
 			return false;
 
-		if(this.model.deleted_by() && (!this.chatViewport.permissions.moderate.vision && (app.session.user && this.model.deleted_by().id() != app.session.user.id())))
+		if(this.model.deleted_by() && (!ChatState.getPermissions().moderate.vision && (app.session.user && this.model.deleted_by().id() != app.session.user.id())))
 			return false;
 
 		return true;
@@ -299,13 +280,7 @@ export default class ChatMessage extends Component
 		this.model.pushAttributes({message: content, edited_at: new Date()});
 		m.redraw();
 
-		this.textFormat();
-	}
-
-	flash()
-	{
-		if(!this.elementWrapper) this.needToFlash = true;
-		else this.flashItem($(this.elementWrapper));
+		ChatState.renderChatMessage(this.model, content);
 	}
 
 	/**

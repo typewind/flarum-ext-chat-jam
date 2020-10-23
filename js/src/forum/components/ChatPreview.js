@@ -1,28 +1,32 @@
 import humanTime from 'flarum/utils/humanTime';
-import fullTime from 'flarum/helpers/fullTime';
 import Component from 'flarum/Component';
 import classList from 'flarum/utils/classList';
+import extractText from 'flarum/utils/extractText';
+
+import ChatState from '../states/ChatState';
 
 export default class ChatPreview extends Component
 {
-	init()
+	oninit(vnode)
 	{
-		this.model = this.props.model;
-		this.attrs = Object.assign(this.model.data.attributes, this.props);
+		super.oninit(vnode);
+		
+		this.model = this.attrs.model;
 
-		this.attrs.textColor = this.pickTextColorBasedOnBgColorSimple(this.attrs.color, '#FFF', '#000');
-		this.attrs.finalTitle = this.attrs.title;
+		this.model.finalTitle = this.model.title();
+		this.model.finalColor = this.model.color()
+		this.model.textColor = this.pickTextColorBasedOnBgColorSimple(this.model.finalColor, '#FFF', '#000');
 
 		let users = this.model.users();
-		if(app.session.user && this.attrs.type == 0 && users.length && users.length < 3)
+		if(app.session.user && this.model.type() == 0 && users.length && users.length < 3)
 		{
 			for(const user of users)
 			{
 				if(user && user.id() != app.session.user.id())
 				{
-					this.attrs.finalTitle = user.displayName();
-					this.attrs.avatarUrl = user.avatarUrl();
-					this.attrs.color = user.color();
+					this.model.finalTitle = user.displayName();
+					this.model.finalColor = user.color();
+					this.model.avatarUrl = user.avatarUrl();
 
 					break;
 				}
@@ -30,10 +34,10 @@ export default class ChatPreview extends Component
 		}
 	}
 
-	view()
+	view(vnode)
 	{
 		return (
-			<div className={'panel-preview ' + (this.attrs.active ? 'active' : '')}>
+			<div className={classList({'panel-preview' : true, 'active': ChatState.getCurrentChat() == this.model})}>
 				{this.componentPreview()}
 			</div>
 		)
@@ -41,21 +45,22 @@ export default class ChatPreview extends Component
 
 	componentMessageTime()
 	{
-		let time = new Date(this.model.last_message().created_at());
+		let lastMessage = this.model.last_message();
+		let time = new Date(lastMessage.created_at());
 		if(Date.now() - time.getTime() < 60 * 60 * 12 * 1000)
 			return time.toLocaleTimeString().slice(0, 5);
 		
-		return humanTime(this.model.last_message().created_at());
+		return humanTime(lastMessage.created_at());
 	}
 
 	componentAvatarPM()
 	{
 		return (
 			<div 
-				className={'avatar ' + (this.attrs.avatarUrl ? 'image' : '')} 
-				style={{'background-color': this.attrs.color, color: this.attrs.textColor, 'background-image': this.attrs.avatarUrl ? `url(${this.attrs.avatarUrl})` : null}}
+				className={'avatar ' + (this.model.avatarUrl ? 'image' : '')} 
+				style={{'background-color': this.model.finalColor, color: this.model.textColor, 'background-image': this.model.avatarUrl ? `url(${this.model.avatarUrl})` : null}}
 			>
-				{this.attrs.avatarUrl ? null : this.firstLetter(this.attrs.finalTitle).toUpperCase()}
+				{this.model.avatarUrl ? null : this.firstLetter(this.model.finalTitle).toUpperCase()}
 			</div>
 		)
 	}
@@ -65,9 +70,9 @@ export default class ChatPreview extends Component
 		return (
 			<div 
 				className='avatar'
-				style={{'background-color': this.attrs.color, color: this.attrs.textColor}}
+				style={{'background-color': this.model.finalColor, color: this.model.textColor}}
 			>
-				{this.attrs.avatarUrl ? null : this.firstLetter(this.attrs.finalTitle).toUpperCase()}
+				{this.model.avatarUrl ? null : this.firstLetter(this.model.finalTitle).toUpperCase()}
 			</div>
 		)
 	}
@@ -75,13 +80,13 @@ export default class ChatPreview extends Component
 	componentPreview()
 	{
 		return ([
-			this.attrs.type ? this.componentAvatarChannel() : this.componentAvatarPM(),
+			this.model.type() ? this.componentAvatarChannel() : this.componentAvatarPM(),
 			<div style="display: flex; flex-direction: column">
-				<div className='title' title={this.attrs.finalTitle}>{this.attrs.finalTitle}</div>
+				<div className='title' title={this.model.finalTitle}>{this.model.finalTitle}</div>
 				{this.model.last_message() ? this.componentTextPreview() : this.componentTextEmpty()}
 			</div>,
 			this.model.last_message() ? 
-				<div className='timestamp' title={fullTime(this.model.last_message().created_at()).children[0]}>{this.humanTime = this.componentMessageTime()}</div>
+				<div className='timestamp' title={extractText(this.model.last_message().created_at())}>{this.humanTime = this.componentMessageTime()}</div>
 				: null
 		])
 	}
@@ -91,15 +96,15 @@ export default class ChatPreview extends Component
 		return ([
 			<div 
 				className='avatar'
-				style={{'background-color': this.attrs.color, color: this.attrs.textColor}}
+				style={{'background-color': this.model.finalColor, color: this.model.textColor}}
 			>
-				{this.attrs.avatarUrl ? null : this.firstLetter(this.attrs.finalTitle).toUpperCase()}
+				{this.model.avatarUrl ? null : this.firstLetter(this.model.finalTitle).toUpperCase()}
 			</div>,
 			<div style="display: flex; flex-direction: column">
-				<div className='title' title={this.attrs.finalTitle}>{this.attrs.finalTitle}</div>
+				<div className='title' title={this.model.finalTitle}>{this.model.finalTitle}</div>
 				{this.componentTextPreview()}
 			</div>,
-			<div className='timestamp' title={fullTime(this.model.last_message().created_at()).children[0]}>{this.humanTime = this.componentMessageTime()}</div>
+			<div className='timestamp' title={extractText(this.model.last_message().created_at())}>{this.humanTime = this.componentMessageTime()}</div>
 		])
 	}
 
@@ -127,7 +132,7 @@ export default class ChatPreview extends Component
 		if(app.session.user)
 		{
 			if(app.session.user.id() == sender.id()) senderName = 'You: '
-			else if(users.length > 2 || this.attrs.type) 
+			else if(users.length > 2 || this.model.type()) 
 				senderName = sender.displayName() + ': ';
 		}
 

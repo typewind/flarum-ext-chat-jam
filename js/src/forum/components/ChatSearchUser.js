@@ -16,7 +16,7 @@ export default class ChatSearchUser extends Search
 		return items;
 	}
 
-	view() 
+	view(vnode) 
 	{
 		const currentSearch = this.getCurrentSearch();
 	

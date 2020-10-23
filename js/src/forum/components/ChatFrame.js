@@ -3,36 +3,23 @@ import ChatPreview from './ChatPreview';
 import ChatViewport from './ChatViewport';
 import ChatCreateModal from './ChatCreateModal';
 
+import ChatState from '../states/ChatState';
+
 export default class ChatFrame extends Component
 {
-    init()
+    oninit(vnode)
     {
-        let beingShown = localStorage.getItem('chat_beingShown');
-        let beingShownChatsList = localStorage.getItem('chat_beingShownChatsList');
-        let isMuted = localStorage.getItem('chat_isMuted');
-        let notify = localStorage.getItem('chat_notify');
-        let transform = localStorage.getItem('chat_transform');
+        super.oninit(vnode);
 
-        this.beingShown = beingShown === null ? !app.forum.attribute('pushedx-chat.settings.display.minimize') : JSON.parse(beingShown);
-        this.beingShownChatsList = beingShownChatsList === null ? 0 : JSON.parse(beingShownChatsList);
-        this.isMuted = isMuted === null ? false : JSON.parse(isMuted);
-        this.notify = notify === null ? false : JSON.parse(notify);
-        this.transform = transform === null ? {x: 0, y: 400} : JSON.parse(transform);
-        this.chats = {components: [], instances: {}};
-        this.messagesStorage = [];
-
-        if(this.notify) Notification.requestPermission();
-
+        if(('Notification' in window) && ChatState.getFrameState('notify')) Notification.requestPermission();
 		setInterval(() => m.redraw(), 30000);
 
         document.addEventListener('mousedown', this.chatMoveListener.bind(this, 'mousedown'));
         document.addEventListener('mouseup', this.chatMoveListener.bind(this, 'mouseup'));
-        window.addEventListener('blur', (() => this.active = false));
-        window.addEventListener('focus', (() => this.active = true));
 
         if(!app.pusher)
         {
-            alert("Please enable Pusher/WebSocket to use Neon Chat!");
+            alert('Please enable Pusher/WebSocket to use Neon Chat!');
             return;
         }
         this.apiFetchChats();
@@ -87,8 +74,8 @@ export default class ChatFrame extends Component
         else chat.classList.add('hidden')
 
         chat.className = classes;
-        this.beingShown = showing;
-        localStorage.setItem('chat_beingShown', JSON.stringify(showing));
+
+        ChatState.saveFrameState('beingShown', showing);
     }
 
     toggleChatsList(e)
@@ -103,14 +90,12 @@ export default class ChatFrame extends Component
         }
         else chatLists.classList.add('toggled')
 
-        this.beingShownChatsList = showing;
-        localStorage.setItem('chat_beingShownChatsList', JSON.stringify(showing));
+        ChatState.saveFrameState('beingShownChatsList', showing); 
     }
 
     toggleSound(e)
     {
-        this.isMuted = !this.isMuted;
-        localStorage.setItem('chat_isMuted', JSON.stringify(this.isMuted));
+        ChatState.saveFrameState('isMuted', !ChatState.getFrameState('isMuted')); 
 
         e.preventDefault();
         e.stopPropagation();
@@ -118,67 +103,59 @@ export default class ChatFrame extends Component
 
     toggleNotifications(e)
     {
-        this.notify = !this.notify;
-        localStorage.setItem('chat_notify', JSON.stringify(this.notify));
-
-        if(this.notify) Notification.requestPermission();
+        ChatState.saveFrameState('notify', !ChatState.getFrameState('notify'));
+        if(('Notification' in window) && ChatState.getFrameState('notify')) Notification.requestPermission();
 
         e.preventDefault();
         e.stopPropagation();
     }
 
-    /**
-     * Show the actual Chat Frame.
-     *
-     * @returns {*}
-     */
-    view() 
+    view(vnode)
     {
         return (
-            <div className={'neonchat left container ' + (this.beingShown ? '' : 'hidden')} style={{right: this.transform.x + 'px'}}>
+            <div className={'neonchat left container ' + (ChatState.getFrameState('beingShown') ? '' : 'hidden')} style={{right: ChatState.getFrameState('transform').x + 'px'}}>
                 <div tabindex='0' className='frame' id='chat'>
-                    <div id='chats-list' className={(this.beingShownChatsList ? 'toggled' : '')}>
+                    <div id='chats-list' className={(ChatState.getFrameState('beingShownChatsList') ? 'toggled' : '')}>
                         <div className='header'>
                             <div className='input-wrapper'>
                                 <textarea
-                                    type = 'text'
                                     id = 'chat-find'
                                     placeholder = {app.translator.trans('pushedx-chat.forum.chat.list.placeholder')}
                                 />
                             </div>
-                            <p data-title={app.translator.trans('pushedx-chat.forum.chat.list.' + (this.beingShownChatsList ? 'unpin' : 'pin'))}>
+                            <p data-title={app.translator.trans('pushedx-chat.forum.chat.list.' + (ChatState.getFrameState('beingShownChatsList') ? 'unpin' : 'pin'))}>
                                 <div className='icon icon-toggle' onclick={this.toggleChatsList.bind(this)}>
                                     <i className="fas fa-paperclip"></i>
                                 </div>
                             </p>
                         </div>
-                        <div className='list' style={{'max-height': this.transform.y + 'px'}}>
-                            {this.chats.components}
-                            {app.session.user ? <div class="panel-add" onclick={() => app.modal.show(new ChatCreateModal)}></div> : null}
+                        <div className='list' style={{'max-height': ChatState.getFrameState('transform').y + 'px'}}>
+                            {ChatState.componentsChats()}
+                            {app.session.user ? <div class="panel-add" onclick={() => app.modal.show(ChatCreateModal)}></div> : null}
                         </div>
                     </div>
 
                     <div id='chat-panel'>
                         <div id='chat-header' ondragstart={() => false}>
-                            <h2>{this.viewportChat ? this.viewportChat.attrs.finalTitle : app.translator.trans('pushedx-chat.forum.toolbar.title')}</h2>
-                            <p data-title={app.translator.trans(this.beingShown ? 'pushedx-chat.forum.toolbar.minimize' : 'pushedx-chat.forum.toolbar.maximize')}>
+                            <h2>{ChatState.getCurrentChat() ? ChatState.getCurrentChat().finalTitle : app.translator.trans('pushedx-chat.forum.toolbar.title')}</h2>
+                            <p data-title={app.translator.trans(ChatState.getFrameState('beingShown') ? 'pushedx-chat.forum.toolbar.minimize' : 'pushedx-chat.forum.toolbar.maximize')}>
                                 <div className='icon' onclick={this.toggleChat.bind(this)}>
-                                    <i className={this.beingShown ? 'fas fa-window-minimize' : 'fas fa-window-maximize'}></i>
+                                    <i className={ChatState.getFrameState('beingShown') ? 'fas fa-window-minimize' : 'fas fa-window-maximize'}></i>
                                 </div>
                             </p>   
-                            <p data-title={app.translator.trans(this.notify ? 'pushedx-chat.forum.toolbar.disable_notifications' : 'pushedx-chat.forum.toolbar.enable_notifications')}>
+                            <p data-title={app.translator.trans(ChatState.getFrameState('notify') ? 'pushedx-chat.forum.toolbar.disable_notifications' : 'pushedx-chat.forum.toolbar.enable_notifications')}>
                                 <div className='icon' onclick={this.toggleNotifications.bind(this)}>
-                                    <i className={this.notify ? 'fas fa-bell' : 'fas fa-bell-slash'}></i>
+                                    <i className={ChatState.getFrameState('notify') ? 'fas fa-bell' : 'fas fa-bell-slash'}></i>
                                 </div>
                             </p>   
-                            <p data-title={app.translator.trans(this.isMuted ? 'pushedx-chat.forum.toolbar.enable_sounds' : 'pushedx-chat.forum.toolbar.disable_sounds')}>
+                            <p data-title={app.translator.trans(ChatState.getFrameState('isMuted')? 'pushedx-chat.forum.toolbar.enable_sounds' : 'pushedx-chat.forum.toolbar.disable_sounds')}>
                                 <div className='icon' onclick={this.toggleSound.bind(this)}>
-                                    <i className={this.isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up'}></i>
+                                    <i className={ChatState.getFrameState('isMuted') ? 'fas fa-volume-mute' : 'fas fa-volume-up'}></i>
                                 </div>
                             </p>
                         </div>
                         <div id='chat-viewport'>
-                            {this.viewportChat ? this.viewportChat.viewport.component : <ChatViewport chatFrame={this}/>}
+                            {ChatState.componentCurViewport() ?? <ChatViewport />}
                         </div>
                     </div>
                 </div>
@@ -228,8 +205,7 @@ export default class ChatFrame extends Component
         document.removeEventListener('mousemove', this.mouseMoveEvent);
         document.body.classList.remove('moving');
 
-        this.transform = {x: parseInt(this.getChat().style.right), y: this.getChatWrapper().offsetHeight};
-        localStorage.setItem('chat_transform', JSON.stringify(this.transform));
+        ChatState.saveFrameState('transform', {x: parseInt(this.getChat().style.right), y: this.getChatWrapper().offsetHeight})
     }
 
     chatMoveProcess(e)
@@ -255,63 +231,13 @@ export default class ChatFrame extends Component
         this.moveLast = {x: e.clientX, y: e.clientY};
     }
 
-    onChatChanged(instance)
-    {
-        if(this.viewportChat == instance) 
-        {
-            m.redraw.strategy('none');
-            return;
-        }
-        
-        if(this.viewportChat) 
-        {
-            this.viewportChat.attrs.active = false;
-            this.viewportChat.viewport.instance.messagesUnload();
-        }
-        this.viewportChat = instance;
-        this.viewportChat.attrs.active = true;
-        this.viewportChat.viewport.instance.messagesLoad();
-
-        m.redraw.strategy('none');
-    }
-
     apiFetchChats()
     {
-        let self = this;
-
         app.store.find('chats').then((chats) =>
         {
-            let fetchedChats = chats.map((chat) => self.createChat(chat));
-            self.chats.components = fetchedChats.concat(self.chats.components);
+            chats.map(model => ChatState.addChat(model));
 
             m.redraw();
         });
-    }
-
-    createChat(model)
-    {
-        let chat = new ChatPreview({
-            model: model,
-        });
-
-        let chatViewport = new ChatViewport({
-            chatFrame: this,
-            model: model,
-            messagesStorage: this.messagesStorage,
-            chatPreview: chat
-        });
-
-        let chatComponent = m.component(chat);
-        chat.component = chatComponent;
-
-        let chatViewportComponent = m.component(chatViewport)
-        chatViewport.component = chatViewportComponent;
-        chat.viewport = {component: chatViewportComponent, instance: chatViewport};
-
-        return (
-            <div onclick={this.onChatChanged.bind(this, chat)}>
-                {chatComponent}
-            </div>
-        )
     }
 }

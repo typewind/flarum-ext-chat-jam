@@ -6,8 +6,10 @@ import ChatSearchUser from './ChatSearchUser';
 
 export default class ChatCreateModal extends Modal
 {
-	init()
+	oninit(vnode)
 	{
+		super.oninit(vnode);
+		
 		this.selectedUsers = [];
 		this.input = {title: m.prop('')};
 		this.isChannel = false;

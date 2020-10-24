@@ -3,6 +3,7 @@ import Button from 'flarum/components/Button';
 import classList from 'flarum/utils/classList';
 
 import ChatSearchUser from './ChatSearchUser';
+import Stream from 'flarum/utils/Stream';
 
 export default class ChatCreateModal extends Modal
 {
@@ -11,7 +12,7 @@ export default class ChatCreateModal extends Modal
 		super.oninit(vnode);
 		
 		this.selectedUsers = [];
-		this.input = {title: m.prop('')};
+		this.input = {title: Stream('')};
 		this.isChannel = false;
 
 		app.search.neonchat = {modalInited: true};
@@ -76,7 +77,7 @@ export default class ChatCreateModal extends Modal
 				{this.selectedUsers.map(u => <div className='UserMention'>{'@' + u.displayName()}</div>)}
 			</div>,
 			<div className="UsersSearch">
-				<ChatSearchUser store={app.search.neonchat} callback={this.userSelected.bind(this)}/>
+				<ChatSearchUser state={app.search} callback={this.userSelected.bind(this)}/>
 			</div>,    
 			<Button 
 				className='Button Button--primary Button--block ButtonCreate'

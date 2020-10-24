@@ -24,6 +24,7 @@ class ChatState
 
 		this.curChat = null;
 		this.evented = evented;
+		this.totalHiddenCount = 0;
 
 		let neonchatState = JSON.parse(localStorage.getItem('neonchat')) ?? {};
 		this.frameState = 
@@ -50,6 +51,8 @@ class ChatState
 
 		this.viewportState = {};
 		app.pusher.then(this.listenSocketChannels.bind(this));
+
+		this.evented.on('onClickMessage', this.onChatMessageClicked.bind(this))
 	}
 
 	initViewportState()
@@ -95,19 +98,19 @@ class ChatState
 				if(actions.msg !== undefined)
 				{
 					if(!app.session.user || message.user().id() != app.session.user.id())
-						this.evented.trigger('messageEdit', message, actions.msg)
+						this.editChatMessage(message, false, actions.msg);
 				}
 				else if(actions.hide !== undefined)
 				{
 					if(!app.session.user || actions.invoker != app.session.user.id())
-						actions.hide ? this.messageHide(message) : this.messageRestore(message);
+						actions.hide ? this.hideChatMessage(message, false, message.deleted_by()) : this.restoreChatMessage(message, false)
 				}
 				break;
 			}
 			case 'message.delete':
 			{
-				if(!app.session.user || message.user().id() != app.session.user.id())
-					this.messageDelete(message)
+				if(!app.session.user || message.deleted_by().id() != app.session.user.id())
+					this.deleteChatMessage(message, false, message.deleted_by())
 
 				break;
 			}
@@ -212,17 +215,21 @@ class ChatState
 		if(this.isChatMessageExists(model)) return null;
 		
 		this.chatmessages.push(model);
-		if(notify) this.messageNotify(model);
+		if(notify) 
+		{
+			this.messageNotify(model);
+			model.needToFlash = true;
+		}
 
-		let list = this.getChatMessages();
-		if(list[list.length - 1] == model)
+		let list = this.getChatMessages(mdl => mdl.chat() == model.chat());
+		if(model.id() && list[list.length - 1] == model)
 			model.chat().pushData({relationships: {last_message: model}})
 	}
 
 	renderChatMessage(model, content)
 	{
 		let element = model instanceof Model ?
-			document.querySelector(`.neonchat .message[data-id=${model.data.attributes.id}]`)
+			document.querySelector(`.neonchat .message-wrapper[data-id="${model.id()}"] .message`)
 			: model
 
 		if(element)
@@ -246,9 +253,97 @@ class ChatState
 		}
 	}
 
-	flashChatMessage(model)
+	onChatMessageClicked(eventName, model)
 	{
-		model.needFlash = true;
+		switch(eventName)
+		{
+			case 'dropdownHide':
+			{
+				this.hideChatMessage(model, true);
+				break;
+			}
+			case 'dropdownRestore':
+			{
+				this.restoreChatMessage(model, true);
+				break;
+			}
+			case 'dropdownDelete':
+			{
+				this.deleteChatMessage(model, true);
+				break;
+			}
+		}
+	}
+
+	postChatMessage(model)
+	{
+		return model.save({message: model.content, created_at: new Date(), chat_id: model.chat().id()})
+        .then(
+            r => {
+				model.timedOut = false;
+				model.needToFlash = true;
+				model.is_editing = false;
+				model.chat().pushData({relationships: {last_message: model}});
+            },
+            r => {
+                model.timedOut = true;
+            }
+        );
+	}
+
+	editChatMessage(model, sync = false, content)
+	{
+		model.content = content;
+		model.needToFlash = true;
+		model.pushAttributes({message: content, edited_at: new Date()});
+		if(sync) model.save({actions: {msg: content}, edited_at: new Date(), message: content});
+
+		m.redraw();
+	}
+
+	deleteChatMessage(model, sync = false, user = app.session.user)
+	{
+		model.deleted_forever = true;
+		if(!model.deleted_by()) model.pushData({relationships: {deleted_by: user}});
+		let list = this.getChatMessages(mdl => mdl.chat() == model.chat() && mdl != model);
+		if(list.length) 
+			model.chat().pushData({relationships: {last_message: list[list.length - 1]}})
+
+		if(sync) model.delete();
+
+		m.redraw();
+	}
+
+	totalHidden()
+	{
+		return this.totalHiddenCount
+	}
+
+	hideChatMessage(model, sync = false, user = app.session.user)
+	{
+		model.pushData({relationships: {deleted_by: user}});
+		if(sync) model.save({actions: {hide: true}, relationships: {deleted_by: app.session.user}});
+
+		this.totalHiddenCount++;
+		m.redraw();
+	}
+
+	restoreChatMessage(model, sync = false)
+	{
+		console.log('restoring ', model);
+		if(!this.isChatMessageExists(model))
+		{
+			this.insertChatMessage(model);
+			model.needToFlash = true;
+		}
+		else
+		{
+			model.pushAttributes({deleted_by: 0});
+			model.needToFlash = true;
+			delete model.data.relationships.deleted_by;
+		}
+		if(sync) model.save({actions: {hide: false}, deleted_by: 0});
+
 		m.redraw();
 	}
 

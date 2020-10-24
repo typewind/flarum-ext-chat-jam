@@ -7,30 +7,34 @@ import UsersSearchSource from './UsersSearchResults';
 
 export default class ChatSearchUser extends Search
 {
+	oninit(vnode) 
+	{
+		super.oninit(vnode);
+	}
+
 	sourceItems() 
 	{
 		const items = new ItemList();
-		this.store = this.props.store ?? {};
-		if (app.forum.attribute('canViewUserList')) items.add('users', new UsersSearchSource({callback: this.props.callback, store: this.store}));
+		this.state = this.attrs.state ?? {};
+		if (app.forum.attribute('canViewUserList')) items.add('users', new UsersSearchSource({callback: this.attrs.callback, store: this.state}));
 	
 		return items;
 	}
 
 	view(vnode) 
 	{
-		const currentSearch = this.getCurrentSearch();
+		const currentSearch = this.state.getInitialSearch();
 	
-		if (!this.value().length) {
-			this.value(currentSearch || '');
+		if (!this.state.getValue().length) {
+			this.state.setValue(currentSearch || '');
 		}
 
-		app.current.searching = () => this.value();
+		app.current.searching = () => this.state.getValue();
 	
 		if (!this.sources) {
 			this.sources = this.sourceItems().toArray();
 		}
 	
-		// Hide the search view if no sources were loaded
 		if (!this.sources.length) return <div></div>;
 	
 		return (
@@ -43,19 +47,19 @@ export default class ChatSearchUser extends Search
 					<input className="FormControl"
 						type="search"
 						placeholder={app.translator.trans('pushedx-chat.forum.chat.list.add_modal.search.placeholder')}
-						value={this.value()}
-						oninput={m.withAttr('value', this.value)}
+						value={this.state.getValue()}
+						oninput={e => this.state.setValue(e.target.value)}
 						onfocus={() => this.hasFocus = true}
 					/>
 					{this.loadingSources
-					? LoadingIndicator.component({size: 'tiny', className: 'Button Button--icon Button--link'})
+					? <LoadingIndicator size='tiny' className='Button Button--icon Button--link' />
 					: currentSearch
 					? <button className="Search-clear Button Button--icon Button--link" onclick={this.clear.bind(this)}>{icon('fas fa-times-circle')}</button>
 					: ''}
 				</div>
-				{this.value() && this.hasFocus ?
+				{this.state.getValue() && this.hasFocus ?
 					<ul className="Dropdown-menu Dropdown--Users">
-						{this.sources.map(source => source.view(this.value()))}
+						{this.sources.map(source => source.view(this.state.getValue()))}
 					</ul> 
 				: null}
 			</div>

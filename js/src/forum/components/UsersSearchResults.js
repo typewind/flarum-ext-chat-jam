@@ -81,7 +81,7 @@ export default class UsersSearchResults {
 			resultsFind.map((user) => {
 				const name = username(user);
 				const id = user.id();
-				name.children[0] = highlight(name.children[0], query);
+				const children = [highlight(name.text, query)];
 
 				return (
 				<li 
@@ -91,7 +91,7 @@ export default class UsersSearchResults {
 				>
 					<span class={(this.usersSelected[id] ? 'selected' : null)}>
 						{avatar(user)}
-						{name}
+						{{ ...name, text: undefined, children }}
 					</span>
 				</li>
 				);
@@ -101,7 +101,7 @@ export default class UsersSearchResults {
 				: null,
 			resultsSelected.map((user) => {
 				const name = username(user);
-				name.children[0] = highlight(name.children[0], query);
+				const children = [highlight(name.text, query)];
 
 				return (
 					<li 
@@ -111,7 +111,7 @@ export default class UsersSearchResults {
 					>
 						<span class='selected'>
 							{avatar(user)}
-							{name}
+							{{ ...name, text: undefined, children }}
 						</span>
 					</li>
 				)

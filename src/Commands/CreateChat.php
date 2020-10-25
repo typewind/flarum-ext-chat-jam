@@ -29,10 +29,12 @@ class CreateChat
     /**
      * @param User			$actor
 	 * @param array			$data
+     * @param string        $ip_address
      */
-    public function __construct(User $actor, $data)
+    public function __construct(User $actor, $data, $ip_address)
     {
         $this->actor = $actor;
         $this->data = $data;
+        $this->ip_address = $ip_address;
     }
 }

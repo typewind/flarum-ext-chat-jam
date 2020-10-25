@@ -4,17 +4,20 @@ import highlight from 'flarum/helpers/highlight';
 
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
 
-export default class UsersSearchResults {
-	constructor(props) {
+export default class UsersSearchResults 
+{
+	constructor(props) 
+	{
 		this.results = {};
 		this.props = props;
 		this.searching = false;
 
-		if(!props.store.usersSelected) props.store.usersSelected = [];
-		this.usersSelected = props.store.usersSelected;
+		if(!props.state.usersSelected) props.state.usersSelected = [];
+		this.usersSelected = props.state.usersSelected;
 	}
 
-	search(query) {
+	search(query) 
+	{
 		this.searching = true;
 
 		return app.store
@@ -52,7 +55,8 @@ export default class UsersSearchResults {
 		}
 	}
 
-	view(query) {
+	view(query) 
+	{
 		query = query.toLowerCase();
 		let localUserId;
 		if(app.session.user) localUserId = app.session.user.id();

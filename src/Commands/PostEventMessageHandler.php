@@ -15,12 +15,13 @@ use Xelson\Chat\MessageValidator;
 use Xelson\Chat\MessageFloodgate;
 use Flarum\User\AssertPermissionTrait;
 
-class PostNotifyHandler
+class PostEventMessageHandler
 {
     /**
      * @param ChatRepository        $chats
      */
-    public function __construct(ChatRepository $chats) {
+    public function __construct(ChatRepository $chats) 
+    {
         $this->chats = $chats;
     }
 
@@ -30,14 +31,12 @@ class PostNotifyHandler
      * @param PostMessage $command
      * @return null|string
      */
-    public function handle(PostNotify $command)
+    public function handle(PostEventMessage $command)
     {
         $actor = $command->actor;
-        $attributes = $command->data['attributes'];
+        $chat_id = $command->chat_id;
+        $content = $command->content;
         $ip_address = $command->ip_address;
-
-        $content = $attributes['message'];
-        $chat_id = $attributes['chat_id'];
 
         $chat = $this->chats->findOrFail($chat_id, $actor);
 

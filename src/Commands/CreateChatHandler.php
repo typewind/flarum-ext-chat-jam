@@ -8,13 +8,17 @@
 
 namespace Xelson\Chat\Commands;
 
+use Carbon\Carbon;
 use Flarum\User\AssertPermissionTrait;
 use Flarum\User\User;
 use Illuminate\Support\Arr;
-use Xelson\Chat\ChatRepository;
-use Xelson\Chat\ChatUser;
 use Xelson\Chat\Chat;
+use Xelson\Chat\ChatUser;
+use Xelson\Chat\ChatValidator;
+use Xelson\Chat\ChatRepository;
+use Xelson\Chat\Commands\PostEventMessage;
 use Xelson\Chat\Exceptions\ChatEditException;
+use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
 
 class CreateChatHandler
 {
@@ -24,10 +28,11 @@ class CreateChatHandler
      * @param ChatRepository $chats
      * @param ChatSocket $socket
      */
-	public function __construct(ChatRepository $chats, ChatSocket $socket) 
+	public function __construct(ChatValidator $validator, ChatRepository $chats, BusDispatcher $bus) 
 	{
+        $this->validator = $validator;
         $this->chats  = $chats;
-        $this->socket = $socket;
+        $this->bus = $bus;
 	}
 	
     /**
@@ -42,6 +47,7 @@ class CreateChatHandler
         $data = $command->data;
         $users = Arr::get($data, 'relationships.users.data', []);
         $attributes = Arr::get($data, 'attributes', []);
+        $ip_address = $command->ip_address;
 
         $isChannel = $attributes['isChannel'];
 
@@ -57,12 +63,16 @@ class CreateChatHandler
         }
         array_push($users, ['id' => $actor->id, 'type' => 'users']);
 
-        if(count($users) < 2)
+        if(!$isChannel && count($users) < 2)
             throw new ChatEditException;
 
         if(count($users) == 2)
         {
-            $chats = $this->chats->query()->where('type', 0)->whereIn('id', ChatUser::select('chat_id')->where('user_id', $actor->id)->get()->toArray())->with('users')->get();
+            $chats = $this->chats->query()
+                ->where('type', 0)
+                ->whereIn('id', ChatUser::select('chat_id')->where('user_id', $actor->id)->get()->toArray())
+                ->with('users')
+                ->get();
 
             foreach($chats as $chat)
             {
@@ -72,19 +82,41 @@ class CreateChatHandler
                     throw new ChatEditException;
             }
         }
-        else
-        {
 
+        $color = sprintf('#%06X', mt_rand(0xFF9999, 0xFFFF00));
 
+        $chat = Chat::build(
+            $attributes['title'],
+            $color,
+            $isChannel,
+            $actor->id,
+            Carbon::now()
+        );
+
+        $this->validator->assertValid($chat->getDirty());
+        $chat->save();
+
+        $user_ids = [];
+        foreach($users as $user) if($user['id'] != $actor->id) $user_ids[] = $user['id'];
+
+        try {
+            $chat->users()->sync(array_merge($user_ids, [$actor->id]));
+        } catch (Exception $e) {
+            $chat->delete();
+
+            throw $e;
         }
 
-		// Личный чат между двумя пользователями не существует (валидация на фронте тоже должна быть)
+        $eventContent = json_encode(['id' => 'chatCreated', 'users' => $user_ids]);
+        $eventMessage = $this->bus->dispatch(new PostEventMessage($chat->id, $actor, $eventContent, $ip_address));
+        
 		// Хендлим список айдишников пользователей для добавления в чат. В конце чат должен быть создан и данные
 		// отосланы по сокету. Но сообщение сокета может прийти раньше чем http ответ (надо учесть)
 		// Пользователь должен иметь возможность запретить приглашать себя куда либо
-		// По-хорошему код на изменение чата (тайтл, участники) должен быть переиспользован, т.к у нас еще будет команда EditChat
-		// Необходимо ввести тип сообщений для служебных уведомлений об событиях (создание чата, добавление юзеров) 
+        // По-хорошему код на изменение чата (тайтл, участники) должен быть переиспользован, т.к у нас еще будет команда EditChat
+        // DeleteChat тоже не стоит забывать
+        // Сделать абстракцию EventMessage для постинга разных типов уведомлений
 
-        return null;
+        return $chat;
     }
 }

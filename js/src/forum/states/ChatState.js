@@ -1,6 +1,7 @@
 import ChatPreview from '../components/ChatPreview';
 import ChatViewport from '../components/ChatViewport';
 import ChatMessage from '../components/ChatMessage';
+import ChatEventMessage from '../components/ChatEventMessage';
 
 import Model from 'flarum/Model';
 import evented from 'flarum/utils/evented';
@@ -58,7 +59,7 @@ class ChatState
 	initViewportState()
 	{
 		return {
-			loading: false,
+			loadingSend: false,
 			scroll: {autoScroll: true, oldScroll: 0, loadingFetch: false, needToScroll: true},
 			input: {messageLength: 0, rows: 1, content: ''},
 			messagesFetched: false,
@@ -156,6 +157,14 @@ class ChatState
 		this.viewportState[model.id()] = this.initViewportState();
 	}
 
+	isExistsPMChat(user1, user2)
+	{
+		return this.getChats().some(model => {
+			let users = model.users();
+			return users.length == 2 && users.some(model => model == user1) && users.some(model => model == user2)
+		});
+	}
+
 	onChatChanged(model, e)
 	{
 		e.redraw = false;
@@ -197,7 +206,7 @@ class ChatState
 
 	componentChatMessage(model)
 	{
-		return <ChatMessage key={model.id()} model={model} />
+		return model.type() ? <ChatEventMessage key={model.id()} model={model} /> : <ChatMessage key={model.id()} model={model} />
 	}
 
 	componentsChatMessages()
@@ -210,6 +219,12 @@ class ChatState
 		return this.chatmessages.find(e => e.id() == model.id());
 	}
 
+	insertEventChatMessage(model, data, notify = false)
+	{
+		model.pushAttributes({message: JSON.stringify(data)});
+		insertChatMessage(model, notify);
+	}
+
 	insertChatMessage(model, notify = false)
 	{
 		if(this.isChatMessageExists(model)) return null;
@@ -218,7 +233,7 @@ class ChatState
 		if(notify) 
 		{
 			this.messageNotify(model);
-			model.needToFlash = true;
+			model.isNeedToFlash = true;
 		}
 
 		let list = this.getChatMessages(mdl => mdl.chat() == model.chat());
@@ -280,13 +295,13 @@ class ChatState
 		return model.save({message: model.content, created_at: new Date(), chat_id: model.chat().id()})
         .then(
             r => {
-				model.timedOut = false;
-				model.needToFlash = true;
-				model.is_editing = false;
+				model.isTimedOut = false;
+				model.isNeedToFlash = true;
+				model.isEditing = false;
 				model.chat().pushData({relationships: {last_message: model}});
             },
             r => {
-                model.timedOut = true;
+                model.isTimedOut = true;
             }
         );
 	}
@@ -294,7 +309,7 @@ class ChatState
 	editChatMessage(model, sync = false, content)
 	{
 		model.content = content;
-		model.needToFlash = true;
+		model.isNeedToFlash = true;
 		model.pushAttributes({message: content, edited_at: new Date()});
 		if(sync) model.save({actions: {msg: content}, edited_at: new Date(), message: content});
 
@@ -303,12 +318,13 @@ class ChatState
 
 	deleteChatMessage(model, sync = false, user = app.session.user)
 	{
-		model.deleted_forever = true;
+		model.isDeletedForever = true;
 		if(!model.deleted_by()) model.pushData({relationships: {deleted_by: user}});
-		let list = this.getChatMessages(mdl => mdl.chat() == model.chat() && mdl != model);
+		let list = this.getChatMessages(mdl => mdl.chat() == model.chat() && !mdl.isDeletedForever);
 		if(list.length) 
 			model.chat().pushData({relationships: {last_message: list[list.length - 1]}})
 
+		this.chatmessages = this.chatmessages.filter(mdl => mdl != model);
 		if(sync) model.delete();
 
 		m.redraw();
@@ -330,16 +346,15 @@ class ChatState
 
 	restoreChatMessage(model, sync = false)
 	{
-		console.log('restoring ', model);
 		if(!this.isChatMessageExists(model))
 		{
 			this.insertChatMessage(model);
-			model.needToFlash = true;
+			model.isNeedToFlash = true;
 		}
 		else
 		{
 			model.pushAttributes({deleted_by: 0});
-			model.needToFlash = true;
+			model.isNeedToFlash = true;
 			delete model.data.relationships.deleted_by;
 		}
 		if(sync) model.save({actions: {hide: false}, deleted_by: 0});

@@ -16,7 +16,7 @@ export default class ChatSearchUser extends Search
 	{
 		const items = new ItemList();
 		this.state = this.attrs.state ?? {};
-		if (app.forum.attribute('canViewUserList')) items.add('users', new UsersSearchSource({callback: this.attrs.callback, store: this.state}));
+		if (app.forum.attribute('canViewUserList')) items.add('users', new UsersSearchSource({callback: this.attrs.callback, state: app.search.neonchat}));
 	
 		return items;
 	}

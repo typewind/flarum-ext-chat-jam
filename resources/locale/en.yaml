@@ -21,6 +21,8 @@ pushedx-chat:
           channel: Channel
           create.chat: Create a new chat
           create.channel: Create a new channel
+          alerts:
+            exists: You can't create another PM with this user!
           form:
             title.chat: Chat name
             title.channel: Channel name
@@ -39,6 +41,12 @@ pushedx-chat:
         censored: Log in to see this message!
         deleted: deleted by 
         deleted_forever: deleted forever by
+        type:
+          url: URL
+          event: Event
+          code: <Code />
+        events:
+          chat.created: "{creatorname} created {chatname} and invited {usernames}"
     errors:
       unauthenticated: Only registered users can use the chat
       chatdenied: Your user group is not allowed to write messages

@@ -31,7 +31,7 @@ class CreateChatController extends AbstractCreateController
     /**
      * {@inheritdoc}
      */
-    public $include = ['creator', 'users'];
+    public $include = ['creator', 'users', 'last_message'];
 
     /**
      * @var Dispatcher
@@ -41,9 +41,10 @@ class CreateChatController extends AbstractCreateController
     /**
      * @param Dispatcher            $bus
      */
-    public function __construct(Dispatcher $bus)
+    public function __construct(Dispatcher $bus, ChatSocket $socket)
     {
-		$this->bus = $bus;
+        $this->bus = $bus;
+        $this->socket = $socket;
 	}
 
     /**
@@ -56,12 +57,13 @@ class CreateChatController extends AbstractCreateController
     protected function data(ServerRequestInterface $request, Document $document)
     {
         $actor = $request->getAttribute('actor');
-		$data = Arr::get($request->getParsedBody(), 'data', []);
+        $data = Arr::get($request->getParsedBody(), 'data', []);
+        $ip_address = Arr::get($request->getServerParams(), 'REMOTE_ADDR', '127.0.0.1');
 		
         $this->getEventDispatcher()->listen(EventWillSerializeData::class, [$this, 'onWillSerializeData']);
 
         return $this->bus->dispatch(
-            new CreateChat($actor, $data)
+            new CreateChat($actor, $data, $ip_address)
         );
 	}
 	

@@ -169,6 +169,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ChatSearchUser__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatSearchUser */ "./src/forum/components/ChatSearchUser.js");
 /* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! flarum/utils/Stream */ "flarum/utils/Stream");
 /* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _states_ChatState__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../states/ChatState */ "./src/forum/states/ChatState.js");
+
 
 
 
@@ -195,9 +197,7 @@ function (_Modal) {
       title: flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_5___default()('')
     };
     this.isChannel = false;
-    app.search.neonchat = {
-      modalInited: true
-    };
+    app.search.neonchat = {};
   };
 
   _proto.className = function className() {
@@ -215,9 +215,14 @@ function (_Modal) {
     return !isSelected;
   };
 
+  _proto.isChatExists = function isChatExists() {
+    return this.selectedUsers.length == 1 && _states_ChatState__WEBPACK_IMPORTED_MODULE_6__["default"].isExistsPMChat(app.session.user, this.selectedUsers[0]);
+  };
+
   _proto.isCanCreateChat = function isCanCreateChat() {
     if (this.selectedUsers.length > 1 && !this.input.title().length) return false;
     if (!this.selectedUsers.length) return false;
+    if (this.isChatExists()) return false;
     return true;
   };
 
@@ -232,8 +237,23 @@ function (_Modal) {
       relationships: {
         users: this.selectedUsers
       }
-    }).then(function (r) {});
+    }).then(function (model) {
+      _states_ChatState__WEBPACK_IMPORTED_MODULE_6__["default"].addChat(model);
+      m.redraw();
+    });
+    app.search.neonchat = null;
     this.hide();
+  };
+
+  _proto.alertText = function alertText() {
+    if (this.isChatExists()) return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.alerts.exists');
+    return null;
+  };
+
+  _proto.componentAlert = function componentAlert() {
+    return !this.alertText() ? null : m("div", {
+      className: "Alert"
+    }, this.alertText());
   };
 
   _proto.componentFormChat = function componentFormChat() {
@@ -242,7 +262,7 @@ function (_Modal) {
       type: "text",
       bidi: this.input.title,
       placeholder: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat')
-    }))] : null, m("label", null, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.users')), m("div", {
+    }))] : null, m("label", null, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.users')), this.componentAlert(), m("div", {
       className: "UsersTags"
     }, this.selectedUsers.map(function (u) {
       return m("div", {
@@ -303,6 +323,91 @@ function (_Modal) {
 
   return ChatCreateModal;
 }(flarum_components_Modal__WEBPACK_IMPORTED_MODULE_1___default.a);
+
+
+
+/***/ }),
+
+/***/ "./src/forum/components/ChatEventMessage.js":
+/*!**************************************************!*\
+  !*** ./src/forum/components/ChatEventMessage.js ***!
+  \**************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChatEventMessage; });
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var _ChatMessage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ChatMessage */ "./src/forum/components/ChatMessage.js");
+/* harmony import */ var flarum_components_Link__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/components/Link */ "flarum/components/Link");
+/* harmony import */ var flarum_components_Link__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Link__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/utils/extractText */ "flarum/utils/extractText");
+/* harmony import */ var flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var flarum_utils_humanTime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! flarum/utils/humanTime */ "flarum/utils/humanTime");
+/* harmony import */ var flarum_utils_humanTime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_humanTime__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var flarum_helpers_fullTime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! flarum/helpers/fullTime */ "flarum/helpers/fullTime");
+/* harmony import */ var flarum_helpers_fullTime__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(flarum_helpers_fullTime__WEBPACK_IMPORTED_MODULE_5__);
+
+
+
+
+
+
+
+var ChatEventMessage =
+/*#__PURE__*/
+function (_ChatMessage) {
+  Object(_babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__["default"])(ChatEventMessage, _ChatMessage);
+
+  function ChatEventMessage() {
+    return _ChatMessage.apply(this, arguments) || this;
+  }
+
+  var _proto = ChatEventMessage.prototype;
+
+  _proto.oninit = function oninit(vnode) {
+    _ChatMessage.prototype.oninit.call(this, vnode);
+
+    this.parsedContent = JSON.parse(this.model.message());
+  };
+
+  _proto.componentUserMention = function componentUserMention(user) {
+    return m(flarum_components_Link__WEBPACK_IMPORTED_MODULE_2___default.a, {
+      href: app.route.user(user)
+    }, m("span", {
+      className: "UserMention"
+    }, user.displayName()));
+  };
+
+  _proto.componentEventText = function componentEventText() {
+    var _this = this;
+
+    switch (this.parsedContent.id) {
+      case 'chatCreated':
+        {
+          return app.translator.trans('pushedx-chat.forum.chat.message.events.chat.created', {
+            creatorname: this.componentUserMention(this.model.chat().creator()),
+            chatname: m("b", null, this.model.chat().title()),
+            usernames: this.parsedContent.users.map(function (user_id) {
+              return _this.componentUserMention(app.store.getById('users', user_id));
+            })
+          });
+        }
+    }
+  };
+
+  _proto.content = function content() {
+    return m("div", {
+      className: "event"
+    }, this.componentEventText(), m("a", {
+      className: "timestamp",
+      title: flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_3___default()(flarum_helpers_fullTime__WEBPACK_IMPORTED_MODULE_5___default()(this.model.created_at()))
+    }, this.humanTime = flarum_utils_humanTime__WEBPACK_IMPORTED_MODULE_4___default()(this.model.created_at())));
+  };
+
+  return ChatEventMessage;
+}(_ChatMessage__WEBPACK_IMPORTED_MODULE_1__["default"]);
 
 
 
@@ -605,15 +710,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7__);
 /* harmony import */ var flarum_utils_ItemList__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! flarum/utils/ItemList */ "flarum/utils/ItemList");
 /* harmony import */ var flarum_utils_ItemList__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_ItemList__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! flarum/components/Dropdown */ "flarum/components/Dropdown");
-/* harmony import */ var flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_9__);
-/* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! flarum/components/Button */ "flarum/components/Button");
-/* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Button__WEBPACK_IMPORTED_MODULE_10__);
-/* harmony import */ var flarum_components_Separator__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! flarum/components/Separator */ "flarum/components/Separator");
-/* harmony import */ var flarum_components_Separator__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Separator__WEBPACK_IMPORTED_MODULE_11__);
-/* harmony import */ var flarum_components_Link__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! flarum/components/Link */ "flarum/components/Link");
-/* harmony import */ var flarum_components_Link__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Link__WEBPACK_IMPORTED_MODULE_12__);
-/* harmony import */ var _states_ChatState__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../states/ChatState */ "./src/forum/states/ChatState.js");
+/* harmony import */ var flarum_utils_SubtreeRetainer__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! flarum/utils/SubtreeRetainer */ "flarum/utils/SubtreeRetainer");
+/* harmony import */ var flarum_utils_SubtreeRetainer__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_SubtreeRetainer__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! flarum/components/Dropdown */ "flarum/components/Dropdown");
+/* harmony import */ var flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! flarum/components/Button */ "flarum/components/Button");
+/* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Button__WEBPACK_IMPORTED_MODULE_11__);
+/* harmony import */ var flarum_components_Separator__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! flarum/components/Separator */ "flarum/components/Separator");
+/* harmony import */ var flarum_components_Separator__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Separator__WEBPACK_IMPORTED_MODULE_12__);
+/* harmony import */ var flarum_components_Link__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! flarum/components/Link */ "flarum/components/Link");
+/* harmony import */ var flarum_components_Link__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Link__WEBPACK_IMPORTED_MODULE_13__);
+/* harmony import */ var _states_ChatState__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../states/ChatState */ "./src/forum/states/ChatState.js");
+
 
 
 
@@ -641,12 +749,32 @@ function (_Component) {
   var _proto = ChatMessage.prototype;
 
   _proto.oninit = function oninit(vnode) {
+    var _this = this;
+
     _Component.prototype.oninit.call(this, vnode);
 
     this.labels = [];
     this.model = this.attrs.model;
     if (!this.model.content) this.model.content = this.model.message();
     this.initLabels();
+    this.subtree = new flarum_utils_SubtreeRetainer__WEBPACK_IMPORTED_MODULE_9___default.a(function () {
+      return _this.model.freshness;
+    }, function () {
+      return _this.model.user().freshness;
+    }, function () {
+      return _states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getCurrentChat();
+    }, // Reactive attrs
+    function () {
+      return _this.model.content;
+    }, function () {
+      return _this.model.isDeletedForever;
+    }, function () {
+      return _this.model.isTimedOut;
+    }, function () {
+      return _this.model.isEditing;
+    }, function () {
+      return _this.model.isNeedToFlash;
+    });
   };
 
   _proto.modelEvent = function modelEvent(name) {
@@ -654,19 +782,18 @@ function (_Component) {
       args[_key - 1] = arguments[_key];
     }
 
-    _states_ChatState__WEBPACK_IMPORTED_MODULE_13__["default"].evented.trigger('onClickMessage', name, this.model, args);
+    _states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].evented.trigger('onClickMessage', name, this.model, args);
   };
 
-  _proto.view = function view(vnode) {
-    return m("div", {
-      className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_5___default()({
-        'message-wrapper': true,
-        hidden: this.model.deleted_by(),
-        editing: this.model.is_editing,
-        deleted: !this.isVisible()
-      }),
-      "data-id": this.model.id()
-    }, m("div", null, this.model.user() ? m(flarum_components_Link__WEBPACK_IMPORTED_MODULE_12___default.a, {
+  _proto.onbeforeupdate = function onbeforeupdate(vnode) {
+    _Component.prototype.onbeforeupdate.call(this, vnode);
+
+    this.model = this.attrs.model;
+    return this.subtree.needsRebuild();
+  };
+
+  _proto.content = function content() {
+    return m("div", null, this.model.user() ? m(flarum_components_Link__WEBPACK_IMPORTED_MODULE_13___default.a, {
       className: "avatar-wrapper",
       href: app.route.user(this.model.user())
     }, m("span", null, flarum_helpers_avatar__WEBPACK_IMPORTED_MODULE_2___default()(this.model.user(), {
@@ -688,10 +815,10 @@ function (_Component) {
       return label.condition() ? label.component() : null;
     })), m("div", {
       className: "right"
-    }, this.model.id() ? [this.model.deleted_forever ? null : this.editDropDown(), m("a", {
+    }, this.model.id() ? [this.model.isDeletedForever ? null : this.editDropDown(), m("a", {
       className: "timestamp",
       title: flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(flarum_helpers_fullTime__WEBPACK_IMPORTED_MODULE_4___default()(this.model.created_at()))
-    }, this.humanTime = flarum_utils_humanTime__WEBPACK_IMPORTED_MODULE_6___default()(this.model.created_at()))] : this.model.timedOut ? this.editDropDownTimedOut() : null)), m("div", {
+    }, this.humanTime = flarum_utils_humanTime__WEBPACK_IMPORTED_MODULE_6___default()(this.model.created_at()))] : this.model.isTimedOut ? this.editDropDownTimedOut() : null)), m("div", {
       className: "message"
     }, this.model.is_censored() ? m("div", {
       className: "censored",
@@ -699,36 +826,48 @@ function (_Component) {
     }, this.model.content) : m("div", {
       oncreate: this.onContentWrapperCreated.bind(this),
       onupdate: this.onContentWrapperUpdated.bind(this)
-    })))));
+    }))));
+  };
+
+  _proto.view = function view(vnode) {
+    return m("div", {
+      className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_5___default()({
+        'message-wrapper': true,
+        hidden: this.model.deleted_by(),
+        editing: this.model.isEditing,
+        deleted: !this.isVisible()
+      }),
+      "data-id": this.model.id()
+    }, this.content());
   };
 
   _proto.initLabels = function initLabels() {
-    var _this = this;
+    var _this2 = this;
 
     this.labelBind(function () {
-      return _this.model.edited_at();
+      return _this2.model.edited_at();
     }, function () {
       return m("div", {
         "class": "icon",
         title: flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_7___default()(app.translator.trans('core.forum.post.edited_tooltip', {
-          user: _this.model.user(),
-          ago: flarum_utils_humanTime__WEBPACK_IMPORTED_MODULE_6___default()(_this.model.edited_at())
+          user: _this2.model.user(),
+          ago: flarum_utils_humanTime__WEBPACK_IMPORTED_MODULE_6___default()(_this2.model.edited_at())
         }))
       }, m("i", {
         "class": "fas fa-pencil-alt"
       }));
     });
     this.labelBind(function () {
-      return _this.model.deleted_by();
+      return _this2.model.deleted_by();
     }, function () {
       return m("div", {
         "class": "icon"
       }, m("i", {
         "class": "fas fa-trash-alt"
-      }), " ", m("span", null, "(" + app.translator.trans('pushedx-chat.forum.chat.message.deleted' + (_this.model.deleted_forever ? '_forever' : '')), " ", flarum_helpers_username__WEBPACK_IMPORTED_MODULE_3___default()(_this.model.deleted_by()), ")"));
+      }), " ", m("span", null, "(" + app.translator.trans('pushedx-chat.forum.chat.message.deleted' + (_this2.model.isDeletedForever ? '_forever' : '')), " ", flarum_helpers_username__WEBPACK_IMPORTED_MODULE_3___default()(_this2.model.deleted_by()), ")"));
     });
     this.labelBind(function () {
-      return _this.model.timedOut;
+      return _this2.model.isTimedOut;
     }, function () {
       return m("div", {
         "class": "icon",
@@ -749,43 +888,43 @@ function (_Component) {
   _proto.editDropDown = function editDropDown() {
     var items = new flarum_utils_ItemList__WEBPACK_IMPORTED_MODULE_8___default.a();
 
-    if (_states_ChatState__WEBPACK_IMPORTED_MODULE_13__["default"].getPermissions().edit && this.model.user() && this.model.user() == app.session.user) {
-      items.add('dropdownEditStart', m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_10___default.a, {
+    if (_states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getPermissions().edit && this.model.user() && this.model.user() == app.session.user) {
+      items.add('dropdownEditStart', m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_11___default.a, {
         onclick: this.modelEvent.bind(this, 'dropdownEditStart'),
         icon: "fas fa-pencil-alt",
-        disabled: this.model.deleted_by() || this.model.is_editing
+        disabled: this.model.deleted_by() || this.model.isEditing
       }, app.translator.trans('core.forum.post_controls.edit_button')));
     }
 
-    items.add('separator', m(flarum_components_Separator__WEBPACK_IMPORTED_MODULE_11___default.a, null));
+    items.add('separator', m(flarum_components_Separator__WEBPACK_IMPORTED_MODULE_12___default.a, null));
 
-    if (_states_ChatState__WEBPACK_IMPORTED_MODULE_13__["default"].getPermissions().moderate["delete"] || _states_ChatState__WEBPACK_IMPORTED_MODULE_13__["default"].getPermissions()["delete"] && this.model.user() == app.session.user) {
+    if (_states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getPermissions().moderate["delete"] || _states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getPermissions()["delete"] && this.model.user() == app.session.user) {
       if (this.model.deleted_by()) {
-        items.add('dropdownRestore', m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_10___default.a, {
+        items.add('dropdownRestore', m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_11___default.a, {
           onclick: this.modelEvent.bind(this, 'dropdownRestore'),
           icon: "fas fa-reply",
-          disabled: !_states_ChatState__WEBPACK_IMPORTED_MODULE_13__["default"].getPermissions().moderate["delete"] && this.model.deleted_by() != app.session.user
+          disabled: !_states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getPermissions().moderate["delete"] && this.model.deleted_by() != app.session.user
         }, app.translator.trans('core.forum.post_controls.restore_button')));
       } else {
-        items.add('dropdownHide', m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_10___default.a, {
+        items.add('dropdownHide', m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_11___default.a, {
           onclick: this.modelEvent.bind(this, 'dropdownHide'),
           icon: "fas fa-trash-alt",
-          disabled: this.model.is_editing
+          disabled: this.model.isEditing
         }, app.translator.trans('core.forum.post_controls.delete_button')));
       }
     }
 
-    if (_states_ChatState__WEBPACK_IMPORTED_MODULE_13__["default"].getPermissions().moderate["delete"] && (this.model.deleted_by() || _states_ChatState__WEBPACK_IMPORTED_MODULE_13__["default"].totalHidden() >= 3)) {
-      items.add('dropdownDelete', m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_10___default.a, {
+    if (_states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getPermissions().moderate["delete"] && (this.model.deleted_by() || _states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].totalHidden() >= 3)) {
+      items.add('dropdownDelete', m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_11___default.a, {
         onclick: this.modelEvent.bind(this, 'dropdownDelete'),
         icon: "fas fa-trash-alt",
-        disabled: !_states_ChatState__WEBPACK_IMPORTED_MODULE_13__["default"].getPermissions()["delete"]
+        disabled: !_states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getPermissions()["delete"]
       }, app.translator.trans('core.forum.post_controls.delete_forever_button')));
     }
 
     return Object.keys(items.items).length <= 1 ? null : m("div", {
       className: "edit"
-    }, m(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_9___default.a, {
+    }, m(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_10___default.a, {
       buttonClassName: "Button Button--icon Button--flat",
       menuClassName: "Dropdown-menu Dropdown-menu--top Dropdown-menu--bottom Dropdown-menu--left Dropdown-menu--right",
       icon: "fas fa-ellipsis-h"
@@ -795,14 +934,14 @@ function (_Component) {
   _proto.editDropDownTimedOut = function editDropDownTimedOut() {
     return m("div", {
       className: "edit"
-    }, m(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_9___default.a, {
+    }, m(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_10___default.a, {
       buttonClassName: "Button Button--icon Button--flat",
       menuClassName: "Dropdown-menu--top Dropdown-menu--bottom Dropdown-menu--left Dropdown-menu--right",
       icon: "fas fa-ellipsis-h"
-    }, m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_10___default.a, {
+    }, m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_11___default.a, {
       onclick: this.modelEvent.bind(this, 'dropdownDelete'),
       icon: "fas fa-trash-alt"
-    }, app.translator.trans('pushedx-chat.forum.chat.message.actions.hide')), m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_10___default.a, {
+    }, app.translator.trans('pushedx-chat.forum.chat.message.actions.hide')), m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_11___default.a, {
       onclick: this.modelEvent.bind(this, 'dropdownResend'),
       icon: "fas fa-reply"
     }, app.translator.trans('pushedx-chat.forum.chat.message.actions.resend'))));
@@ -825,21 +964,23 @@ function (_Component) {
   _proto.renderMessage = function renderMessage(vnode) {
     var element = vnode.dom;
 
-    if (this.model.needToFlash) {
+    if (this.model.isNeedToFlash) {
       this.flashItem($(this.messageWrapper));
-      this.model.needToFlash = false;
+      this.model.isNeedToFlash = false;
     }
 
     if (this.model.content !== this.oldContent) {
       this.oldContent = this.model.content;
-      _states_ChatState__WEBPACK_IMPORTED_MODULE_13__["default"].renderChatMessage(element, this.model.content);
+      _states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].renderChatMessage(element, this.model.content);
     }
   };
 
   _proto.isVisible = function isVisible() {
-    if (this.model.chat() != _states_ChatState__WEBPACK_IMPORTED_MODULE_13__["default"].getCurrentChat()) return false;
-    if (this.model.deleted_forever && (!_states_ChatState__WEBPACK_IMPORTED_MODULE_13__["default"].getPermissions().moderate.vision || !this.model.id())) return false;
-    if (this.model.deleted_by() && !(_states_ChatState__WEBPACK_IMPORTED_MODULE_13__["default"].getPermissions().moderate.vision || this.model.user() == app.session.user)) return false;
+    if (this.model.chat() != _states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getCurrentChat()) return false;
+    if (this.model.isDeletedForever
+    /*&& (!ChatState.getPermissions().moderate.vision || !this.model.id())*/
+    ) return false;
+    if (this.model.deleted_by() && !(_states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getPermissions().moderate.vision || this.model.user() == app.session.user)) return false;
     return true;
   }
   /**
@@ -1007,10 +1148,10 @@ function (_Component) {
     var type;
 
     if (text.startsWith('```')) {
-      text = '<Code/>';
+      text = app.translator.trans('pushedx-chat.forum.chat.message.type.code');
       type = 'media';
     } else if (text.startsWith('http://') || text.startsWith('https://')) {
-      text = 'URL';
+      text = app.translator.trans('pushedx-chat.forum.chat.message.type.url');
       type = 'media';
     }
 
@@ -1022,6 +1163,15 @@ function (_Component) {
 
   _proto.componentTextPreview = function componentTextPreview() {
     var lastMessage = this.model.last_message();
+
+    if (lastMessage.type() != 0) {
+      return m("div", {
+        className: "message"
+      }, m("span", {
+        className: "media"
+      }, app.translator.trans('pushedx-chat.forum.chat.message.type.event')));
+    }
+
     var formatResult = this.formatTextPreview(lastMessage.message());
     var senderName,
         users = this.model.users(),
@@ -1131,7 +1281,7 @@ function (_Search) {
     this.state = (_this$attrs$state = this.attrs.state) != null ? _this$attrs$state : {};
     if (app.forum.attribute('canViewUserList')) items.add('users', new _UsersSearchResults__WEBPACK_IMPORTED_MODULE_6__["default"]({
       callback: this.attrs.callback,
-      store: this.state
+      state: app.search.neonchat
     }));
     return items;
   };
@@ -1260,14 +1410,14 @@ function (_Component) {
 
     return m("div", null, m("div", {
       className: "wrapper",
-      oncreate: this.configScroll.bind(this),
-      onupdate: this.chatOnResize(this),
-      onscroll: this.disableAutoScroll.bind(this),
+      oncreate: this.wrapperOnCreate.bind(this),
+      onupdate: this.wrapperOnUpdate.bind(this),
+      onscroll: this.wrapperOnScroll.bind(this),
       style: {
         height: _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('transform').y + 'px'
       }
-    }, this.state.scroll.loadingFetch ? m("div", {
-      className: "message-wrapper"
+    }, this.state.scroll.loadingFetch ? m("msgloader", {
+      className: "message-wrapper--loading"
     }, m(flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_3___default.a, {
       className: "loading-old Button-icon"
     })) : null, _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentsChatMessages().concat(this.state.input.writingPreview ? _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentChatMessage(this.state.input.previewModel) : [])), m("div", {
@@ -1329,19 +1479,21 @@ function (_Component) {
     return this.oldReached;
   };
 
-  _proto.configScroll = function configScroll(vnode) {
+  _proto.wrapperOnCreate = function wrapperOnCreate(vnode) {
     _Component.prototype.oncreate.call(this, vnode);
 
-    var e = vnode.dom;
-    if (this.state.scroll.oldScroll >= 0) e.scrollTop = this.state.scroll.oldScroll;else e.scrollTop = e.scrollHeight + this.state.scroll.oldScroll - 30;
-    this.chatOnResize(vnode);
+    this.wrapperOnUpdate(vnode);
   };
 
-  _proto.disableAutoScroll = function disableAutoScroll(e) {
+  _proto.wrapperOnUpdate = function wrapperOnUpdate(vnode) {
+    var el = vnode.dom;
+    if (this.model && this.state.scroll.autoScroll) this.scrollToBottom();
+  };
+
+  _proto.wrapperOnScroll = function wrapperOnScroll(e) {
     var _this = this;
 
     e.redraw = false;
-    if (_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat() != this.model) return;
     var el = e.target;
     this.state.scroll.autoScroll = el.scrollTop + el.offsetHeight >= el.scrollHeight;
     var currentHeight = el.scrollHeight;
@@ -1355,10 +1507,8 @@ function (_Component) {
       })[0];
       if (topMessage) _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].apiFetchChatMessages(this.model, topMessage.id());
     } else this.state.scroll.oldScroll = el.scrollTop;
-  };
 
-  _proto.chatOnResize = function chatOnResize(vnode) {
-    if (this.model && this.state.scroll.autoScroll) this.scrollToBottom();
+    if (el.scrollTop <= 0) el.scrollTop = 1;
   };
 
   _proto.scrollToBottom = function scrollToBottom() {
@@ -1383,10 +1533,10 @@ function (_Component) {
   _proto.inputSyncWithPreview = function inputSyncWithPreview() {
     var input = this.getChatInput();
 
-    if (this.state.input.writingPreview) {
+    if (this.state.input.content) {
       input.value = this.state.input.content;
       this.inputProcess();
-    }
+    } else input.value = '';
   };
 
   _proto.inputProcess = function inputProcess(e) {
@@ -1422,7 +1572,6 @@ function (_Component) {
 
   _proto.inputPressEnter = function inputPressEnter(e) {
     e.redraw = false;
-    if (this.loading) return false;
 
     if (e.keyCode == 13 && !e.shiftKey) {
       this.messageSend(this.getChatInput().value);
@@ -1440,12 +1589,12 @@ function (_Component) {
     this.state.input.messageLength = 0;
     this.state.input.rows = 1;
     this.getChatInput().value = '';
+    this.state.input.content = '';
   };
 
   _proto.inputPreviewStart = function inputPreviewStart(content) {
-    this.state.input.writingPreview = true;
-
-    if (!this.state.input.previewModel) {
+    if (!this.state.input.writingPreview) {
+      this.state.input.writingPreview = true;
       this.state.input.previewModel = app.store.createRecord('chatmessages');
       this.state.input.previewModel.pushData({
         id: 0,
@@ -1460,11 +1609,11 @@ function (_Component) {
       });
 
       Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"])(this.state.input.previewModel, {
-        is_editing: true,
-        needToFlash: true,
+        isEditing: true,
+        isNeedToFlash: true,
         content: content
       });
-    } else this.state.input.previewModel.needToFlash = true;
+    } else this.state.input.previewModel.isNeedToFlash = true;
 
     m.redraw();
   };
@@ -1485,16 +1634,23 @@ function (_Component) {
       case 'dropdownResend':
         {
           this.messageResend(model);
+          break;
+        }
+
+      case 'insertMention':
+        {
+          this.insertMention(model);
+          break;
         }
     }
   };
 
   _proto.messageSend = function messageSend(text) {
-    if (text.trim().length > 0 && !this.loading) {
+    if (text.trim().length > 0 && !this.state.loadingSend) {
       if (this.state.input.writingPreview) {
         this.state.input.writingPreview = false;
         this.messagePost(this.state.input.previewModel);
-        _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].insertChatMessage(this.state.input.previewModel);
+        _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].insertChatMessage(Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"])(this.state.input.previewModel, {}));
         this.inputClear();
       } else if (this.state.messageEditing) {
         var model = this.state.messageEditing;
@@ -1513,7 +1669,7 @@ function (_Component) {
   _proto.messageEdit = function messageEdit(model) {
     var chatInput = this.getChatInput();
     if (this.state.input.writingPreview) this.inputPreviewEnd();
-    model.is_editing = true;
+    model.isEditing = true;
     model.oldContent = model.message();
     this.state.messageEditing = model;
     chatInput.value = model.oldContent;
@@ -1526,26 +1682,11 @@ function (_Component) {
     var message = this.state.messageEditing;
 
     if (message) {
-      message.is_editing = false;
+      message.isEditing = false;
       message.content = message.oldContent;
       this.inputClear();
       m.redraw();
       this.state.messageEditing = null;
-    }
-  };
-
-  _proto.messageHide = function messageHide(message) {
-    _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].evented.trigger('messageHide', message);
-  };
-
-  _proto.messageDelete = function messageDelete(message) {
-    _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].evented.trigger('messageDelete', message);
-  };
-
-  _proto.messageRestore = function messageRestore(message) {
-    if (_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].isChatMessageExists(message)) _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].evented.trigger('messageRestore', message);else {
-      _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].insertChatMessage(message);
-      m.redraw();
     }
   };
 
@@ -1555,15 +1696,13 @@ function (_Component) {
 
   _proto.messagePost = function messagePost(model) {
     var self = this;
-    self.state.loading = true;
+    self.state.loadingSend = true;
     m.redraw();
     return _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].postChatMessage(model).then(function (r) {
-      self.state.input.previewModel = null;
-      self.state.loading = false;
+      self.state.loadingSend = false;
       m.redraw();
     }, function (r) {
-      self.state.input.previewModel = null;
-      self.state.loading = false;
+      self.state.loadingSend = false;
       m.redraw();
     });
   };
@@ -1598,7 +1737,7 @@ function (_Component) {
     var user = model.user();
     if (!app.session.user) return;
     var input = this.getChatInput();
-    input.value = input.value + " @" + user.username() + " ";
+    input.value += " @" + user.username() + " ";
     input.focus();
     this.inputProcess();
   };
@@ -1642,8 +1781,8 @@ function () {
     this.results = {};
     this.props = props;
     this.searching = false;
-    if (!props.store.usersSelected) props.store.usersSelected = [];
-    this.usersSelected = props.store.usersSelected;
+    if (!props.state.usersSelected) props.state.usersSelected = [];
+    this.usersSelected = props.state.usersSelected;
   }
 
   var _proto = UsersSearchResults.prototype;
@@ -1920,11 +2059,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_ChatPreview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../components/ChatPreview */ "./src/forum/components/ChatPreview.js");
 /* harmony import */ var _components_ChatViewport__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/ChatViewport */ "./src/forum/components/ChatViewport.js");
 /* harmony import */ var _components_ChatMessage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/ChatMessage */ "./src/forum/components/ChatMessage.js");
-/* harmony import */ var flarum_Model__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/Model */ "flarum/Model");
-/* harmony import */ var flarum_Model__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(flarum_Model__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var flarum_utils_evented__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! flarum/utils/evented */ "flarum/utils/evented");
-/* harmony import */ var flarum_utils_evented__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_evented__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _resources__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../resources */ "./src/forum/resources.js");
+/* harmony import */ var _components_ChatEventMessage__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/ChatEventMessage */ "./src/forum/components/ChatEventMessage.js");
+/* harmony import */ var flarum_Model__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! flarum/Model */ "flarum/Model");
+/* harmony import */ var flarum_Model__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(flarum_Model__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var flarum_utils_evented__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! flarum/utils/evented */ "flarum/utils/evented");
+/* harmony import */ var flarum_utils_evented__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_evented__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _resources__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../resources */ "./src/forum/resources.js");
+
 
 
 
@@ -1932,10 +2073,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var refAudio = new Audio();
-refAudio.src = _resources__WEBPACK_IMPORTED_MODULE_5__["base64AudioNotificationRef"];
+refAudio.src = _resources__WEBPACK_IMPORTED_MODULE_6__["base64AudioNotificationRef"];
 refAudio.volume = 0.5;
 var audio = new Audio();
-audio.src = _resources__WEBPACK_IMPORTED_MODULE_5__["base64AudioNotification"];
+audio.src = _resources__WEBPACK_IMPORTED_MODULE_6__["base64AudioNotification"];
 audio.volume = 0.5;
 
 var ChatState =
@@ -1951,7 +2092,7 @@ function () {
     this.chats = [];
     this.chatmessages = [];
     this.curChat = null;
-    this.evented = flarum_utils_evented__WEBPACK_IMPORTED_MODULE_4___default.a;
+    this.evented = flarum_utils_evented__WEBPACK_IMPORTED_MODULE_5___default.a;
     this.totalHiddenCount = 0;
     var neonchatState = (_JSON$parse = JSON.parse(localStorage.getItem('neonchat'))) != null ? _JSON$parse : {};
     this.frameState = {
@@ -1981,7 +2122,7 @@ function () {
 
   _proto.initViewportState = function initViewportState() {
     return {
-      loading: false,
+      loadingSend: false,
       scroll: {
         autoScroll: true,
         oldScroll: 0,
@@ -2081,6 +2222,17 @@ function () {
     this.viewportState[model.id()] = this.initViewportState();
   };
 
+  _proto.isExistsPMChat = function isExistsPMChat(user1, user2) {
+    return this.getChats().some(function (model) {
+      var users = model.users();
+      return users.length == 2 && users.some(function (model) {
+        return model == user1;
+      }) && users.some(function (model) {
+        return model == user2;
+      });
+    });
+  };
+
   _proto.onChatChanged = function onChatChanged(model, e) {
     e.redraw = false;
     if (model == this.getCurrentChat()) return;
@@ -2120,7 +2272,10 @@ function () {
   };
 
   _proto.componentChatMessage = function componentChatMessage(model) {
-    return m(_components_ChatMessage__WEBPACK_IMPORTED_MODULE_2__["default"], {
+    return model.type() ? m(_components_ChatEventMessage__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      key: model.id(),
+      model: model
+    }) : m(_components_ChatMessage__WEBPACK_IMPORTED_MODULE_2__["default"], {
       key: model.id(),
       model: model
     });
@@ -2140,6 +2295,17 @@ function () {
     });
   };
 
+  _proto.insertEventChatMessage = function insertEventChatMessage(model, data, notify) {
+    if (notify === void 0) {
+      notify = false;
+    }
+
+    model.pushAttributes({
+      message: JSON.stringify(data)
+    });
+    insertChatMessage(model, notify);
+  };
+
   _proto.insertChatMessage = function insertChatMessage(model, notify) {
     if (notify === void 0) {
       notify = false;
@@ -2150,7 +2316,7 @@ function () {
 
     if (notify) {
       this.messageNotify(model);
-      model.needToFlash = true;
+      model.isNeedToFlash = true;
     }
 
     var list = this.getChatMessages(function (mdl) {
@@ -2164,7 +2330,7 @@ function () {
   };
 
   _proto.renderChatMessage = function renderChatMessage(model, content) {
-    var element = model instanceof flarum_Model__WEBPACK_IMPORTED_MODULE_3___default.a ? document.querySelector(".neonchat .message-wrapper[data-id=\"" + model.id() + "\"] .message") : model;
+    var element = model instanceof flarum_Model__WEBPACK_IMPORTED_MODULE_4___default.a ? document.querySelector(".neonchat .message-wrapper[data-id=\"" + model.id() + "\"] .message") : model;
 
     if (element) {
       s9e.TextFormatter.preview(content, element);
@@ -2212,16 +2378,16 @@ function () {
       created_at: new Date(),
       chat_id: model.chat().id()
     }).then(function (r) {
-      model.timedOut = false;
-      model.needToFlash = true;
-      model.is_editing = false;
+      model.isTimedOut = false;
+      model.isNeedToFlash = true;
+      model.isEditing = false;
       model.chat().pushData({
         relationships: {
           last_message: model
         }
       });
     }, function (r) {
-      model.timedOut = true;
+      model.isTimedOut = true;
     });
   };
 
@@ -2231,7 +2397,7 @@ function () {
     }
 
     model.content = content;
-    model.needToFlash = true;
+    model.isNeedToFlash = true;
     model.pushAttributes({
       message: content,
       edited_at: new Date()
@@ -2255,19 +2421,22 @@ function () {
       user = app.session.user;
     }
 
-    model.deleted_forever = true;
+    model.isDeletedForever = true;
     if (!model.deleted_by()) model.pushData({
       relationships: {
         deleted_by: user
       }
     });
     var list = this.getChatMessages(function (mdl) {
-      return mdl.chat() == model.chat() && mdl != model;
+      return mdl.chat() == model.chat() && !mdl.isDeletedForever;
     });
     if (list.length) model.chat().pushData({
       relationships: {
         last_message: list[list.length - 1]
       }
+    });
+    this.chatmessages = this.chatmessages.filter(function (mdl) {
+      return mdl != model;
     });
     if (sync) model["delete"]();
     m.redraw();
@@ -2308,16 +2477,14 @@ function () {
       sync = false;
     }
 
-    console.log('restoring ', model);
-
     if (!this.isChatMessageExists(model)) {
       this.insertChatMessage(model);
-      model.needToFlash = true;
+      model.isNeedToFlash = true;
     } else {
       model.pushAttributes({
         deleted_by: 0
       });
-      model.needToFlash = true;
+      model.isNeedToFlash = true;
       delete model.data.relationships.deleted_by;
     }
 
@@ -2371,7 +2538,7 @@ function () {
 
   _proto.notifySend = function notifySend(model) {
     var avatar = model.user().avatarUrl();
-    if (!avatar) avatar = _resources__WEBPACK_IMPORTED_MODULE_5__["base64PlaceholderAvatarImage"];
+    if (!avatar) avatar = _resources__WEBPACK_IMPORTED_MODULE_6__["base64PlaceholderAvatarImage"];
     if (this.getFrameState('notify') && document.hidden) new Notification(model.chat().finalTitle, {
       body: model.user().username() + ": " + model.message(),
       icon: avatar,
@@ -2608,6 +2775,17 @@ module.exports = flarum.core.compat['utils/ItemList'];
 /***/ (function(module, exports) {
 
 module.exports = flarum.core.compat['utils/Stream'];
+
+/***/ }),
+
+/***/ "flarum/utils/SubtreeRetainer":
+/*!**************************************************************!*\
+  !*** external "flarum.core.compat['utils/SubtreeRetainer']" ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = flarum.core.compat['utils/SubtreeRetainer'];
 
 /***/ }),
 

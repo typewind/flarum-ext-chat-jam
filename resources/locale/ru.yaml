@@ -21,6 +21,8 @@ pushedx-chat:
           channel: Канал
           create.chat: Создать чат
           create.channel: Создать канал
+          alerts:
+            exists: Вы не можете создать еще одно ЛС с этим пользователем!
           form:
             title.chat: Название чата
             title.channel: Название канала
@@ -38,6 +40,12 @@ pushedx-chat:
         censored: Авторизируйтесь, чтобы увидеть это сообщение!
         deleted: удалено 
         deleted_forever: удалено навсегда
+        type:
+          url: URL
+          event: Событие
+          code: <Код />
+        events:
+          chat.created: "{creatorname} создал {chatname} и пригласил {usernames}"
     errors:
       unauthenticated: Писать в чате могут только зарегистрированные пользователи
       chatdenied: Вашей группе пользователей запрещено писать сообщения

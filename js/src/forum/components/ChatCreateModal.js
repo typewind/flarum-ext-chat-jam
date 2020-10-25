@@ -5,6 +5,8 @@ import classList from 'flarum/utils/classList';
 import ChatSearchUser from './ChatSearchUser';
 import Stream from 'flarum/utils/Stream';
 
+import ChatState from '../states/ChatState';
+
 export default class ChatCreateModal extends Modal
 {
 	oninit(vnode)
@@ -15,7 +17,7 @@ export default class ChatCreateModal extends Modal
 		this.input = {title: Stream('')};
 		this.isChannel = false;
 
-		app.search.neonchat = {modalInited: true};
+		app.search.neonchat = {};
 	}
 
 	className() {
@@ -34,10 +36,17 @@ export default class ChatCreateModal extends Modal
 		return !isSelected;
 	}
 
+	isChatExists()
+	{
+		return this.selectedUsers.length == 1 && ChatState.isExistsPMChat(app.session.user, this.selectedUsers[0]);
+	}
+
 	isCanCreateChat()
 	{
 		if(this.selectedUsers.length > 1 && !this.input.title().length) return false;
 		if(!this.selectedUsers.length) return false;
+		if(this.isChatExists()) return false;
+
 		return true;
 	}
 
@@ -50,15 +59,31 @@ export default class ChatCreateModal extends Modal
 	{
 		app.store.createRecord('chats').save({title: this.input.title(), isChannel: this.isChannel, relationships: {users: this.selectedUsers}})
 		.then(
-			r =>
+			model =>
 			{
-
-
-
+				ChatState.addChat(model);
+				m.redraw();
 			}
 		);
 
+		app.search.neonchat = null;
 		this.hide();
+	}
+
+	alertText()
+	{
+		if(this.isChatExists()) return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.alerts.exists');
+
+		return null;
+	}
+
+	componentAlert()
+	{
+		return !this.alertText() ? null : (
+			<div className="Alert">
+				{this.alertText()}
+			</div>
+		);
 	}
 
 	componentFormChat()
@@ -73,6 +98,7 @@ export default class ChatCreateModal extends Modal
 			</div>
 			] : null,
 			<label>{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.users')}</label>,
+			this.componentAlert(),
 			<div className="UsersTags">
 				{this.selectedUsers.map(u => <div className='UserMention'>{'@' + u.displayName()}</div>)}
 			</div>,

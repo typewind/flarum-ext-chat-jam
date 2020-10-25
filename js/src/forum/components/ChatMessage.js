@@ -6,6 +6,7 @@ import classList from 'flarum/utils/classList';
 import humanTime from 'flarum/utils/humanTime';
 import extractText from 'flarum/utils/extractText';
 import ItemList from 'flarum/utils/ItemList';
+import SubtreeRetainer from 'flarum/utils/SubtreeRetainer';
 
 import Dropdown from 'flarum/components/Dropdown';
 import Button from 'flarum/components/Button';
@@ -25,11 +26,73 @@ export default class ChatMessage extends Component
 		if(!this.model.content) this.model.content = this.model.message();
 
 		this.initLabels();
+
+		this.subtree = new SubtreeRetainer(
+			() => this.model.freshness,
+			() => this.model.user().freshness,
+			() => ChatState.getCurrentChat(),
+
+			// Reactive attrs
+			() => this.model.content,
+			() => this.model.isDeletedForever,
+			() => this.model.isTimedOut,
+			() => this.model.isEditing,
+			() => this.model.isNeedToFlash
+		);
 	}
 
 	modelEvent(name, ...args)
 	{
 		ChatState.evented.trigger('onClickMessage', name, this.model, args)
+	}
+
+	onbeforeupdate(vnode) 
+	{
+		super.onbeforeupdate(vnode);
+		this.model = this.attrs.model;
+
+		return this.subtree.needsRebuild();
+	}
+
+	content()
+	{
+		return (
+			<div>
+				{this.model.user() ? 
+					<Link className='avatar-wrapper' href={app.route.user(this.model.user())}>
+						<span>{avatar(this.model.user(), {className: 'avatar'})}</span>
+					</Link>
+					:
+					<div className='avatar-wrapper'>
+						<span>{avatar(this.model.user(), {className: 'avatar'})}</span>
+					</div>
+				}
+				<div className='message-block'>
+					<div className='toolbar'>
+						<a className='name' onclick={this.modelEvent.bind(this, 'insertMention')}>
+							{extractText(username(this.model.user())) + ': '}
+						</a>
+						<div className='labels'>
+							{this.labels.map(label => label.condition() ? label.component() : null)}
+						</div>
+						<div className='right'>
+							{this.model.id() ? [
+								this.model.isDeletedForever ? null : this.editDropDown(),
+								<a className='timestamp' title={extractText(fullTime(this.model.created_at()))}>{this.humanTime = humanTime(this.model.created_at())}</a>
+							] 
+							: this.model.isTimedOut ? this.editDropDownTimedOut() : null}
+						</div>
+					</div>
+					<div className='message'>
+						{this.model.is_censored() ?
+							<div className='censored' title={app.translator.trans('pushedx-chat.forum.chat.message.censored')}>
+								{this.model.content}
+							</div> : <div oncreate={this.onContentWrapperCreated.bind(this)} onupdate={this.onContentWrapperUpdated.bind(this)}></div>
+						}
+					</div>
+				</div>
+			</div>
+		);
 	}
 
 	view(vnode)
@@ -39,45 +102,11 @@ export default class ChatMessage extends Component
 				className={classList({
 					'message-wrapper': true, 
 					hidden: this.model.deleted_by(), 
-					editing: this.model.is_editing, 
+					editing: this.model.isEditing, 
 					deleted: !this.isVisible()}
 					)}
 				data-id={this.model.id()}>
-				<div>
-					{this.model.user() ? 
-						<Link className='avatar-wrapper' href={app.route.user(this.model.user())}>
-							<span>{avatar(this.model.user(), {className: 'avatar'})}</span>
-						</Link>
-						:
-						<div className='avatar-wrapper'>
-							<span>{avatar(this.model.user(), {className: 'avatar'})}</span>
-						</div>
-					}
-					<div className='message-block'>
-						<div className='toolbar'>
-							<a className='name' onclick={this.modelEvent.bind(this, 'insertMention')}>
-								{extractText(username(this.model.user())) + ': '}
-							</a>
-							<div className='labels'>
-								{this.labels.map(label => label.condition() ? label.component() : null)}
-							</div>
-							<div className='right'>
-								{this.model.id() ? [
-									this.model.deleted_forever ? null : this.editDropDown(),
-									<a className='timestamp' title={extractText(fullTime(this.model.created_at()))}>{this.humanTime = humanTime(this.model.created_at())}</a>
-								] 
-								: this.model.timedOut ? this.editDropDownTimedOut() : null}
-							</div>
-						</div>
-						<div className='message'>
-							{this.model.is_censored() ?
-								<div className='censored' title={app.translator.trans('pushedx-chat.forum.chat.message.censored')}>
-									{this.model.content}
-								</div> : <div oncreate={this.onContentWrapperCreated.bind(this)} onupdate={this.onContentWrapperUpdated.bind(this)}></div>
-							}
-						</div>
-					</div>
-				</div>
+				{this.content()}
 			</div>
 		)
 	}
@@ -101,14 +130,14 @@ export default class ChatMessage extends Component
 			() => (
 				<div class='icon'>
 					<i class="fas fa-trash-alt"></i> <span>
-						{`(${app.translator.trans('pushedx-chat.forum.chat.message.deleted' + (this.model.deleted_forever ? '_forever' : ''))}`} {username(this.model.deleted_by())})
+						{`(${app.translator.trans('pushedx-chat.forum.chat.message.deleted' + (this.model.isDeletedForever ? '_forever' : ''))}`} {username(this.model.deleted_by())})
 					</span>
 				</div>
 			)
 		);
 
 		this.labelBind(
-			() => this.model.timedOut, 
+			() => this.model.isTimedOut, 
 			() => (
 				<div class='icon' style='color: #ff4063'>
 					<i class="fas fa-exclamation-circle"></i>
@@ -132,7 +161,7 @@ export default class ChatMessage extends Component
 				<Button 
 					onclick={this.modelEvent.bind(this, 'dropdownEditStart')} 
 					icon='fas fa-pencil-alt'
-					disabled={this.model.deleted_by() || this.model.is_editing}
+					disabled={this.model.deleted_by() || this.model.isEditing}
 				>
 					{app.translator.trans('core.forum.post_controls.edit_button')}
 				</Button>
@@ -162,7 +191,7 @@ export default class ChatMessage extends Component
 					<Button
 						onclick={this.modelEvent.bind(this, 'dropdownHide')} 
 						icon='fas fa-trash-alt'
-						disabled={this.model.is_editing}
+						disabled={this.model.isEditing}
 					>
 						{app.translator.trans('core.forum.post_controls.delete_button')}
 					</Button>
@@ -242,10 +271,10 @@ export default class ChatMessage extends Component
 	{
 		let element = vnode.dom;
 
-		if(this.model.needToFlash) 
+		if(this.model.isNeedToFlash) 
 		{
 			this.flashItem($(this.messageWrapper));
-			this.model.needToFlash = false;
+			this.model.isNeedToFlash = false;
 		}
 		if(this.model.content !== this.oldContent)
 		{
@@ -259,7 +288,7 @@ export default class ChatMessage extends Component
 		if(this.model.chat() != ChatState.getCurrentChat())
 			return false;
 
-		if(this.model.deleted_forever && (!ChatState.getPermissions().moderate.vision || !this.model.id()))
+		if(this.model.isDeletedForever /*&& (!ChatState.getPermissions().moderate.vision || !this.model.id())*/)
 			return false;
 
 		if(this.model.deleted_by() && !(ChatState.getPermissions().moderate.vision || this.model.user() == app.session.user))

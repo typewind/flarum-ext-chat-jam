@@ -10,7 +10,7 @@ namespace Xelson\Chat\Commands;
 
 use Flarum\User\User;
 
-class PostNotify
+class PostEventMessage
 {
     /**
      * The user performing the action.
@@ -20,20 +20,26 @@ class PostNotify
     public $actor;
 
     /**
-     * The chat message
-     *
      * @var string
      */
-    public $msg;
+    public $event_id;
 
     /**
-     * @param int                          $postId The ID of the post to upload the image for.
-     * @param User                         $actor  The user performing the action.
+     * @var string
      */
-    public function __construct(User $actor, $data, string $ip_address)
+    public $ip_address;
+
+    /**
+     * @param User $actor
+     * @param int $chat_id
+     * @param string $content
+     * @param string $ip_address
+     */
+    public function __construct($chat_id, User $actor, string $content, string $ip_address)
     {
         $this->actor = $actor;
-        $this->data = $data;
+        $this->chat_id = $chat_id;
+        $this->content = $content;
         $this->ip_address = $ip_address;
     }
 }

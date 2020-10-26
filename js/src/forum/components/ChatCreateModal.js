@@ -62,6 +62,7 @@ export default class ChatCreateModal extends Modal
 			model =>
 			{
 				ChatState.addChat(model);
+				ChatState.onChatChanged(model);
 				m.redraw();
 			}
 		);

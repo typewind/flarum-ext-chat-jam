@@ -16,6 +16,7 @@ use Xelson\Chat\Chat;
 use Xelson\Chat\ChatUser;
 use Xelson\Chat\ChatValidator;
 use Xelson\Chat\ChatRepository;
+use Xelson\Chat\EventMessageChatCreated;
 use Xelson\Chat\Commands\PostEventMessage;
 use Xelson\Chat\Exceptions\ChatEditException;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
@@ -25,6 +26,7 @@ class CreateChatHandler
 	use AssertPermissionTrait;
 
 	/**
+     * @param ChatValidator $validator
      * @param ChatRepository $chats
      * @param ChatSocket $socket
      */
@@ -78,12 +80,15 @@ class CreateChatHandler
             {
                 $chatUsers = $chat->users;
 
-                if(count($chatUsers) == 2 && ($chatUsers[0]->id == $users[0]['id'] || $chatUsers[1]->id == $users[0]['id']))
+                if(count($chatUsers) == 2 && 
+                    ($chatUsers[0]->id == $users[0]['id'] || $chatUsers[0]->id == $users[1]['id']) &&
+                    ($chatUsers[1]->id == $users[0]['id'] || $chatUsers[1]->id == $users[1]['id'])
+                )
                     throw new ChatEditException;
             }
         }
 
-        $color = sprintf('#%06X', mt_rand(0xFF9999, 0xFFFF00));
+        $color = sprintf('#%06X', mt_rand(0x222222, 0xFFFF00));
 
         $chat = Chat::build(
             $attributes['title'],
@@ -107,15 +112,11 @@ class CreateChatHandler
             throw $e;
         }
 
-        $eventContent = json_encode(['id' => 'chatCreated', 'users' => $user_ids]);
-        $eventMessage = $this->bus->dispatch(new PostEventMessage($chat->id, $actor, $eventContent, $ip_address));
+        $eventMessage = $this->bus->dispatch(
+            new PostEventMessage($chat->id, $actor, new EventMessageChatCreated($user_ids), $ip_address)
+        );
         
-		// Хендлим список айдишников пользователей для добавления в чат. В конце чат должен быть создан и данные
-		// отосланы по сокету. Но сообщение сокета может прийти раньше чем http ответ (надо учесть)
 		// Пользователь должен иметь возможность запретить приглашать себя куда либо
-        // По-хорошему код на изменение чата (тайтл, участники) должен быть переиспользован, т.к у нас еще будет команда EditChat
-        // DeleteChat тоже не стоит забывать
-        // Сделать абстракцию EventMessage для постинга разных типов уведомлений
 
         return $chat;
     }

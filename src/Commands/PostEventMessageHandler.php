@@ -35,10 +35,11 @@ class PostEventMessageHandler
     {
         $actor = $command->actor;
         $chat_id = $command->chat_id;
-        $content = $command->content;
+        $eventInstance = $command->event;
         $ip_address = $command->ip_address;
 
         $chat = $this->chats->findOrFail($chat_id, $actor);
+        $content = $eventInstance->content();
 
         $message = Message::build(
             $content,

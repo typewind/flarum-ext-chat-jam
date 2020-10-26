@@ -28,10 +28,15 @@ export default class ChatEventMessage extends ChatMessage
 		{
 			case 'chatCreated':
 			{
-				return app.translator.trans('pushedx-chat.forum.chat.message.events.chat.created', {
+				let transKey = 'chat'
+				if(this.parsedContent.users.length == 1) transKey = 'pm'
+				else if(this.model.chat().type() == 1) transKey = 'channel'
+
+				return app.translator.trans(`pushedx-chat.forum.chat.message.events.${transKey}.created`, {
 					creatorname: this.componentUserMention(this.model.chat().creator()), 
 					chatname: <b>{this.model.chat().title()}</b>,
-					usernames: this.parsedContent.users.map(user_id => this.componentUserMention(app.store.getById('users', user_id))) 
+					usernames: this.parsedContent.users.map(user_id => this.componentUserMention(app.store.getById('users', user_id))),
+					username: this.parsedContent.users.length ? this.componentUserMention(app.store.getById('users', this.parsedContent.users[0])) : null
 				})
 			}
 		}

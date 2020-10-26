@@ -40,12 +40,15 @@ pushedx-chat:
         censored: Авторизируйтесь, чтобы увидеть это сообщение!
         deleted: удалено 
         deleted_forever: удалено навсегда
+        you: Вы
         type:
           url: URL
           event: Событие
           code: <Код />
         events:
           chat.created: "{creatorname} создал {chatname} и пригласил {usernames}"
+          pm.created: "{creatorname} создал чат с {username}"
+          channel.created: "{creatorname} создал канал {chatname}"
     errors:
       unauthenticated: Писать в чате могут только зарегистрированные пользователи
       chatdenied: Вашей группе пользователей запрещено писать сообщения

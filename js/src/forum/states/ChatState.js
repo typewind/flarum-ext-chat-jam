@@ -79,8 +79,13 @@ class ChatState
 	
 	handleSocketEvent(r)
     {
+		console.log(r);
+
 		let message = r.response.message;
 		if(message) message = app.store.pushPayload(message);
+
+		let chat = r.response.chat;
+		if(chat) chat = app.store.pushPayload(chat);
 
 		switch(r.event.id)
 		{
@@ -114,6 +119,22 @@ class ChatState
 					this.deleteChatMessage(message, false, message.deleted_by())
 
 				break;
+			}
+			case 'chat.create':
+			{
+				if(!app.session.user || chat.creator() != app.session.user)
+				{
+					this.addChat(chat);
+					m.redraw();
+				}
+			}
+			case 'chat.delete':
+			{
+				if(!app.session.user || chat.creator() != app.session.user)
+				{
+					this.deleteChat(chat);
+					m.redraw();
+				}
 			}
 		}
 	}
@@ -155,6 +176,14 @@ class ChatState
 	{
 		this.chats.push(model);
 		this.viewportState[model.id()] = this.initViewportState();
+
+		app.test = () => model.delete();
+	}
+
+	deleteChat(model)
+	{
+		this.chats = this.chats.map(mdl => mdl != model);
+		if(this.getCurrentChat() == model) this.setCurrentChat(null);
 	}
 
 	isExistsPMChat(user1, user2)
@@ -165,7 +194,7 @@ class ChatState
 		});
 	}
 
-	onChatChanged(model, e)
+	onChatChanged(model, e = {})
 	{
 		e.redraw = false;
 		if(model == this.getCurrentChat()) return;

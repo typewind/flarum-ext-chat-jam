@@ -41,12 +41,15 @@ pushedx-chat:
         censored: Log in to see this message!
         deleted: deleted by 
         deleted_forever: deleted forever by
+        you: You
         type:
           url: URL
           event: Event
           code: <Code />
         events:
           chat.created: "{creatorname} created {chatname} and invited {usernames}"
+          pm.created: "{creatorname} created chat with {username}"
+          channel.created: "{creatorname} created channel {chatname}"
     errors:
       unauthenticated: Only registered users can use the chat
       chatdenied: Your user group is not allowed to write messages

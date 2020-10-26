@@ -239,6 +239,7 @@ function (_Modal) {
       }
     }).then(function (model) {
       _states_ChatState__WEBPACK_IMPORTED_MODULE_6__["default"].addChat(model);
+      _states_ChatState__WEBPACK_IMPORTED_MODULE_6__["default"].onChatChanged(model);
       m.redraw();
     });
     app.search.neonchat = null;
@@ -386,12 +387,15 @@ function (_ChatMessage) {
     switch (this.parsedContent.id) {
       case 'chatCreated':
         {
-          return app.translator.trans('pushedx-chat.forum.chat.message.events.chat.created', {
+          var transKey = 'chat';
+          if (this.parsedContent.users.length == 1) transKey = 'pm';else if (this.model.chat().type() == 1) transKey = 'channel';
+          return app.translator.trans("pushedx-chat.forum.chat.message.events." + transKey + ".created", {
             creatorname: this.componentUserMention(this.model.chat().creator()),
             chatname: m("b", null, this.model.chat().title()),
             usernames: this.parsedContent.users.map(function (user_id) {
               return _this.componentUserMention(app.store.getById('users', user_id));
-            })
+            }),
+            username: this.parsedContent.users.length ? this.componentUserMention(app.store.getById('users', this.parsedContent.users[0])) : null
           });
         }
     }
@@ -1178,7 +1182,7 @@ function (_Component) {
         sender = lastMessage.user();
 
     if (app.session.user) {
-      if (app.session.user.id() == sender.id()) senderName = 'You: ';else if (users.length > 2 || this.model.type()) senderName = sender.displayName() + ': ';
+      if (app.session.user.id() == sender.id()) senderName = app.translator.trans('pushedx-chat.forum.chat.message.you') + ": ";else if (users.length > 2 || this.model.type()) senderName = sender.displayName() + ': ';
     }
 
     return m("div", {
@@ -2148,8 +2152,11 @@ function () {
   };
 
   _proto.handleSocketEvent = function handleSocketEvent(r) {
+    console.log(r);
     var message = r.response.message;
     if (message) message = app.store.pushPayload(message);
+    var chat = r.response.chat;
+    if (chat) chat = app.store.pushPayload(chat);
 
     switch (r.event.id) {
       case 'message.post':
@@ -2179,6 +2186,22 @@ function () {
         {
           if (!app.session.user || message.deleted_by().id() != app.session.user.id()) this.deleteChatMessage(message, false, message.deleted_by());
           break;
+        }
+
+      case 'chat.create':
+        {
+          if (!app.session.user || chat.creator() != app.session.user) {
+            this.addChat(chat);
+            m.redraw();
+          }
+        }
+
+      case 'chat.delete':
+        {
+          if (!app.session.user || chat.creator() != app.session.user) {
+            this.deleteChat(chat);
+            m.redraw();
+          }
         }
     }
   };
@@ -2220,6 +2243,17 @@ function () {
   _proto.addChat = function addChat(model) {
     this.chats.push(model);
     this.viewportState[model.id()] = this.initViewportState();
+
+    app.test = function () {
+      return model["delete"]();
+    };
+  };
+
+  _proto.deleteChat = function deleteChat(model) {
+    this.chats = this.chats.map(function (mdl) {
+      return mdl != model;
+    });
+    if (this.getCurrentChat() == model) this.setCurrentChat(null);
   };
 
   _proto.isExistsPMChat = function isExistsPMChat(user1, user2) {
@@ -2234,6 +2268,10 @@ function () {
   };
 
   _proto.onChatChanged = function onChatChanged(model, e) {
+    if (e === void 0) {
+      e = {};
+    }
+
     e.redraw = false;
     if (model == this.getCurrentChat()) return;
     this.setCurrentChat(model);

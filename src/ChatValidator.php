@@ -18,7 +18,6 @@ class ChatValidator extends AbstractValidator
 		[
 			'title' => 
 			[
-				'required',
 				"max:100"
 			],
 			'type' => 

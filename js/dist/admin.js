@@ -212,7 +212,7 @@ __webpack_require__.r(__webpack_exports__);
 
 flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.initializers.add('pushedx-chat', function (app) {
   app.extensionSettings['xelson-chat'] = function () {
-    return app.modal.show(new _components_ChatSettingsModal__WEBPACK_IMPORTED_MODULE_3__["default"]());
+    return app.modal.show(_components_ChatSettingsModal__WEBPACK_IMPORTED_MODULE_3__["default"]);
   };
 
   Object(flarum_extend__WEBPACK_IMPORTED_MODULE_0__["extend"])(flarum_components_PermissionGrid__WEBPACK_IMPORTED_MODULE_2___default.a.prototype, 'viewItems', function (items) {

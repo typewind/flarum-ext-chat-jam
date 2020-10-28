@@ -149,6 +149,93 @@ function _inheritsLoose(subClass, superClass) {
 
 /***/ }),
 
+/***/ "./src/forum/components/ChatAvatar.js":
+/*!********************************************!*\
+  !*** ./src/forum/components/ChatAvatar.js ***!
+  \********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChatAvatar; });
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flarum/Component */ "flarum/Component");
+/* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_Component__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var flarum_utils_classList__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/utils/classList */ "flarum/utils/classList");
+/* harmony import */ var flarum_utils_classList__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_classList__WEBPACK_IMPORTED_MODULE_2__);
+
+
+
+
+var ChatAvatar =
+/*#__PURE__*/
+function (_Component) {
+  Object(_babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__["default"])(ChatAvatar, _Component);
+
+  function ChatAvatar() {
+    return _Component.apply(this, arguments) || this;
+  }
+
+  var _proto = ChatAvatar.prototype;
+
+  _proto.oninit = function oninit(vnode) {
+    _Component.prototype.oninit.call(this, vnode);
+
+    this.model = this.attrs.model;
+  };
+
+  _proto.componentAvatarPM = function componentAvatarPM() {
+    return m("div", {
+      className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_2___default()({
+        avatar: true,
+        image: this.model.avatarUrl()
+      }),
+      style: {
+        'background-color': this.model.color(),
+        color: this.model.textColor(),
+        'background-image': this.model.avatarUrl() ? "url(" + this.model.avatarUrl() + ")" : null
+      }
+    }, this.model.icon() ? m("i", {
+      "class": this.model.icon()
+    }) : this.model.avatarUrl() ? null : this.firstLetter(this.model.title()).toUpperCase());
+  };
+
+  _proto.componentAvatarChannel = function componentAvatarChannel() {
+    return m("div", {
+      className: "avatar",
+      style: {
+        'background-color': this.model.color(),
+        color: this.model.textColor()
+      }
+    }, this.model.icon() ? m("i", {
+      "class": this.model.icon()
+    }) : this.model.avatarUrl() ? null : this.firstLetter(this.model.title()).toUpperCase());
+  };
+
+  _proto.view = function view(vnode) {
+    return this.model.type() == 1 ? this.componentAvatarChannel() : this.componentAvatarPM();
+  };
+
+  _proto.firstLetter = function firstLetter(string) {
+    for (var i = 0; i < string.length; i++) {
+      if (this.isLetter(string[i])) return string[i];
+    }
+
+    return string[0];
+  };
+
+  _proto.isLetter = function isLetter(c) {
+    return c.toLowerCase() != c.toUpperCase();
+  };
+
+  return ChatAvatar;
+}(flarum_Component__WEBPACK_IMPORTED_MODULE_1___default.a);
+
+
+
+/***/ }),
+
 /***/ "./src/forum/components/ChatCreateModal.js":
 /*!*************************************************!*\
   !*** ./src/forum/components/ChatCreateModal.js ***!
@@ -160,13 +247,12 @@ function _inheritsLoose(subClass, superClass) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChatCreateModal; });
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
-/* harmony import */ var flarum_components_Modal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flarum/components/Modal */ "flarum/components/Modal");
-/* harmony import */ var flarum_components_Modal__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Modal__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/components/Button */ "flarum/components/Button");
-/* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Button__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var flarum_utils_classList__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/utils/classList */ "flarum/utils/classList");
-/* harmony import */ var flarum_utils_classList__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_classList__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _ChatSearchUser__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatSearchUser */ "./src/forum/components/ChatSearchUser.js");
+/* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flarum/components/Button */ "flarum/components/Button");
+/* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Button__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var flarum_utils_classList__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/utils/classList */ "flarum/utils/classList");
+/* harmony import */ var flarum_utils_classList__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_classList__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _ChatSearchUser__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ChatSearchUser */ "./src/forum/components/ChatSearchUser.js");
+/* harmony import */ var _ChatModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatModal */ "./src/forum/components/ChatModal.js");
 /* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! flarum/utils/Stream */ "flarum/utils/Stream");
 /* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _states_ChatState__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../states/ChatState */ "./src/forum/states/ChatState.js");
@@ -180,118 +266,81 @@ __webpack_require__.r(__webpack_exports__);
 
 var ChatCreateModal =
 /*#__PURE__*/
-function (_Modal) {
-  Object(_babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__["default"])(ChatCreateModal, _Modal);
+function (_ChatModal) {
+  Object(_babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__["default"])(ChatCreateModal, _ChatModal);
 
   function ChatCreateModal() {
-    return _Modal.apply(this, arguments) || this;
+    return _ChatModal.apply(this, arguments) || this;
   }
 
   var _proto = ChatCreateModal.prototype;
 
   _proto.oninit = function oninit(vnode) {
-    _Modal.prototype.oninit.call(this, vnode);
+    _ChatModal.prototype.oninit.call(this, vnode);
 
-    this.selectedUsers = [];
-    this.input = {
-      title: flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_5___default()('')
-    };
     this.isChannel = false;
-    app.search.neonchat = {};
-  };
-
-  _proto.className = function className() {
-    return 'Modal--small';
   };
 
   _proto.title = function title() {
     return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.title');
   };
 
-  _proto.userSelected = function userSelected(user, isSelected) {
-    if (!isSelected) this.selectedUsers.push(user);else this.selectedUsers = this.selectedUsers.filter(function (u) {
-      return u.id() != user.id();
-    });
-    return !isSelected;
-  };
-
-  _proto.isChatExists = function isChatExists() {
-    return this.selectedUsers.length == 1 && _states_ChatState__WEBPACK_IMPORTED_MODULE_6__["default"].isExistsPMChat(app.session.user, this.selectedUsers[0]);
-  };
-
-  _proto.isCanCreateChat = function isCanCreateChat() {
-    if (this.selectedUsers.length > 1 && !this.input.title().length) return false;
-    if (!this.selectedUsers.length) return false;
-    if (this.isChatExists()) return false;
-    return true;
-  };
-
-  _proto.isCanCreateChannel = function isCanCreateChannel() {
-    return this.input.title().length;
-  };
-
   _proto.onsubmit = function onsubmit() {
     app.store.createRecord('chats').save({
-      title: this.input.title(),
+      title: this.getInput().title(),
       isChannel: this.isChannel,
+      icon: this.getInput().icon(),
+      color: this.getInput().color(),
       relationships: {
-        users: this.selectedUsers
+        users: this.getSelectedUsers()
       }
     }).then(function (model) {
       _states_ChatState__WEBPACK_IMPORTED_MODULE_6__["default"].addChat(model);
       _states_ChatState__WEBPACK_IMPORTED_MODULE_6__["default"].onChatChanged(model);
       m.redraw();
     });
-    app.search.neonchat = null;
     this.hide();
   };
 
-  _proto.alertText = function alertText() {
-    if (this.isChatExists()) return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.alerts.exists');
-    return null;
+  _proto.componentFormInputColor = function componentFormInputColor() {
+    return this.componentFormColor({
+      title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.color'),
+      desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.color.validator'),
+      stream: this.getInput().color,
+      placeholder: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.color')
+    });
   };
 
-  _proto.componentAlert = function componentAlert() {
-    return !this.alertText() ? null : m("div", {
-      className: "Alert"
-    }, this.alertText());
+  _proto.componentFormInputIcon = function componentFormInputIcon() {
+    return this.componentFormIcon({
+      title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.icon'),
+      desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.icon.validator', {
+        a: m("a", {
+          href: "https://fontawesome.com/icons?m=free",
+          tabindex: "-1"
+        })
+      }),
+      stream: this.getInput().icon,
+      placeholder: 'fas fa-bolt'
+    });
   };
 
   _proto.componentFormChat = function componentFormChat() {
-    return [this.selectedUsers.length > 1 ? [m("label", null, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat')), m("div", null, m("label", null, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator')), m("input", {
-      "class": "FormControl",
-      type: "text",
-      bidi: this.input.title,
+    return [this.usersSelected.length > 1 ? [this.componentFormInput({
+      title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat'),
+      desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator'),
+      stream: this.getInput().title,
       placeholder: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat')
-    }))] : null, m("label", null, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.users')), this.componentAlert(), m("div", {
-      className: "UsersTags"
-    }, this.selectedUsers.map(function (u) {
-      return m("div", {
-        className: "UserMention"
-      }, '@' + u.displayName());
-    })), m("div", {
-      className: "UsersSearch"
-    }, m(_ChatSearchUser__WEBPACK_IMPORTED_MODULE_4__["default"], {
-      state: app.search,
-      callback: this.userSelected.bind(this)
-    })), m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default.a, {
-      className: "Button Button--primary Button--block ButtonCreate",
-      disabled: !this.isCanCreateChat(),
-      onclick: this.onsubmit.bind(this)
-    }, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.create.chat'))];
+    }), this.componentFormInputColor(), this.componentFormInputIcon()] : null, this.componentFormUsersSelect()];
   };
 
   _proto.componentFormChannel = function componentFormChannel() {
-    return [m("label", null, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.channel')), m("div", null, m("label", null, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator')), m("input", {
-      "class": "FormControl",
-      type: "text",
-      bidi: this.input.title,
+    return [this.componentFormInput({
+      title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.channel'),
+      desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator'),
+      stream: this.getInput().title,
       placeholder: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.channel')
-    })), m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default.a, {
-      className: "Button Button--primary Button--block ButtonCreate",
-      disabled: !this.isCanCreateChannel(),
-      onclick: this.onsubmit.bind(this)
-    }, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.create.channel'))];
+    }), this.componentFormInputColor(), this.componentFormInputIcon()];
   };
 
   _proto.content = function content() {
@@ -304,7 +353,7 @@ function (_Modal) {
     }, m("div", {
       className: "ChatType"
     }, m("div", {
-      className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_3___default()({
+      className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_2___default()({
         'Tab Tab--left': true,
         'Tab--active': !this.isChannel
       }),
@@ -312,18 +361,148 @@ function (_Modal) {
         return _this.isChannel = false;
       }.bind(this)
     }, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.chat')), m("div", {
-      className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_3___default()({
+      className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_2___default()({
         'Tab Tab--right': true,
         'Tab--active': this.isChannel
       }),
       onclick: function () {
         return _this.isChannel = true;
       }.bind(this)
-    }, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.channel'))), this.isChannel ? this.componentFormChannel() : this.componentFormChat()));
+    }, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.channel'))), this.isChannel ? this.componentFormChannel() : this.componentFormChat(), m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_1___default.a, {
+      className: "Button Button--primary Button--block ButtonCreate",
+      disabled: this.isChannel ? !this.isCanCreateChannel() : !this.isCanCreateChat(),
+      onclick: this.onsubmit.bind(this)
+    }, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.create.chat'))));
   };
 
   return ChatCreateModal;
-}(flarum_components_Modal__WEBPACK_IMPORTED_MODULE_1___default.a);
+}(_ChatModal__WEBPACK_IMPORTED_MODULE_4__["default"]);
+
+
+
+/***/ }),
+
+/***/ "./src/forum/components/ChatEditModal.js":
+/*!***********************************************!*\
+  !*** ./src/forum/components/ChatEditModal.js ***!
+  \***********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChatEditModal; });
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flarum/components/Button */ "flarum/components/Button");
+/* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Button__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _ChatModal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ChatModal */ "./src/forum/components/ChatModal.js");
+/* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/utils/Stream */ "flarum/utils/Stream");
+/* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _ChatAvatar__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatAvatar */ "./src/forum/components/ChatAvatar.js");
+
+
+
+
+
+
+var ChatEditModal =
+/*#__PURE__*/
+function (_ChatModal) {
+  Object(_babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__["default"])(ChatEditModal, _ChatModal);
+
+  function ChatEditModal() {
+    return _ChatModal.apply(this, arguments) || this;
+  }
+
+  var _proto = ChatEditModal.prototype;
+
+  _proto.oninit = function oninit(vnode) {
+    _ChatModal.prototype.oninit.call(this, vnode);
+
+    this.getInput().title = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default()(this.model.title());
+    this.getInput().color = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default()(this.model.color());
+    this.getInput().icon = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default()(this.model.icon());
+    this.setSelectedUsers(this.model.users());
+  };
+
+  _proto.title = function title() {
+    return app.translator.trans('pushedx-chat.forum.chat.edit_modal.title');
+  };
+
+  _proto.onsubmit = function onsubmit() {
+    this.hide();
+  };
+
+  _proto.alertText = function alertText() {
+    if (this.isChatExists()) return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.alerts.exists');
+    if (!!!this.model.getPMUser() && this.getSelectedUsers().length < 3) return app.translator.trans('pushedx-chat.forum.chat.edit_modal.alerts.chat_to_pm');
+    return null;
+  };
+
+  _proto.componentFormInputIcon = function componentFormInputIcon() {
+    return this.componentFormIcon({
+      title: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.icon'),
+      desc: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.icon.validator', {
+        a: m("a", {
+          href: "https://fontawesome.com/icons?m=free",
+          tabindex: "-1"
+        })
+      }),
+      stream: this.getInput().icon,
+      placeholder: 'fas fa-bolt'
+    });
+  };
+
+  _proto.componentFormInputTitle = function componentFormInputTitle() {
+    return this.componentFormInput({
+      title: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.title'),
+      desc: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.title.validator'),
+      stream: this.getInput().title,
+      placeholder: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.title')
+    });
+  };
+
+  _proto.componentFormInputColor = function componentFormInputColor() {
+    return this.componentFormColor({
+      title: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.color'),
+      desc: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.color.validator'),
+      stream: this.getInput().color,
+      placeholder: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.color')
+    });
+  };
+
+  _proto.componentFormPM = function componentFormPM() {
+    return [];
+  };
+
+  _proto.componentFormChannel = function componentFormChannel() {
+    return [this.componentFormInputTitle(), this.componentFormInputColor(), this.componentFormInputIcon()];
+  };
+
+  _proto.componentFormChat = function componentFormChat() {
+    return [this.componentFormInputTitle(), this.componentFormInputColor(), this.componentFormInputIcon(), this.componentFormUsersSelect()];
+  };
+
+  _proto.componentForm = function componentForm() {
+    if (this.model.type()) return this.componentFormChannel();
+    if (this.model.users().length == 2) return this.componentFormPM();
+    return this.componentFormChat();
+  };
+
+  _proto.content = function content() {
+    return m("div", {
+      className: "Modal-body Modal-body--neonchat"
+    }, m("div", {
+      "class": "Form-group InputTitle"
+    }, this.componentForm(), m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_1___default.a, {
+      className: "Button Button--primary Button--block ButtonCreate",
+      onclick: this.onsubmit.bind(this),
+      disabled: this.model.type() ? !this.isCanCreateChannel() : !this.isCanCreateChat()
+    }, app.translator.trans('pushedx-chat.forum.chat.edit_modal.save_button'))));
+  };
+
+  return ChatEditModal;
+}(_ChatModal__WEBPACK_IMPORTED_MODULE_2__["default"]);
 
 
 
@@ -370,7 +549,9 @@ function (_ChatMessage) {
   _proto.oninit = function oninit(vnode) {
     _ChatMessage.prototype.oninit.call(this, vnode);
 
-    this.parsedContent = JSON.parse(this.model.message());
+    if (this.model.message()[0] == '*') this.parsedContent = {
+      id: 'chatCensored'
+    };else this.parsedContent = JSON.parse(this.model.message());
   };
 
   _proto.componentUserMention = function componentUserMention(user) {
@@ -385,13 +566,22 @@ function (_ChatMessage) {
     var _this = this;
 
     switch (this.parsedContent.id) {
+      case 'chatCensored':
+        {
+          return m("div", {
+            className: "censored"
+          }, this.model.message());
+        }
+
       case 'chatCreated':
         {
           var transKey = 'chat';
           if (this.parsedContent.users.length == 1) transKey = 'pm';else if (this.model.chat().type() == 1) transKey = 'channel';
           return app.translator.trans("pushedx-chat.forum.chat.message.events." + transKey + ".created", {
             creatorname: this.componentUserMention(this.model.chat().creator()),
-            chatname: m("b", null, this.model.chat().title()),
+            chatname: m("b", {
+              className: "chat-title"
+            }, this.model.chat().title()),
             usernames: this.parsedContent.users.map(function (user_id) {
               return _this.componentUserMention(app.store.getById('users', user_id));
             }),
@@ -430,9 +620,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flarum/Component */ "flarum/Component");
 /* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_Component__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _ChatPreview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ChatPreview */ "./src/forum/components/ChatPreview.js");
-/* harmony import */ var _ChatViewport__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ChatViewport */ "./src/forum/components/ChatViewport.js");
-/* harmony import */ var _ChatCreateModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatCreateModal */ "./src/forum/components/ChatCreateModal.js");
+/* harmony import */ var _ChatWelcome__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ChatWelcome */ "./src/forum/components/ChatWelcome.js");
+/* harmony import */ var _ChatCreateModal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ChatCreateModal */ "./src/forum/components/ChatCreateModal.js");
+/* harmony import */ var _ChatEditModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatEditModal */ "./src/forum/components/ChatEditModal.js");
 /* harmony import */ var _states_ChatState__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../states/ChatState */ "./src/forum/states/ChatState.js");
 
 
@@ -559,14 +749,13 @@ function (_Component) {
     }, m("textarea", {
       id: "chat-find",
       placeholder: app.translator.trans('pushedx-chat.forum.chat.list.placeholder')
-    })), m("p", {
-      "data-title": app.translator.trans('pushedx-chat.forum.chat.list.' + (_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('beingShownChatsList') ? 'unpin' : 'pin'))
-    }, m("div", {
+    })), m("div", {
       className: "icon icon-toggle",
-      onclick: this.toggleChatsList.bind(this)
+      onclick: this.toggleChatsList.bind(this),
+      "data-title": app.translator.trans('pushedx-chat.forum.chat.list.' + (_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('beingShownChatsList') ? 'unpin' : 'pin'))
     }, m("i", {
       className: "fas fa-paperclip"
-    })))), m("div", {
+    }))), m("div", {
       className: "list",
       style: {
         'max-height': _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('transform').y + 'px'
@@ -574,7 +763,7 @@ function (_Component) {
     }, _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentsChats(), app.session.user ? m("div", {
       "class": "panel-add",
       onclick: function onclick() {
-        return app.modal.show(_ChatCreateModal__WEBPACK_IMPORTED_MODULE_4__["default"]);
+        return app.modal.show(_ChatCreateModal__WEBPACK_IMPORTED_MODULE_3__["default"]);
       }
     }) : null)), m("div", {
       id: "chat-panel"
@@ -583,30 +772,49 @@ function (_Component) {
       ondragstart: function ondragstart() {
         return false;
       }
-    }, m("h2", null, _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat() ? _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat().finalTitle : app.translator.trans('pushedx-chat.forum.toolbar.title')), m("p", {
-      "data-title": app.translator.trans(_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('beingShown') ? 'pushedx-chat.forum.toolbar.minimize' : 'pushedx-chat.forum.toolbar.maximize')
-    }, m("div", {
+    }, m("h2", null, _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat() ? [_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat().icon() ? m("i", {
+      "class": _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat().icon(),
+      style: {
+        color: _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat().color(),
+        'margin-right': '3px'
+      }
+    }) : null, _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat().title()] : app.translator.trans('pushedx-chat.forum.toolbar.title')), !_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat() ? null : m("div", {
       className: "icon",
-      onclick: this.toggleChat.bind(this)
+      "data-title": app.translator.trans('pushedx-chat.forum.toolbar.chat.settings'),
+      onclick: function onclick() {
+        return app.modal.show(_ChatEditModal__WEBPACK_IMPORTED_MODULE_4__["default"], {
+          model: _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat()
+        });
+      }
     }, m("i", {
-      className: _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('beingShown') ? 'fas fa-window-minimize' : 'fas fa-window-maximize'
-    }))), m("p", {
-      "data-title": app.translator.trans(_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('notify') ? 'pushedx-chat.forum.toolbar.disable_notifications' : 'pushedx-chat.forum.toolbar.enable_notifications')
+      className: "fas fa-cog"
+    })), m("div", {
+      className: "window-buttons"
     }, m("div", {
       className: "icon",
-      onclick: this.toggleNotifications.bind(this)
-    }, m("i", {
-      className: _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('notify') ? 'fas fa-bell' : 'fas fa-bell-slash'
-    }))), m("p", {
-      "data-title": app.translator.trans(_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('isMuted') ? 'pushedx-chat.forum.toolbar.enable_sounds' : 'pushedx-chat.forum.toolbar.disable_sounds')
-    }, m("div", {
-      className: "icon",
-      onclick: this.toggleSound.bind(this)
+      onclick: this.toggleSound.bind(this),
+      "data-title": app.translator.trans('pushedx-chat.forum.toolbar.' + (_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('isMuted') ? 'enable_sounds' : 'disable_sounds'))
     }, m("i", {
       className: _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('isMuted') ? 'fas fa-volume-mute' : 'fas fa-volume-up'
+    })), m("div", {
+      className: "icon",
+      onclick: this.toggleNotifications.bind(this),
+      "data-title": app.translator.trans('pushedx-chat.forum.toolbar.' + (_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('notify') ? 'disable_notifications' : 'enable_notifications'))
+    }, m("i", {
+      className: _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('notify') ? 'fas fa-bell' : 'fas fa-bell-slash'
+    })), m("div", {
+      className: "icon",
+      onclick: this.toggleChat.bind(this),
+      "data-title": app.translator.trans('pushedx-chat.forum.toolbar.' + (_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('beingShown') ? 'minimize' : 'maximize'))
+    }, m("i", {
+      className: _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('beingShown') ? 'fas fa-window-minimize' : 'fas fa-window-maximize'
     })))), m("div", {
       id: "chat-viewport"
-    }, (_ChatState$componentC = _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentCurViewport()) != null ? _ChatState$componentC : m(_ChatViewport__WEBPACK_IMPORTED_MODULE_3__["default"], null)))));
+    }, (_ChatState$componentC = _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentCurViewport()) != null ? _ChatState$componentC : m(_ChatWelcome__WEBPACK_IMPORTED_MODULE_2__["default"], null)))));
+  };
+
+  _proto.tooltip = function tooltip(vnode) {
+    $(vnode.dom).tooltip('fixTitle');
   };
 
   _proto.chatMoveListener = function chatMoveListener(event, e) {
@@ -1009,6 +1217,188 @@ function (_Component) {
 
 /***/ }),
 
+/***/ "./src/forum/components/ChatModal.js":
+/*!*******************************************!*\
+  !*** ./src/forum/components/ChatModal.js ***!
+  \*******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChatModal; });
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var flarum_components_Modal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flarum/components/Modal */ "flarum/components/Modal");
+/* harmony import */ var flarum_components_Modal__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Modal__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _ChatSearchUser__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ChatSearchUser */ "./src/forum/components/ChatSearchUser.js");
+/* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/utils/Stream */ "flarum/utils/Stream");
+/* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var flarum_utils_ItemList__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! flarum/utils/ItemList */ "flarum/utils/ItemList");
+/* harmony import */ var flarum_utils_ItemList__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_ItemList__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _states_ChatState__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../states/ChatState */ "./src/forum/states/ChatState.js");
+
+
+
+
+
+
+
+var ChatModal =
+/*#__PURE__*/
+function (_Modal) {
+  Object(_babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__["default"])(ChatModal, _Modal);
+
+  function ChatModal() {
+    return _Modal.apply(this, arguments) || this;
+  }
+
+  var _proto = ChatModal.prototype;
+
+  _proto.oninit = function oninit(vnode) {
+    _Modal.prototype.oninit.call(this, vnode);
+
+    this.model = this.attrs.model;
+    app.search.neonchat = {
+      usersSelected: []
+    };
+    this.usersSelected = app.search.neonchat.usersSelected;
+    this.input = {
+      title: flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default()(''),
+      color: flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default()(''),
+      icon: flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default()('')
+    };
+  };
+
+  _proto.onremove = function onremove(vnode) {
+    app.search.neonchat = null;
+  };
+
+  _proto.getInput = function getInput() {
+    return this.input;
+  };
+
+  _proto.setSelectedUsers = function setSelectedUsers(users) {
+    app.search.neonchat.usersSelected = users;
+    this.usersSelected = app.search.neonchat.usersSelected;
+  };
+
+  _proto.getSelectedUsers = function getSelectedUsers() {
+    return this.usersSelected;
+  };
+
+  _proto.className = function className() {
+    return 'Modal--small';
+  };
+
+  _proto.isChatExists = function isChatExists() {
+    return this.getSelectedUsers().length == 1 && _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].isExistsPMChat(app.session.user, this.getSelectedUsers()[0]);
+  };
+
+  _proto.isCanCreateChat = function isCanCreateChat() {
+    if (this.getSelectedUsers().length > 1 && !this.input.title().length) return false;
+    if (!this.getSelectedUsers().length) return false;
+    if (this.alertText()) return false;
+    return true;
+  };
+
+  _proto.isCanCreateChannel = function isCanCreateChannel() {
+    return this.input.title().length;
+  };
+
+  _proto.alertText = function alertText() {
+    if (this.isChatExists()) return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.alerts.exists');
+    return null;
+  };
+
+  _proto.componentAlert = function componentAlert() {
+    return !this.alertText() ? null : m("div", {
+      className: "Alert"
+    }, this.alertText());
+  };
+
+  _proto.componentFormUsersSelect = function componentFormUsersSelect() {
+    return [m("label", null, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.users')), this.componentUsersSelect()];
+  };
+
+  _proto.componentUsersSelect = function componentUsersSelect() {
+    var _this = this;
+
+    return [this.componentAlert(), m("div", {
+      className: "UsersTags"
+    }, this.getSelectedUsers().map(function (u) {
+      return m("div", {
+        className: "UserMention deleteable",
+        onclick: function onclick() {
+          return _this.getSelectedUsers().splice(_this.getSelectedUsers().indexOf(u), 1);
+        }
+      }, '@' + u.displayName());
+    })), m("div", {
+      className: "UsersSearch"
+    }, m(_ChatSearchUser__WEBPACK_IMPORTED_MODULE_2__["default"], {
+      state: app.search
+    }))];
+  };
+
+  _proto.componentFormIcon = function componentFormIcon(options) {
+    var _this2 = this;
+
+    return [options.title ? m("label", null, options.title) : null, m("div", null, options.desc ? m("label", null, options.desc) : null, m("div", {
+      className: "Icon-Input"
+    }, m("input", {
+      "class": "FormControl",
+      type: "text",
+      bidi: options.stream,
+      placeholder: options.placeholder,
+      onupdate: function onupdate(vnode) {
+        return $('.Chat-FullColor').css({
+          color: _this2.input.color(),
+          backgroundColor: _this2.input.color()
+        });
+      }
+    }), m("icon", {
+      className: "Chat-FullColor"
+    }, m("i", {
+      className: this.input.icon()
+    }))))];
+  };
+
+  _proto.componentFormColor = function componentFormColor(options) {
+    var _this3 = this;
+
+    return [options.title ? m("label", null, options.title) : null, m("div", null, options.desc ? m("label", null, options.desc) : null, m("div", {
+      className: "Color-Input"
+    }, m("input", {
+      "class": "FormControl",
+      type: "text",
+      bidi: options.stream,
+      placeholder: options.placeholder,
+      onupdate: function onupdate(vnode) {
+        return $('.Chat-FullColor').css({
+          color: _this3.input.color(),
+          backgroundColor: _this3.input.color()
+        });
+      }
+    }), m("color", {
+      className: "Chat-FullColor"
+    })))];
+  };
+
+  _proto.componentFormInput = function componentFormInput(options) {
+    return [options.title ? m("label", null, options.title) : null, m("div", null, options.desc ? m("label", null, options.desc) : null, m("input", {
+      "class": "FormControl",
+      type: "text",
+      bidi: options.stream,
+      placeholder: options.placeholder
+    }))];
+  };
+
+  return ChatModal;
+}(flarum_components_Modal__WEBPACK_IMPORTED_MODULE_1___default.a);
+
+
+
+/***/ }),
+
 /***/ "./src/forum/components/ChatPreview.js":
 /*!*********************************************!*\
   !*** ./src/forum/components/ChatPreview.js ***!
@@ -1029,6 +1419,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! flarum/utils/extractText */ "flarum/utils/extractText");
 /* harmony import */ var flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _states_ChatState__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../states/ChatState */ "./src/forum/states/ChatState.js");
+/* harmony import */ var _ChatAvatar__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ChatAvatar */ "./src/forum/components/ChatAvatar.js");
+
 
 
 
@@ -1051,34 +1443,6 @@ function (_Component) {
     _Component.prototype.oninit.call(this, vnode);
 
     this.model = this.attrs.model;
-    this.model.finalTitle = this.model.title();
-    this.model.finalColor = this.model.color();
-    this.model.textColor = this.pickTextColorBasedOnBgColorSimple(this.model.finalColor, '#FFF', '#000');
-    var users = this.model.users();
-
-    if (app.session.user && this.model.type() == 0 && users.length && users.length < 3) {
-      for (var _iterator = users, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
-
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
-        }
-
-        var user = _ref;
-
-        if (user && user.id() != app.session.user.id()) {
-          this.model.finalTitle = user.displayName();
-          this.model.finalColor = user.color();
-          this.model.avatarUrl = user.avatarUrl();
-          break;
-        }
-      }
-    }
   };
 
   _proto.view = function view(vnode) {
@@ -1097,52 +1461,34 @@ function (_Component) {
     return flarum_utils_humanTime__WEBPACK_IMPORTED_MODULE_1___default()(lastMessage.created_at());
   };
 
-  _proto.componentAvatarPM = function componentAvatarPM() {
-    return m("div", {
-      className: 'avatar ' + (this.model.avatarUrl ? 'image' : ''),
-      style: {
-        'background-color': this.model.finalColor,
-        color: this.model.textColor,
-        'background-image': this.model.avatarUrl ? "url(" + this.model.avatarUrl + ")" : null
-      }
-    }, this.model.avatarUrl ? null : this.firstLetter(this.model.finalTitle).toUpperCase());
-  };
-
-  _proto.componentAvatarChannel = function componentAvatarChannel() {
-    return m("div", {
-      className: "avatar",
-      style: {
-        'background-color': this.model.finalColor,
-        color: this.model.textColor
-      }
-    }, this.model.avatarUrl ? null : this.firstLetter(this.model.finalTitle).toUpperCase());
-  };
-
   _proto.componentPreview = function componentPreview() {
-    return [this.model.type() ? this.componentAvatarChannel() : this.componentAvatarPM(), m("div", {
+    return [m(_ChatAvatar__WEBPACK_IMPORTED_MODULE_6__["default"], {
+      model: this.model
+    }), m("div", {
       style: "display: flex; flex-direction: column"
     }, m("div", {
       className: "title",
-      title: this.model.finalTitle
-    }, this.model.finalTitle), this.model.last_message() ? this.componentTextPreview() : this.componentTextEmpty()), this.model.last_message() ? m("div", {
+      title: this.model.title()
+    }, this.model.icon() ? m("i", {
+      "class": this.model.icon(),
+      style: {
+        color: this.model.color()
+      }
+    }) : null, this.model.title()), this.model.last_message() ? this.componentTextPreview() : this.componentTextEmpty()), this.model.last_message() ? m("div", {
       className: "timestamp",
       title: flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_4___default()(this.model.last_message().created_at())
     }, this.humanTime = this.componentMessageTime()) : null];
   };
 
   _proto.componentPreviewChannel = function componentPreviewChannel() {
-    return [m("div", {
-      className: "avatar",
-      style: {
-        'background-color': this.model.finalColor,
-        color: this.model.textColor
-      }
-    }, this.model.avatarUrl ? null : this.firstLetter(this.model.finalTitle).toUpperCase()), m("div", {
+    return [m(_ChatAvatar__WEBPACK_IMPORTED_MODULE_6__["default"], {
+      model: this.model
+    }), m("div", {
       style: "display: flex; flex-direction: column"
     }, m("div", {
       className: "title",
-      title: this.model.finalTitle
-    }, this.model.finalTitle), this.componentTextPreview()), m("div", {
+      title: this.model.title()
+    }, this.model.title()), this.componentTextPreview()), m("div", {
       className: "timestamp",
       title: flarum_utils_extractText__WEBPACK_IMPORTED_MODULE_4___default()(this.model.last_message().created_at())
     }, this.humanTime = this.componentMessageTime())];
@@ -1206,26 +1552,6 @@ function (_Component) {
     }, app.translator.trans('pushedx-chat.forum.chat.list.preview.empty')));
   };
 
-  _proto.pickTextColorBasedOnBgColorSimple = function pickTextColorBasedOnBgColorSimple(bgColor, lightColor, darkColor) {
-    var color = bgColor.charAt(0) === '#' ? bgColor.substring(1, 7) : bgColor;
-    var r = parseInt(color.substring(0, 2), 16);
-    var g = parseInt(color.substring(2, 4), 16);
-    var b = parseInt(color.substring(4, 6), 16);
-    return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? darkColor : lightColor;
-  };
-
-  _proto.firstLetter = function firstLetter(string) {
-    for (var i = 0; i < string.length; i++) {
-      if (this.isLetter(string[i])) return string[i];
-    }
-
-    return string[0];
-  };
-
-  _proto.isLetter = function isLetter(c) {
-    return c.toLowerCase() != c.toUpperCase();
-  };
-
   return ChatPreview;
 }(flarum_Component__WEBPACK_IMPORTED_MODULE_2___default.a);
 
@@ -1284,7 +1610,6 @@ function (_Search) {
     var items = new flarum_utils_ItemList__WEBPACK_IMPORTED_MODULE_3___default.a();
     this.state = (_this$attrs$state = this.attrs.state) != null ? _this$attrs$state : {};
     if (app.forum.attribute('canViewUserList')) items.add('users', new _UsersSearchResults__WEBPACK_IMPORTED_MODULE_6__["default"]({
-      callback: this.attrs.callback,
       state: app.search.neonchat
     }));
     return items;
@@ -1363,9 +1688,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_Component__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/components/LoadingIndicator */ "flarum/components/LoadingIndicator");
 /* harmony import */ var flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _ChatMessage__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatMessage */ "./src/forum/components/ChatMessage.js");
-/* harmony import */ var _states_ChatState__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../states/ChatState */ "./src/forum/states/ChatState.js");
-
+/* harmony import */ var _states_ChatState__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../states/ChatState */ "./src/forum/states/ChatState.js");
 
 
 
@@ -1389,47 +1712,43 @@ function (_Component) {
     _Component.prototype.oninit.call(this, vnode);
 
     this.model = this.attrs.model;
+    this.state = _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].getViewportState(this.model);
     this.messageCharLimit = (_app$forum$attribute = app.forum.attribute('pushedx-chat.settings.charlimit')) != null ? _app$forum$attribute : 512;
-    if (!app.session.user) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.unauthenticated');else this.inputPlaceholder = app.translator.trans(_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getPermissions().post ? 'pushedx-chat.forum.chat.placeholder' : 'pushedx-chat.forum.errors.chatdenied');
-    _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].evented.on('onChatChanged', this.onChatChanged.bind(this));
-    _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].evented.on('onClickMessage', this.onChatMessageClicked.bind(this));
+    if (!app.session.user) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.unauthenticated');else this.inputPlaceholder = app.translator.trans(_states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].getPermissions().post ? 'pushedx-chat.forum.chat.placeholder' : 'pushedx-chat.forum.errors.chatdenied');
+    _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].evented.on('onChatChanged', this.onChatChanged.bind(this));
+    _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].evented.on('onClickMessage', this.onChatMessageClicked.bind(this));
   };
 
   _proto.onbeforeupdate = function onbeforeupdate(vnode) {
     _Component.prototype.onbeforeupdate.call(this, vnode);
 
     this.model = this.attrs.model;
-    if (this.model) this.state = _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getViewportState(this.model);
+    this.state = _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].getViewportState(this.model);
+  };
+
+  _proto.onupdate = function onupdate(vnode) {
+    _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].colorizeOddChatMessages();
   };
 
   _proto.view = function view(vnode) {
-    if (!this.model) {
-      return m("div", null, m("div", {
-        className: "wrapper",
-        style: {
-          height: _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('transform').y + 'px'
-        }
-      }));
-    }
-
     return m("div", null, m("div", {
       className: "wrapper",
       oncreate: this.wrapperOnCreate.bind(this),
       onupdate: this.wrapperOnUpdate.bind(this),
       onscroll: this.wrapperOnScroll.bind(this),
       style: {
-        height: _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('transform').y + 'px'
+        height: _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].getFrameState('transform').y + 'px'
       }
     }, this.state.scroll.loadingFetch ? m("msgloader", {
       className: "message-wrapper--loading"
     }, m(flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_3___default.a, {
       className: "loading-old Button-icon"
-    })) : null, _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentsChatMessages().concat(this.state.input.writingPreview ? _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentChatMessage(this.state.input.previewModel) : [])), m("div", {
+    })) : null, _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].componentsChatMessages().concat(this.state.input.writingPreview ? _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].componentChatMessage(this.state.input.previewModel) : [])), m("div", {
       className: "input-wrapper"
     }, m("textarea", {
       id: "chat-input",
       maxlength: this.messageCharLimit,
-      disabled: !_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getPermissions().post,
+      disabled: !_states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].getPermissions().post,
       placeholder: this.inputPlaceholder,
       onkeypress: this.inputPressEnter.bind(this),
       oninput: this.inputProcess.bind(this),
@@ -1449,7 +1768,7 @@ function (_Component) {
       id: "chat-limitter",
       className: this.reachedLimit() ? 'reaching-limit' : '',
       style: {
-        display: !_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getPermissions().post ? 'none' : ''
+        display: !_states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].getPermissions().post ? 'none' : ''
       }
     }, this.messageCharLimit - (this.state.input.messageLength || 0) + '/' + this.messageCharLimit)));
   };
@@ -1506,10 +1825,10 @@ function (_Component) {
 
     if (el.scrollTop <= 0 && this.state.scroll.oldScroll > 0 && !this.state.scroll.loadingFetch && !this.state.messageEditing) {
       this.state.scroll.oldScroll = -currentHeight;
-      var topMessage = _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getChatMessages(function (model) {
+      var topMessage = _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].getChatMessages(function (model) {
         return model.chat() == _this.model;
       })[0];
-      if (topMessage) _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].apiFetchChatMessages(this.model, topMessage.id());
+      if (topMessage) _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].apiFetchChatMessages(this.model, topMessage.id());
     } else this.state.scroll.oldScroll = el.scrollTop;
 
     if (el.scrollTop <= 0) el.scrollTop = 1;
@@ -1654,14 +1973,14 @@ function (_Component) {
       if (this.state.input.writingPreview) {
         this.state.input.writingPreview = false;
         this.messagePost(this.state.input.previewModel);
-        _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].insertChatMessage(Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"])(this.state.input.previewModel, {}));
+        _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].insertChatMessage(Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"])(this.state.input.previewModel, {}));
         this.inputClear();
       } else if (this.state.messageEditing) {
         var model = this.state.messageEditing;
 
         if (model.content.trim() !== model.oldContent.trim()) {
           model.oldContent = model.content;
-          _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].editChatMessage(model, true, model.content);
+          _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].editChatMessage(model, true, model.content);
         }
 
         this.messageEditEnd();
@@ -1702,7 +2021,7 @@ function (_Component) {
     var self = this;
     self.state.loadingSend = true;
     m.redraw();
-    return _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].postChatMessage(model).then(function (r) {
+    return _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].postChatMessage(model).then(function (r) {
       self.state.loadingSend = false;
       m.redraw();
     }, function (r) {
@@ -1717,7 +2036,7 @@ function (_Component) {
 
   _proto.messagesLoad = function messagesLoad() {
     if (!this.state.messagesFetched) {
-      _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].apiFetchChatMessages(this.model);
+      _states_ChatState__WEBPACK_IMPORTED_MODULE_4__["default"].apiFetchChatMessages(this.model);
       this.state.messagesFetched = true;
     }
 
@@ -1753,6 +2072,53 @@ function (_Component) {
 
 /***/ }),
 
+/***/ "./src/forum/components/ChatWelcome.js":
+/*!*********************************************!*\
+  !*** ./src/forum/components/ChatWelcome.js ***!
+  \*********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChatWelcome; });
+/* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
+/* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flarum/Component */ "flarum/Component");
+/* harmony import */ var flarum_Component__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_Component__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _states_ChatState__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../states/ChatState */ "./src/forum/states/ChatState.js");
+
+
+
+
+var ChatWelcome =
+/*#__PURE__*/
+function (_Component) {
+  Object(_babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__["default"])(ChatWelcome, _Component);
+
+  function ChatWelcome() {
+    return _Component.apply(this, arguments) || this;
+  }
+
+  var _proto = ChatWelcome.prototype;
+
+  _proto.view = function view(vnode) {
+    return m("div", null, m("div", {
+      className: "wrapper",
+      style: {
+        height: _states_ChatState__WEBPACK_IMPORTED_MODULE_2__["default"].getFrameState('transform').y + 40 + 'px'
+      }
+    }, _states_ChatState__WEBPACK_IMPORTED_MODULE_2__["default"].getChats().length ? m("div", {
+      className: "welcome"
+    }, m("h1", null, app.translator.trans('pushedx-chat.forum.chat.welcome.header')), m("span", null, app.translator.trans('pushedx-chat.forum.chat.welcome'))) : null));
+  };
+
+  return ChatWelcome;
+}(flarum_Component__WEBPACK_IMPORTED_MODULE_1___default.a);
+
+
+
+/***/ }),
+
 /***/ "./src/forum/components/UsersSearchResults.js":
 /*!****************************************************!*\
   !*** ./src/forum/components/UsersSearchResults.js ***!
@@ -1783,7 +2149,6 @@ var UsersSearchResults =
 function () {
   function UsersSearchResults(props) {
     this.results = {};
-    this.props = props;
     this.searching = false;
     if (!props.state.usersSelected) props.state.usersSelected = [];
     this.usersSelected = props.state.usersSelected;
@@ -1816,15 +2181,7 @@ function () {
   };
 
   _proto.userClick = function userClick(user) {
-    if (this.props.callback) {
-      if (this.props.callback(user, this.isUserSelected(user))) {
-        if (!this.isUserSelected(user)) this.usersSelected.push(user);
-      } else {
-        if (this.isUserSelected(user)) this.usersSelected = this.usersSelected.filter(function (u) {
-          return u.id() != user.id();
-        });
-      }
-    }
+    if (!this.isUserSelected(user)) this.usersSelected.push(user);else this.usersSelected.splice(this.usersSelected.indexOf(user), 1);
   };
 
   _proto.view = function view(query) {
@@ -1956,6 +2313,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var flarum_Model__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/Model */ "flarum/Model");
 /* harmony import */ var flarum_Model__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_Model__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var flarum_utils_computed__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/utils/computed */ "flarum/utils/computed");
+/* harmony import */ var flarum_utils_computed__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_computed__WEBPACK_IMPORTED_MODULE_3__);
+
 
 
 
@@ -1975,13 +2335,62 @@ function (_Model) {
 
 
 Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"])(Chat.prototype, {
-  title: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('title'),
-  color: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('color'),
+  _title: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('title'),
+  _color: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('color'),
   type: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('type'),
   created_at: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('created_at', flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.transformDate),
   creator: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.hasOne('creator'),
   users: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.hasMany('users'),
-  last_message: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.hasOne('last_message')
+  last_message: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.hasOne('last_message'),
+  icon: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('icon'),
+  updated: function updated() {
+    return this.freshness;
+  },
+  pm_user: flarum_utils_computed__WEBPACK_IMPORTED_MODULE_3___default()('updated', function (updated) {
+    return this.getPMUser();
+  }),
+  title: flarum_utils_computed__WEBPACK_IMPORTED_MODULE_3___default()('pm_user', '_title', function (pm_user, _title) {
+    return pm_user ? pm_user.displayName() : _title;
+  }),
+  color: flarum_utils_computed__WEBPACK_IMPORTED_MODULE_3___default()('pm_user', '_color', function (pm_user, _color) {
+    return pm_user ? pm_user.color() : _color;
+  }),
+  avatarUrl: flarum_utils_computed__WEBPACK_IMPORTED_MODULE_3___default()('pm_user', function (pm_user) {
+    return pm_user ? pm_user.avatarUrl() : null;
+  }),
+  textColor: flarum_utils_computed__WEBPACK_IMPORTED_MODULE_3___default()('color', function (color) {
+    return this.pickTextColorBasedOnBgColorSimple(color, '#FFF', '#000');
+  }),
+  getPMUser: function getPMUser() {
+    var users = this.users();
+
+    if (app.session.user && this.type() == 0 && users.length && users.length < 3) {
+      for (var _iterator = users, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+        var _ref;
+
+        if (_isArray) {
+          if (_i >= _iterator.length) break;
+          _ref = _iterator[_i++];
+        } else {
+          _i = _iterator.next();
+          if (_i.done) break;
+          _ref = _i.value;
+        }
+
+        var user = _ref;
+        if (user && user.id() != app.session.user.id()) return user;
+      }
+    }
+
+    return null;
+  },
+  pickTextColorBasedOnBgColorSimple: function pickTextColorBasedOnBgColorSimple(bgColor, lightColor, darkColor) {
+    var color = bgColor.charAt(0) === '#' ? bgColor.substring(1, 7) : bgColor;
+    var r = parseInt(color.substring(0, 2), 16);
+    var g = parseInt(color.substring(2, 4), 16);
+    var b = parseInt(color.substring(4, 6), 16);
+    return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? darkColor : lightColor;
+  }
 });
 
 /***/ }),
@@ -2091,7 +2500,7 @@ function () {
   var _proto = ChatState.prototype;
 
   _proto.init = function init() {
-    var _JSON$parse, _neonchatState$beingS, _neonchatState$beingS2, _neonchatState$isMute, _neonchatState$notify, _neonchatState$transf;
+    var _JSON$parse, _neonchatState$beingS, _neonchatState$beingS2, _neonchatState$isMute, _neonchatState$notify, _neonchatState$transf, _neonchatState$select;
 
     this.chats = [];
     this.chatmessages = [];
@@ -2108,7 +2517,8 @@ function () {
         x: 0,
         y: 400
       },
-      isActive: true
+      isActive: true,
+      selectedChat: (_neonchatState$select = neonchatState.selectedChat) != null ? _neonchatState$select : 0
     };
     this.permissions = {
       post: app.forum.attribute('pushedx-chat.permissions.chat'),
@@ -2243,6 +2653,7 @@ function () {
   _proto.addChat = function addChat(model) {
     this.chats.push(model);
     this.viewportState[model.id()] = this.initViewportState();
+    if (model.id() == this.getFrameState('selectedChat')) this.onChatChanged(model);
 
     app.test = function () {
       return model["delete"]();
@@ -2264,6 +2675,18 @@ function () {
       }) && users.some(function (model) {
         return model == user2;
       });
+    });
+  };
+
+  _proto.colorizeOddChatMessages = function colorizeOddChatMessages() {
+    var odd = false;
+    $($('.message-wrapper').get().reverse()).each(function () {
+      var e = $(this);
+
+      if (!e.hasClass('deleted')) {
+        odd = !odd;
+        odd ? e.removeClass('odd') : e.addClass('odd');
+      }
     });
   };
 
@@ -2537,6 +2960,7 @@ function () {
 
   _proto.setCurrentChat = function setCurrentChat(model) {
     this.curChat = model;
+    this.saveFrameState('selectedChat', model.id());
   };
 
   _proto.getCurrentChat = function getCurrentChat() {
@@ -2577,7 +3001,7 @@ function () {
   _proto.notifySend = function notifySend(model) {
     var avatar = model.user().avatarUrl();
     if (!avatar) avatar = _resources__WEBPACK_IMPORTED_MODULE_6__["base64PlaceholderAvatarImage"];
-    if (this.getFrameState('notify') && document.hidden) new Notification(model.chat().finalTitle, {
+    if (this.getFrameState('notify') && document.hidden) new Notification(model.chat().title(), {
       body: model.user().username() + ": " + model.message(),
       icon: avatar,
       silent: true,
@@ -2835,6 +3259,17 @@ module.exports = flarum.core.compat['utils/SubtreeRetainer'];
 /***/ (function(module, exports) {
 
 module.exports = flarum.core.compat['utils/classList'];
+
+/***/ }),
+
+/***/ "flarum/utils/computed":
+/*!*******************************************************!*\
+  !*** external "flarum.core.compat['utils/computed']" ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = flarum.core.compat['utils/computed'];
 
 /***/ }),
 

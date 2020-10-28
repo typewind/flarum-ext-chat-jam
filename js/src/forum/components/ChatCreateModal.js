@@ -1,63 +1,34 @@
-import Modal from 'flarum/components/Modal';
 import Button from 'flarum/components/Button';
 import classList from 'flarum/utils/classList';
 
 import ChatSearchUser from './ChatSearchUser';
+import ChatModal from './ChatModal';
 import Stream from 'flarum/utils/Stream';
 
 import ChatState from '../states/ChatState';
 
-export default class ChatCreateModal extends Modal
+export default class ChatCreateModal extends ChatModal
 {
 	oninit(vnode)
 	{
 		super.oninit(vnode);
-		
-		this.selectedUsers = [];
-		this.input = {title: Stream('')};
+
 		this.isChannel = false;
-
-		app.search.neonchat = {};
 	}
 
-	className() {
-		return 'Modal--small';
-	}
-
-	title() {
+	title() 
+	{
 		return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.title');
-	}
-
-	userSelected(user, isSelected)
-	{
-		if(!isSelected) this.selectedUsers.push(user);
-		else this.selectedUsers = this.selectedUsers.filter(u => u.id() != user.id()); 
-
-		return !isSelected;
-	}
-
-	isChatExists()
-	{
-		return this.selectedUsers.length == 1 && ChatState.isExistsPMChat(app.session.user, this.selectedUsers[0]);
-	}
-
-	isCanCreateChat()
-	{
-		if(this.selectedUsers.length > 1 && !this.input.title().length) return false;
-		if(!this.selectedUsers.length) return false;
-		if(this.isChatExists()) return false;
-
-		return true;
-	}
-
-	isCanCreateChannel()
-	{
-		return this.input.title().length;
 	}
 
 	onsubmit()
 	{
-		app.store.createRecord('chats').save({title: this.input.title(), isChannel: this.isChannel, relationships: {users: this.selectedUsers}})
+		app.store.createRecord('chats').save({
+			title: this.getInput().title(), 
+			isChannel: this.isChannel, 
+			icon: this.getInput().icon(),
+			color: this.getInput().color(),
+			relationships: {users: this.getSelectedUsers()}})
 		.then(
 			model =>
 			{
@@ -66,72 +37,57 @@ export default class ChatCreateModal extends Modal
 				m.redraw();
 			}
 		);
-
-		app.search.neonchat = null;
 		this.hide();
 	}
 
-	alertText()
+	componentFormInputColor()
 	{
-		if(this.isChatExists()) return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.alerts.exists');
-
-		return null;
+		return this.componentFormColor({
+			title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.color'),
+			desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.color.validator'),
+			stream: this.getInput().color,
+			placeholder: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.color')
+		});
 	}
 
-	componentAlert()
+	componentFormInputIcon()
 	{
-		return !this.alertText() ? null : (
-			<div className="Alert">
-				{this.alertText()}
-			</div>
-		);
+		return this.componentFormIcon({
+			title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.icon'),
+			desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.icon.validator', {a: <a href="https://fontawesome.com/icons?m=free" tabindex="-1" />}),
+			stream: this.getInput().icon,
+			placeholder: 'fas fa-bolt'
+		});
 	}
 
 	componentFormChat()
 	{
 		return [
-			this.selectedUsers.length > 1 ? [
-			<label>{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat')}</label>,
-			<div>
-				<label>{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator')}</label>
-				<input class="FormControl" type="text" bidi={this.input.title} 
-					placeholder={app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat')} />
-			</div>
+			this.usersSelected.length > 1 ? [
+				this.componentFormInput({
+					title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat'),
+					desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator'),
+					stream: this.getInput().title,
+					placeholder: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat')
+				}),
+				this.componentFormInputColor(),
+				this.componentFormInputIcon()
 			] : null,
-			<label>{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.users')}</label>,
-			this.componentAlert(),
-			<div className="UsersTags">
-				{this.selectedUsers.map(u => <div className='UserMention'>{'@' + u.displayName()}</div>)}
-			</div>,
-			<div className="UsersSearch">
-				<ChatSearchUser state={app.search} callback={this.userSelected.bind(this)}/>
-			</div>,    
-			<Button 
-				className='Button Button--primary Button--block ButtonCreate'
-				disabled={!this.isCanCreateChat()}
-				onclick={this.onsubmit.bind(this)}
-			>
-				{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.create.chat')}
-			</Button>
+			this.componentFormUsersSelect()
 		]
 	}
 
 	componentFormChannel()
 	{
 		return [
-			<label>{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.channel')}</label>,
-			<div>
-				<label>{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator')}</label>
-				<input class="FormControl" type="text" bidi={this.input.title} 
-					placeholder={app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.channel')} />
-			</div>,  
-			<Button 
-				className='Button Button--primary Button--block ButtonCreate'
-				disabled={!this.isCanCreateChannel()}
-				onclick={this.onsubmit.bind(this)}
-			>
-				{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.create.channel')}
-			</Button>
+			this.componentFormInput({
+				title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.channel'),
+				desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator'),
+				stream: this.getInput().title,
+				placeholder: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.channel')
+			}),
+			this.componentFormInputColor(),
+			this.componentFormInputIcon()
 		]
 	}
 
@@ -152,6 +108,13 @@ export default class ChatCreateModal extends Modal
 						</div>
 					</div>
 					{this.isChannel ? this.componentFormChannel() : this.componentFormChat()}
+					<Button 
+						className='Button Button--primary Button--block ButtonCreate'
+						disabled={this.isChannel ? !this.isCanCreateChannel() : !this.isCanCreateChat()}
+						onclick={this.onsubmit.bind(this)}
+					>
+						{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.create.chat')}
+					</Button>
 				</div>
 			</div>
 		);

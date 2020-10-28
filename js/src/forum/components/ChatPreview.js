@@ -4,6 +4,7 @@ import classList from 'flarum/utils/classList';
 import extractText from 'flarum/utils/extractText';
 
 import ChatState from '../states/ChatState';
+import ChatAvatar from './ChatAvatar';
 
 export default class ChatPreview extends Component
 {
@@ -12,26 +13,6 @@ export default class ChatPreview extends Component
 		super.oninit(vnode);
 		
 		this.model = this.attrs.model;
-
-		this.model.finalTitle = this.model.title();
-		this.model.finalColor = this.model.color()
-		this.model.textColor = this.pickTextColorBasedOnBgColorSimple(this.model.finalColor, '#FFF', '#000');
-
-		let users = this.model.users();
-		if(app.session.user && this.model.type() == 0 && users.length && users.length < 3)
-		{
-			for(const user of users)
-			{
-				if(user && user.id() != app.session.user.id())
-				{
-					this.model.finalTitle = user.displayName();
-					this.model.finalColor = user.color();
-					this.model.avatarUrl = user.avatarUrl();
-
-					break;
-				}
-			}
-		}
 	}
 
 	view(vnode)
@@ -53,36 +34,15 @@ export default class ChatPreview extends Component
 		return humanTime(lastMessage.created_at());
 	}
 
-	componentAvatarPM()
-	{
-		return (
-			<div 
-				className={'avatar ' + (this.model.avatarUrl ? 'image' : '')} 
-				style={{'background-color': this.model.finalColor, color: this.model.textColor, 'background-image': this.model.avatarUrl ? `url(${this.model.avatarUrl})` : null}}
-			>
-				{this.model.avatarUrl ? null : this.firstLetter(this.model.finalTitle).toUpperCase()}
-			</div>
-		)
-	}
-
-	componentAvatarChannel()
-	{
-		return (
-			<div 
-				className='avatar'
-				style={{'background-color': this.model.finalColor, color: this.model.textColor}}
-			>
-				{this.model.avatarUrl ? null : this.firstLetter(this.model.finalTitle).toUpperCase()}
-			</div>
-		)
-	}
-
 	componentPreview()
 	{
 		return ([
-			this.model.type() ? this.componentAvatarChannel() : this.componentAvatarPM(),
+			<ChatAvatar model={this.model} />,
 			<div style="display: flex; flex-direction: column">
-				<div className='title' title={this.model.finalTitle}>{this.model.finalTitle}</div>
+				<div className='title' title={this.model.title()}>
+					{this.model.icon() ? <i class={this.model.icon()} style={{color: this.model.color()}}></i> : null}
+					{this.model.title()}
+				</div>
 				{this.model.last_message() ? this.componentTextPreview() : this.componentTextEmpty()}
 			</div>,
 			this.model.last_message() ? 
@@ -94,14 +54,9 @@ export default class ChatPreview extends Component
 	componentPreviewChannel()
 	{
 		return ([
-			<div 
-				className='avatar'
-				style={{'background-color': this.model.finalColor, color: this.model.textColor}}
-			>
-				{this.model.avatarUrl ? null : this.firstLetter(this.model.finalTitle).toUpperCase()}
-			</div>,
+			<ChatAvatar model={this.model} />,
 			<div style="display: flex; flex-direction: column">
-				<div className='title' title={this.model.finalTitle}>{this.model.finalTitle}</div>
+				<div className='title' title={this.model.title()}>{this.model.title()}</div>
 				{this.componentTextPreview()}
 			</div>,
 			<div className='timestamp' title={extractText(this.model.last_message().created_at())}>{this.humanTime = this.componentMessageTime()}</div>
@@ -161,29 +116,5 @@ export default class ChatPreview extends Component
 				<span className='empty'>{app.translator.trans('pushedx-chat.forum.chat.list.preview.empty')}</span>
 			</div>
 		)
-	}
-
-	pickTextColorBasedOnBgColorSimple(bgColor, lightColor, darkColor) 
-	{
-		var color = (bgColor.charAt(0) === '#') ? bgColor.substring(1, 7) : bgColor;
-		var r = parseInt(color.substring(0, 2), 16);
-		var g = parseInt(color.substring(2, 4), 16);
-		var b = parseInt(color.substring(4, 6), 16);
-		return (((r * 0.299) + (g * 0.587) + (b * 0.114)) > 186) ? darkColor : lightColor;
-	}
-
-	firstLetter(string)
-	{
-		for(let i = 0; i < string.length; i++)
-		{
-			if(this.isLetter(string[i]))
-				return string[i];
-		}
-		return string[0];
-	}
-
-	isLetter(c) 
-	{
-		return c.toLowerCase() != c.toUpperCase();
 	}
 }

@@ -88,11 +88,13 @@ class CreateChatHandler
             }
         }
 
-        $color = sprintf('#%06X', mt_rand(0x222222, 0xFFFF00));
+        $color = Arr::get($data, 'attributes.color', sprintf('#%06X', mt_rand(0x222222, 0xFFFF00)));
+        $icon = Arr::get($data, 'attributes.icon', '');
 
         $chat = Chat::build(
             $attributes['title'],
             $color,
+            $icon,
             $isChannel,
             $actor->id,
             Carbon::now()

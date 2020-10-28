@@ -23,17 +23,19 @@ class Chat extends AbstractModel
      *
      * @param string    $message
      * @param int       $color
+     * @param string    $icon
      * @param int    	$type
      * @param int       $creator_id
 	 * @param Carbon    $created_at
      * 
      */
-    public static function build($title, $color, $type, $creator_id = null, $created_at = null)
+    public static function build($title, $color, $icon, $type, $creator_id = null, $created_at = null)
     {
         $chat = new static;
 
         $chat->title = $title;
         $chat->color = $color;
+        $chat->icon = $icon;
         $chat->type = $type;
         $chat->creator_id = $creator_id;
         $chat->created_at = $created_at;

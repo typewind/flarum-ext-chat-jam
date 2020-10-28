@@ -20,6 +20,7 @@ return [
 		$db->table('neonchat_chats')->insert([
 			'title' => '#main',
 			'color' => '#FF94C1',
+			'icon' => 'fas fa-cloud',
 			'type' => 1
 		]);
 

@@ -35,7 +35,8 @@ class ChatState
 			isMuted: neonchatState.isMuted ?? false,
 			notify: neonchatState.notify ?? false,
 			transform: neonchatState.transform ?? {x: 0, y: 400},
-			isActive: true
+			isActive: true,
+			selectedChat: neonchatState.selectedChat ?? 0
 		}
 		
 		this.permissions =
@@ -177,6 +178,8 @@ class ChatState
 		this.chats.push(model);
 		this.viewportState[model.id()] = this.initViewportState();
 
+		if(model.id() == this.getFrameState('selectedChat')) this.onChatChanged(model);
+
 		app.test = () => model.delete();
 	}
 
@@ -192,6 +195,19 @@ class ChatState
 			let users = model.users();
 			return users.length == 2 && users.some(model => model == user1) && users.some(model => model == user2)
 		});
+	}
+
+	colorizeOddChatMessages()
+	{
+		let odd = false;
+        $($('.message-wrapper').get().reverse()).each(function() {
+            let e = $(this)
+            if(!e.hasClass('deleted')) 
+            {
+				odd = !odd;
+				odd ? e.removeClass('odd') : e.addClass('odd');
+            }
+        });
 	}
 
 	onChatChanged(model, e = {})
@@ -229,7 +245,7 @@ class ChatState
                 viewport.scroll.loadingFetch = false;
 
                 r.map(model => self.insertChatMessage(model));
-                m.redraw();
+				m.redraw();
             });
 	}
 
@@ -394,6 +410,7 @@ class ChatState
 	setCurrentChat(model)
 	{
 		this.curChat = model;
+		this.saveFrameState('selectedChat', model.id());
 	}
 
 	getCurrentChat()
@@ -407,7 +424,7 @@ class ChatState
 
         return app.store.find('chats').then((chats) =>
         {
-            chats.map(model => self.addChat(model));
+			chats.map(model => self.addChat(model));
             m.redraw();
         });
     }
@@ -443,7 +460,7 @@ class ChatState
 		if(!avatar) avatar = resources.base64PlaceholderAvatarImage;
 
         if(this.getFrameState('notify') && document.hidden)
-            new Notification(model.chat().finalTitle, {
+            new Notification(model.chat().title(), {
 				body: `${model.user().username()}: ${model.message()}`, 
 				icon: avatar, 
 				silent: true, 

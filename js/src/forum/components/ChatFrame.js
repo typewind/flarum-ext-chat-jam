@@ -1,7 +1,8 @@
 import Component from 'flarum/Component';
-import ChatPreview from './ChatPreview';
-import ChatViewport from './ChatViewport';
+import ChatWelcome from './ChatWelcome';
+
 import ChatCreateModal from './ChatCreateModal';
+import ChatEditModal from './ChatEditModal';
 
 import ChatState from '../states/ChatState';
 
@@ -124,11 +125,13 @@ export default class ChatFrame extends Component
                                     placeholder = {app.translator.trans('pushedx-chat.forum.chat.list.placeholder')}
                                 />
                             </div>
-                            <p data-title={app.translator.trans('pushedx-chat.forum.chat.list.' + (ChatState.getFrameState('beingShownChatsList') ? 'unpin' : 'pin'))}>
-                                <div className='icon icon-toggle' onclick={this.toggleChatsList.bind(this)}>
-                                    <i className="fas fa-paperclip"></i>
-                                </div>
-                            </p>
+                            <div 
+                                className='icon icon-toggle' 
+                                onclick={this.toggleChatsList.bind(this)}
+                                data-title={app.translator.trans('pushedx-chat.forum.chat.list.' + (ChatState.getFrameState('beingShownChatsList') ? 'unpin' : 'pin'))}
+                            >
+                                <i className="fas fa-paperclip"></i>
+                            </div>
                         </div>
                         <div className='list' style={{'max-height': ChatState.getFrameState('transform').y + 'px'}}>
                             {ChatState.componentsChats()}
@@ -138,30 +141,59 @@ export default class ChatFrame extends Component
 
                     <div id='chat-panel'>
                         <div id='chat-header' ondragstart={() => false}>
-                            <h2>{ChatState.getCurrentChat() ? ChatState.getCurrentChat().finalTitle : app.translator.trans('pushedx-chat.forum.toolbar.title')}</h2>
-                            <p data-title={app.translator.trans(ChatState.getFrameState('beingShown') ? 'pushedx-chat.forum.toolbar.minimize' : 'pushedx-chat.forum.toolbar.maximize')}>
-                                <div className='icon' onclick={this.toggleChat.bind(this)}>
-                                    <i className={ChatState.getFrameState('beingShown') ? 'fas fa-window-minimize' : 'fas fa-window-maximize'}></i>
-                                </div>
-                            </p>   
-                            <p data-title={app.translator.trans(ChatState.getFrameState('notify') ? 'pushedx-chat.forum.toolbar.disable_notifications' : 'pushedx-chat.forum.toolbar.enable_notifications')}>
-                                <div className='icon' onclick={this.toggleNotifications.bind(this)}>
-                                    <i className={ChatState.getFrameState('notify') ? 'fas fa-bell' : 'fas fa-bell-slash'}></i>
-                                </div>
-                            </p>   
-                            <p data-title={app.translator.trans(ChatState.getFrameState('isMuted')? 'pushedx-chat.forum.toolbar.enable_sounds' : 'pushedx-chat.forum.toolbar.disable_sounds')}>
-                                <div className='icon' onclick={this.toggleSound.bind(this)}>
+                            <h2>{ChatState.getCurrentChat() ? [
+                                ChatState.getCurrentChat().icon() ? 
+                                    <i 
+                                        class={ChatState.getCurrentChat().icon()} 
+                                        style={{color: ChatState.getCurrentChat().color(), 'margin-right': '3px'}}
+                                    ></i> 
+                                    : null,
+                                ChatState.getCurrentChat().title() 
+                            ]: app.translator.trans('pushedx-chat.forum.toolbar.title')}</h2>
+                            {!ChatState.getCurrentChat() ? null :<div 
+                                className='icon'
+                                data-title={app.translator.trans('pushedx-chat.forum.toolbar.chat.settings')}
+
+                                onclick={() => app.modal.show(ChatEditModal, {model: ChatState.getCurrentChat()})}
+                            >
+                                <i className='fas fa-cog'></i>
+                            </div>}
+                            <div className='window-buttons'>
+                                <div 
+                                    className='icon' 
+                                    onclick={this.toggleSound.bind(this)}
+                                    data-title={app.translator.trans('pushedx-chat.forum.toolbar.' + (ChatState.getFrameState('isMuted')? 'enable_sounds' : 'disable_sounds'))}
+                                >
                                     <i className={ChatState.getFrameState('isMuted') ? 'fas fa-volume-mute' : 'fas fa-volume-up'}></i>
                                 </div>
-                            </p>
+                                <div 
+                                    className='icon' 
+                                    onclick={this.toggleNotifications.bind(this)}
+                                    data-title={app.translator.trans('pushedx-chat.forum.toolbar.' + (ChatState.getFrameState('notify') ? 'disable_notifications' : 'enable_notifications'))}
+                                >
+                                    <i className={ChatState.getFrameState('notify') ? 'fas fa-bell' : 'fas fa-bell-slash'}></i>
+                                </div>
+                                <div 
+                                    className='icon' 
+                                    onclick={this.toggleChat.bind(this)}
+                                    data-title={app.translator.trans('pushedx-chat.forum.toolbar.' + (ChatState.getFrameState('beingShown') ? 'minimize' : 'maximize'))}
+                                >
+                                    <i className={ChatState.getFrameState('beingShown') ? 'fas fa-window-minimize' : 'fas fa-window-maximize'}></i>
+                                </div>
+                            </div>
                         </div>
                         <div id='chat-viewport'>
-                            {ChatState.componentCurViewport() ?? <ChatViewport />}
+                            {ChatState.componentCurViewport() ?? <ChatWelcome />}
                         </div>
                     </div>
                 </div>
             </div>
         )
+    }
+
+    tooltip(vnode)
+    {
+        $(vnode.dom).tooltip('fixTitle');
     }
 
     chatMoveListener(event, e)

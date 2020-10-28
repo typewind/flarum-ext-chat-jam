@@ -1,6 +1,5 @@
 import Component from 'flarum/Component';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
-import ChatMessage from './ChatMessage';
 
 import ChatState from '../states/ChatState';
 
@@ -11,6 +10,7 @@ export default class ChatViewport extends Component
         super.oninit(vnode);
 
         this.model = this.attrs.model;
+        this.state = ChatState.getViewportState(this.model);
 
         this.messageCharLimit = app.forum.attribute('pushedx-chat.settings.charlimit') ?? 512;
         if(!app.session.user) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.unauthenticated')
@@ -25,22 +25,16 @@ export default class ChatViewport extends Component
         super.onbeforeupdate(vnode);
         
         this.model = this.attrs.model;
-        if(this.model) this.state = ChatState.getViewportState(this.model);
+        this.state = ChatState.getViewportState(this.model);
+    }
+
+    onupdate(vnode)
+    {
+        ChatState.colorizeOddChatMessages();
     }
   
 	view(vnode)
 	{
-        if(!this.model) 
-        {
-            return (
-                <div>
-                    <div className='wrapper' style={{height: ChatState.getFrameState('transform').y + 'px'}}>
-
-                    </div>
-                </div>
-            );
-        }
-
 		return (
 			<div>
 				<div className='wrapper' 
@@ -376,7 +370,7 @@ export default class ChatViewport extends Component
 
     onChatChanged(model)
     {
-        if(this.model) this.messagesLoad()
+        if(this.model) this.messagesLoad();
     }
 
 	messagesLoad()

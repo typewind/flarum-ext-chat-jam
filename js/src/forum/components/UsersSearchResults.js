@@ -9,7 +9,6 @@ export default class UsersSearchResults
 	constructor(props) 
 	{
 		this.results = {};
-		this.props = props;
 		this.searching = false;
 
 		if(!props.state.usersSelected) props.state.usersSelected = [];
@@ -39,20 +38,8 @@ export default class UsersSearchResults
 
 	userClick(user)
 	{
-		if(this.props.callback)
-		{
-			if(this.props.callback(user, this.isUserSelected(user)))
-			{
-				if(!this.isUserSelected(user))
-					this.usersSelected.push(user)
-			}
-			else 
-			{
-				if(this.isUserSelected(user))
-					this.usersSelected = this.usersSelected.filter(u => u.id() != user.id());
-			}
-
-		}
+		if(!this.isUserSelected(user)) this.usersSelected.push(user)
+		else this.usersSelected.splice(this.usersSelected.indexOf(user), 1)
 	}
 
 	view(query) 

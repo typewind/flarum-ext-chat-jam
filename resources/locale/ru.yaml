@@ -8,7 +8,27 @@ pushedx-chat:
       disable_notifications: Отключить push-уведомления
       minimize: Свернуть
       maximize: Развернуть
+      chat.settings: Настройки чата
     chat:
+      welcome: Пожалуйста, выберите чат слева для беседы
+      welcome.header: Добро пожаловать в Neon Chat!
+      edit_modal:
+        title: Настройки чата
+        form:
+          title: Название чата
+          title.validator: Хотя бы один символ
+          color: Цвет
+          color.validator: В hex формате
+          icon: => core.ref.icon
+          icon.validator: => core.ref.icon_text
+          users: Выбранные пользователи
+        search:
+          placeholder: Поиск пользователей
+          failed: Ничего не найдено по запросу
+          invited: Приглашены
+        alerts:
+          chat_to_pm: Вы не можете преобразовать публичный чат в ЛС!
+        save_button: => core.ref.save_changes
       list:
         pin: Закрепить панель
         unpin: Открепить панель
@@ -27,6 +47,10 @@ pushedx-chat:
             title.chat: Название чата
             title.channel: Название канала
             title.validator: Хотя бы один символ
+            icon: => core.ref.icon
+            icon.validator: => core.ref.icon_text
+            color: => pushedx-chat.forum.chat.edit_modal.form.color
+            color.validator: => pushedx-chat.forum.chat.edit_modal.form.color.validator
             users: Выбранные пользователи
           search:
             placeholder: Поиск пользователей
@@ -42,7 +66,7 @@ pushedx-chat:
         deleted_forever: удалено навсегда
         you: Вы
         type:
-          url: URL
+          url: Ссылка
           event: Событие
           code: <Код />
         events:

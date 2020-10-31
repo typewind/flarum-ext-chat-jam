@@ -18,10 +18,31 @@ export default class ChatPreview extends Component
 	view(vnode)
 	{
 		return (
-			<div className={classList({'panel-preview' : true, 'active': ChatState.getCurrentChat() == this.model})}>
-				{this.componentPreview()}
+			<div style={{position: 'relative'}}>
+				<div className={classList({'panel-preview' : true, 'active': ChatState.getCurrentChat() == this.model})}>
+					{this.componentPreview()}
+				</div>
+				{this.model.unreaded() ? <div className='unreaded'>{this.model.unreaded()}</div> : null}
 			</div>
 		)
+	}
+
+	oncreate(vnode)
+	{
+		if(this.model.isNeedToFlash)
+		{
+			ChatState.flashItem($(vnode.dom));
+			this.model.isNeedToFlash = false;
+		}
+	}
+
+	onupdate(vnode)
+	{
+		if(this.model.isNeedToFlash)
+		{
+			ChatState.flashItem($(vnode.dom));
+			this.model.isNeedToFlash = false;
+		}
 	}
 
 	componentMessageTime()

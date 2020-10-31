@@ -8,7 +8,7 @@
 
 namespace Xelson\Chat\Api\Controllers;
 
-use Xelson\Chat\Api\Serializers\ChatSerializer;
+use Xelson\Chat\Api\Serializers\ChatUserSerializer;
 use Xelson\Chat\ChatRepository;
 use Illuminate\Support\Arr;
 use Tobscure\JsonApi\Document;
@@ -21,9 +21,9 @@ class ListChatsController extends AbstractListController
     /**
      * The serializer instance for this request.
      *
-     * @var MessageSerializer
+     * @var ChatUserSerializer
      */
-    public $serializer = ChatSerializer::class;
+    public $serializer = ChatUserSerializer::class;
 
     /**
      * {@inheritdoc}

@@ -73,6 +73,9 @@ pushedx-chat:
           chat.created: "{creatorname} создал {chatname} и пригласил {usernames}"
           pm.created: "{creatorname} создал чат с {username}"
           channel.created: "{creatorname} создал канал {chatname}"
+          title.edited: "{editorname} изменил название чата с {old} на {new}"
+          icon.edited: "{editorname} изменил иконку с {old} на {new}"
+          color.edited: "{editorname} изменил цвет с {old} на {new}"
     errors:
       unauthenticated: Писать в чате могут только зарегистрированные пользователи
       chatdenied: Вашей группе пользователей запрещено писать сообщения

@@ -13,9 +13,9 @@ use Flarum\User\User;
 class FetchMessage
 {
     /**
-     * @var int
+     * @var mixed
      */
-    public $start_from;
+    public $query;
 
     /**
      * @var User
@@ -28,13 +28,13 @@ class FetchMessage
     public $chat_id;
 
     /**
-     * @param int $start_from
+     * @param mixed $query
      * @param User $actor
      * @param int $chat_id
      */
-    public function __construct(int $start_from, User $actor, int $chat_id)
+    public function __construct($query, User $actor, int $chat_id)
     {
-        $this->start_from = $start_from;
+        $this->query = $query;
         $this->actor = $actor;
         $this->chat_id = $chat_id;
     }

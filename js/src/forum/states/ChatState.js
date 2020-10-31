@@ -52,7 +52,7 @@ class ChatState
 		}
 
 		this.viewportState = {};
-		app.pusher.then(this.listenSocketChannels.bind(this));
+		if(app.session.user) app.pusher.then(this.listenSocketChannels.bind(this));
 
 		this.evented.on('onClickMessage', this.onChatMessageClicked.bind(this))
 	}
@@ -61,7 +61,7 @@ class ChatState
 	{
 		return {
 			loadingSend: false,
-			scroll: {autoScroll: true, oldScroll: 0, loadingFetch: false, needToScroll: true},
+			scroll: {autoScroll: true, oldScroll: 0, loadingTop: false, loadginBottom: false, needToScroll: false},
 			input: {messageLength: 0, rows: 1, content: ''},
 			messagesFetched: false,
 		}
@@ -125,9 +125,20 @@ class ChatState
 			{
 				if(!app.session.user || chat.creator() != app.session.user)
 				{
-					this.addChat(chat);
+					this.addChat(chat, true);
 					m.redraw();
 				}
+				break;
+			}
+			case 'chat.edit':
+			{
+				this.editChat(chat, true);
+				let range = r.response.eventmsg_range;
+				if(range) this.apiFetchChatMessages(chat, range, {notify: true, withFlash: true, disableLoader: true});
+
+				m.redraw();
+				
+				break;
 			}
 			case 'chat.delete':
 			{
@@ -136,6 +147,7 @@ class ChatState
 					this.deleteChat(chat);
 					m.redraw();
 				}
+				break;
 			}
 		}
 	}
@@ -173,14 +185,26 @@ class ChatState
 		));
 	}
 
-	addChat(model)
+	addChat(model, outside = false)
 	{
 		this.chats.push(model);
 		this.viewportState[model.id()] = this.initViewportState();
 
 		if(model.id() == this.getFrameState('selectedChat')) this.onChatChanged(model);
+		if(outside) model.isNeedToFlash = true;
 
 		app.test = () => model.delete();
+	}
+
+	editChat(model, outside = false)
+	{
+		if(outside) model.isNeedToFlash = true;
+	}
+
+	apiReadChat(chat, message)
+	{
+		if(this.readingTimeout) clearTimeout(this.readingTimeout);
+		this.readingTimeout = setTimeout(() => chat.save({actions: {reading: message.created_at().toISOString()}}), 1000);
 	}
 
 	deleteChat(model)
@@ -232,20 +256,32 @@ class ChatState
 		return filter ? list.filter(filter) : list;
 	}
 
-	apiFetchChatMessages(model, start_from)
+	apiFetchChatMessages(model, query, options = {})
 	{
 		let viewport = this.getViewportState(model);
 		let self = this;
 
-		viewport.scroll.loadingFetch = true;
-		m.redraw();
-		
-        return app.store.find('chatmessages', {chat_id: model.id(), start_from})
-            .then(r => {
-                viewport.scroll.loadingFetch = false;
+		let loaderProp = 'loadingTop';
+		if(typeof query == "string") loaderProp = query[0] == '-' ? 'loadingBottom' : 'loadingTop';
 
-                r.map(model => self.insertChatMessage(model));
-				m.redraw();
+		if(!options.disableLoader) viewport.scroll[loaderProp] = true;
+		
+        return app.store.find('chatmessages', {chat_id: model.id(), query})
+            .then(r => {
+
+				if(r.length)
+				{
+					r.map(model => {
+						if(options.withFlash) model.isNeedToFlash = true;
+						self.insertChatMessage(model);
+					});
+					if(options.notify) this.messageNotify(r[0]);
+
+					viewport.scroll[loaderProp] = false;
+					if(loaderProp == 'loadingBottom') viewport.scroll.autoScroll = false;
+
+					m.redraw();
+				}
             });
 	}
 
@@ -279,10 +315,11 @@ class ChatState
 		{
 			this.messageNotify(model);
 			model.isNeedToFlash = true;
+			model.pushAttributes({unreaded: model.unreaded() + 1});
 		}
 
 		let list = this.getChatMessages(mdl => mdl.chat() == model.chat());
-		if(model.id() && list[list.length - 1] == model)
+		if(notify && model.id() && list[list.length - 1] == model)
 			model.chat().pushData({relationships: {last_message: model}})
 	}
 
@@ -296,7 +333,8 @@ class ChatState
 		{
 			s9e.TextFormatter.preview(content, element);
 
-			setTimeout(() => {
+			if(this.executeScriptsTimeout) clearTimeout(this.executeScriptsTimeout);
+			this.executeScriptsTimeout = setTimeout(() => {
 				$('.neonchat script').each(function() {
 					if(!self.executedScripts) self.executedScripts = {};
 					let scriptURL = $(this).attr('src');
@@ -309,7 +347,7 @@ class ChatState
 						self.executedScripts[scriptURL] = true;
 					}
 				});
-			}, 10);
+			}, 100);
 		}
 	}
 
@@ -476,7 +514,18 @@ class ChatState
             sound.currentTime = 0;
             sound.play();
         }
-    }
+	}
+	
+	/**
+	 * https://github.com/flarum/core/blob/7e74f5a03c7f206014f3f091968625fc0bf29094/js/src/forum/components/PostStream.js#L579
+	 * 
+	 * 'Flash' the given post, drawing the user's attention to it.
+	 *
+	 * @param {jQuery} $item
+	 */
+	flashItem($item) {
+		$item.addClass('flash').one('animationend webkitAnimationEnd', () => $item.removeClass('flash'));
+	}
 }
 
 export default new ChatState;

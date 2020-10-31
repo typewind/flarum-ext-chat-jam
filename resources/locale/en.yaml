@@ -74,6 +74,9 @@ pushedx-chat:
           chat.created: "{creatorname} created {chatname} and invited {usernames}"
           pm.created: "{creatorname} created chat with {username}"
           channel.created: "{creatorname} created channel {chatname}"
+          title.edited: "{editorname} changed chat's title from {old} to {new}"
+          icon.edited: "{editorname} changed chat's icon from {old} to {new}"
+          color.edited: "{editorname} changed chat's color from {old} to {new}"
     errors:
       unauthenticated: Only registered users can use the chat
       chatdenied: Your user group is not allowed to write messages

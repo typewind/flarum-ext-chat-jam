@@ -14,7 +14,33 @@ use Flarum\Database\AbstractModel;
 
 class ChatUser extends AbstractModel
 {
-	protected $table = 'neonchat_chat_user';
+    protected $table = 'neonchat_chat_user';
+
+    protected $dates = ['joined_at', 'readed_at', 'removed_at'];
+    
+    /**
+     * @param int $chat_id
+     * @param int $user_id
+     * @param Carbon $joined_at
+     * @param mixed $removed_by
+     * @param Carbon $readed_at
+     * @param Carbon $removed_at
+     * 
+     * @return ChatUser
+     */
+    public static function build(int $chat_id, int $user_id, $joined_at, $readed_at = null, $removed_by = null, $removed_at = null)
+    {
+        $model = new static;
+
+        $model->chat_id = $chat_id;
+        $model->user_id = $user_id;
+        $model->joined_at = $joined_at;
+        $model->removed_by = $removed_by;
+        $model->removed_at = $removed_at;
+        $model->readed_at = $readed_at;
+
+        return $model;
+    }
 	
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

@@ -39,10 +39,12 @@ class FetchMessageHandler
     public function handle(FetchMessage $command)
     {
         $actor = $command->actor;
-        $start_from = $command->start_from;
+        $query = $command->query;
  
-        $chat_id = $this->chats->findOrFail($command->chat_id, $actor);
-        $messages = $this->messages->fetch($start_from, $actor, $chat_id);
+        $chat = $this->chats->findOrFail($command->chat_id, $actor);
+
+        if(is_array($query)) $messages = $this->messages->queryVisible($actor)->whereIn('id', $query)->get();
+        else $messages = $this->messages->fetch($query, $actor, $chat);
 
         return $messages;
     }

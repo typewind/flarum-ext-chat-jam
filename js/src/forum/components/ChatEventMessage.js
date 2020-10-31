@@ -33,16 +33,43 @@ export default class ChatEventMessage extends ChatMessage
 			}
 			case 'chatCreated':
 			{
-				let transKey = 'chat'
-				if(this.parsedContent.users.length == 1) transKey = 'pm'
-				else if(this.model.chat().type() == 1) transKey = 'channel'
+				let transKey = 'chat';
+				if(this.parsedContent.users.length == 1) transKey = 'pm';
+				else if(this.model.chat().type() == 1) transKey = 'channel';
 
 				return app.translator.trans(`pushedx-chat.forum.chat.message.events.${transKey}.created`, {
-					creatorname: this.componentUserMention(this.model.chat().creator()), 
+					creatorname: this.componentUserMention(this.model.user()), 
 					chatname: <b className='chat-title'>{this.model.chat().title()}</b>,
 					usernames: this.parsedContent.users.map(user_id => this.componentUserMention(app.store.getById('users', user_id))),
 					username: this.parsedContent.users.length ? this.componentUserMention(app.store.getById('users', this.parsedContent.users[0])) : null
-				})
+				});
+			}
+			case 'chatEdited':
+			{
+				let componentOld, componentNew;
+				switch(this.parsedContent.column)
+				{
+					case 'title':
+						componentOld = <b className='chat-title'>{this.parsedContent.old}</b>;
+						componentNew = <b className='chat-title'>{this.parsedContent.new}</b>;
+						break;
+
+					case 'color':
+						componentOld = <i className='fas fa-circle' style={{color: this.parsedContent.old}}></i>;
+						componentNew = <i className='fas fa-circle' style={{color: this.parsedContent.new}}></i>;
+						break;
+
+					case 'icon':
+						componentOld = this.parsedContent.old ? <i className={this.parsedContent.old}></i> : <b>[nothing]</b>;
+						componentNew = <i className={this.parsedContent.new}></i>;
+						break;
+				}
+			
+				return app.translator.trans(`pushedx-chat.forum.chat.message.events.${this.parsedContent.column}.edited`, {
+					editorname: this.componentUserMention(this.model.user()),
+					old: componentOld,
+					new: componentNew
+				});
 			}
 		}
 	}

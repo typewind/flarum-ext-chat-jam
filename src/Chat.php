@@ -43,6 +43,24 @@ class Chat extends AbstractModel
         return $chat;
     }
 
+    public function unreadedCount($start)
+    {
+        if($start == null) $start = 0;
+        return $this->messages()->where('created_at', '>', $start)->count();
+    }
+
+    public function getChatUser(User $user)
+    {
+        $chatUser = ChatUser::where('chat_id', $this->id)->where('user_id', $user->id)->first();
+        if(!$chatUser && $user->id && $this->type == 1)
+        {
+            $now = Carbon::now();
+            $this->users()->attach($user->id, ['readed_at' => $now]);
+            $chatUser = ChatUser::build($this->id, $user->id, $now, $now);
+        }
+        return $chatUser;
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

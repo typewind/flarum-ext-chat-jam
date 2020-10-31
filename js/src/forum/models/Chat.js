@@ -14,9 +14,13 @@ Object.assign(Chat.prototype,
 	last_message: Model.hasOne('last_message'),
 	icon: Model.attribute('icon'),
 
-	updated: function() {return this.freshness},
+	unreaded: Model.attribute('unreaded'),
+	readed_at: Model.attribute('readed_at', Model.transformDate),
+	removed_at: Model.attribute('removed_at', Model.transformDate),
+	joined_at: Model.attribute('joined_at', Model.transformDate),
+	removed_by: Model.hasOne('removed_by'),
 
-	pm_user: computed('updated', function (updated) {
+	pm_user: computed('freshness', function (updated) {
 		return this.getPMUser();
 	}),
 

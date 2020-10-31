@@ -140,7 +140,7 @@ export default class ChatFrame extends Component
                     </div>
 
                     <div id='chat-panel'>
-                        <div id='chat-header' ondragstart={() => false}>
+                        <div id='chat-header' ondragstart={() => false} onmousedown={this.chatHeaderOnMouseDown.bind(this)}>
                             <h2>{ChatState.getCurrentChat() ? [
                                 ChatState.getCurrentChat().icon() ? 
                                     <i 
@@ -196,22 +196,26 @@ export default class ChatFrame extends Component
         $(vnode.dom).tooltip('fixTitle');
     }
 
+    chatHeaderOnMouseDown(e)
+    {
+        for(let i = 0, el; i < e.path.length; i++) 
+        {
+            el = e.path[i];
+            if(el.classList && el.classList.contains('icon')) 
+                return;
+        }
+
+        if(!this.chatMoveStart(e))
+        {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+    }
+
     chatMoveListener(event, e)
     {
         switch(event)
         {
-            case 'mousedown':
-            {
-                if(e.target == this.getChatHeader())
-                {
-                    if(!this.chatMoveStart(e))
-                    {
-                        e.stopPropagation();
-                        e.preventDefault();
-                    }
-                }
-                break;
-            }
             case 'mouseup': 
             {
                 if(this.chatMoving) this.chatMoveEnd(e);

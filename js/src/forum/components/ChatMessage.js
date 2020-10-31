@@ -273,7 +273,7 @@ export default class ChatMessage extends Component
 
 		if(this.model.isNeedToFlash) 
 		{
-			this.flashItem($(this.messageWrapper));
+			ChatState.flashItem($(this.messageWrapper));
 			this.model.isNeedToFlash = false;
 		}
 		if(this.model.content !== this.oldContent)
@@ -295,16 +295,5 @@ export default class ChatMessage extends Component
 			return false;
 
 		return true;
-	}
-
-	/**
-	 * https://github.com/flarum/core/blob/7e74f5a03c7f206014f3f091968625fc0bf29094/js/src/forum/components/PostStream.js#L579
-	 * 
-	 * 'Flash' the given post, drawing the user's attention to it.
-	 *
-	 * @param {jQuery} $item
-	 */
-	flashItem($item) {
-		$item.addClass('flash').one('animationend webkitAnimationEnd', () => $item.removeClass('flash'));
 	}
 }

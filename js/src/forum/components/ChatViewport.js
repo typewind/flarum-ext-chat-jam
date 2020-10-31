@@ -40,14 +40,10 @@ export default class ChatViewport extends Component
 				<div className='wrapper' 
                     oncreate={this.wrapperOnCreate.bind(this)} 
                     onupdate={this.wrapperOnUpdate.bind(this)}
-					onscroll={this.wrapperOnScroll.bind(this)}
+                    onscroll={this.wrapperOnScroll.bind(this)}
+                    onmousewheel={this.wrapperOnMouseWheel.bind(this)}
 					style={{height: ChatState.getFrameState('transform').y + 'px'}}
 				>
-					{this.state.scroll.loadingFetch ?
-						<msgloader className='message-wrapper--loading'>
-							<LoadingIndicator className='loading-old Button-icon' />
-						</msgloader> : null
-					}
 					{ChatState.componentsChatMessages().concat(this.state.input.writingPreview ? ChatState.componentChatMessage(this.state.input.previewModel) : [])}
 				</div>
 				<div className='input-wrapper'>
@@ -78,8 +74,27 @@ export default class ChatViewport extends Component
 						{(this.messageCharLimit - (this.state.input.messageLength || 0)) + '/' + this.messageCharLimit}
 					</div>
 				</div>
+                {this.isFastScrollAvailable() ? this.componentScroller() : null}
 			</div>
 		)
+    }
+
+    componentScroller()
+    {
+        return (
+            <div className='scroller' onclick={this.fastScroll.bind(this)}>
+                <i class="fas fa-angle-down"></i>
+            </div>
+        );
+    }
+    
+    componentLoader(watch)
+    {
+        return watch ? (
+            <msgloader className='message-wrapper--loading'>
+                <LoadingIndicator className='loading-old Button-icon' />
+            </msgloader> 
+        ): null
     }
 
     getChat()
@@ -118,6 +133,45 @@ export default class ChatViewport extends Component
         return this.oldReached;
     }
 
+    isFastScrollAvailable()
+    {
+        let chatWrapper = this.getChatWrapper();
+        return (
+            this.model.unreaded() >= 30 || 
+            (chatWrapper && chatWrapper.scrollHeight > 2000 && chatWrapper.scrollTop < chatWrapper.scrollHeight - 2000)
+        );
+    }
+
+    fastScroll()
+    {
+        if(this.model.unreaded() >= 30) this.fastMessagesFetch.bind(this)
+        else
+        {
+            let chatWrapper = this.getChatWrapper();
+            chatWrapper.scrollTop = Math.max(chatWrapper.scrollTop, chatWrapper.scrollHeight - 3000);
+            this.scrollToBottom();
+        }
+    }
+
+    fastMessagesFetch(e)
+    {
+        e.redraw = false;
+        ChatState.chatmessages = [];
+
+        ChatState.apiFetchChatMessages(this.model).then(
+            r => 
+            {
+                this.state.scroll.loadingTop = false;
+                this.scrollToBottom();
+                this.timedRedraw(300);
+
+                this.model.pushAttributes({unreaded: 0});
+                let message = ChatState.getChatMessages(mdl => mdl.chat() == this.model).slice(-1)[0];
+                ChatState.apiReadChat(this.model, message);
+            }
+        );
+    }
+
     wrapperOnCreate(vnode)
     {
         super.oncreate(vnode);
@@ -129,29 +183,78 @@ export default class ChatViewport extends Component
         let el = vnode.dom;
         if(this.model && this.state.scroll.autoScroll) 
             this.scrollToBottom();
+
+        if(el.scrollTop <= 0) el.scrollTop = 1;
+        this.checkUnreaded();
     }
 
     wrapperOnScroll(e)
     {
         e.redraw = false;
-
         let el = e.target;
-        this.state.scroll.autoScroll = (el.scrollTop + el.offsetHeight >= el.scrollHeight);
+
+        if(el.scrollTop <= 0) el.scrollTop = 1;
+        else if(el.scrollTop + el.offsetHeight >= el.scrollHeight) el.scrollTop -= 1;
+        this.state.scroll.oldScroll = el.scrollTop;
+
+        this.checkUnreaded();
+
+        if(this.lastFastScrollStatus != this.isFastScrollAvailable()) 
+        {
+            this.lastFastScrollStatus = this.isFastScrollAvailable();
+            m.redraw();
+        }
+    }
+
+    checkUnreaded()
+    {
+        let wrapper = this.getChatWrapper();
+        if(wrapper && this.model.unreaded())
+        {
+            let list = ChatState.getChatMessages(mdl => 
+                mdl.chat() == this.model && mdl.created_at() > this.model.readed_at() && !mdl.isReaded
+            );
+
+            for(const message of list)
+            {
+                let msg = document.querySelector(`.message-wrapper[data-id="${message.id()}"`);
+                if(msg && wrapper.scrollTop + wrapper.offsetHeight >= msg.offsetTop)
+                {
+                    message.isReaded = true;
+
+                    ChatState.apiReadChat(this.model, message);
+
+                    this.model.pushAttributes({unreaded: this.model.unreaded() - 1});
+                    m.redraw();
+                }
+            }
+        }
+    }
+
+    wrapperOnMouseWheel(e)
+    {
+        e.redraw = false;
+
+        let el = this.element;
+        this.state.scroll.autoScroll = (el.scrollTop + el.offsetHeight >= el.scrollHeight - 10);
         let currentHeight = el.scrollHeight;
         
         if(this.state.scroll.autoScroll) this.state.scroll.needToScroll = false;
         if(this.state.scroll.needToScroll) this.scrollToBottom();
 
-        if(el.scrollTop <= 0 && this.state.scroll.oldScroll > 0 && !this.state.scroll.loadingFetch && !this.state.messageEditing) 
+        if(!this.state.messageEditing && this.state.scroll.oldScroll >= 0)
         {
-            this.state.scroll.oldScroll = -currentHeight;
-
-            let topMessage = ChatState.getChatMessages(model => model.chat() == this.model)[0];
-            if(topMessage) ChatState.apiFetchChatMessages(this.model, topMessage.id());
+            if(!this.state.scroll.loadingTop && el.scrollTop <= 100)
+            {
+                let topMessage = ChatState.getChatMessages(model => model.chat() == this.model)[0];
+                if(topMessage) ChatState.apiFetchChatMessages(this.model, topMessage.created_at().toISOString());
+            }
+            else if(!this.state.scroll.loadingBottom && el.scrollTop + el.offsetHeight >= currentHeight - 100)
+            {
+                let bottomMessage = ChatState.getChatMessages(model => model.chat() == this.model).slice(-1)[0];
+                if(bottomMessage) ChatState.apiFetchChatMessages(this.model, '-' + bottomMessage.created_at().toISOString()); 
+            }
         }
-        else this.state.scroll.oldScroll = el.scrollTop;
-        
-        if(el.scrollTop <= 0) el.scrollTop = 1;
 	}
 
     scrollToBottom()
@@ -370,14 +473,21 @@ export default class ChatViewport extends Component
 
     onChatChanged(model)
     {
-        if(this.model) this.messagesLoad();
+        if(this.model) this.messagesDraw();
     }
 
-	messagesLoad()
+	messagesDraw()
 	{
         if(!this.state.messagesFetched) 
         {
-            ChatState.apiFetchChatMessages(this.model);
+            let query;
+            if(this.model.unreaded()) 
+            {
+                query = '-' + (this.model.readed_at()?.toISOString() ?? new Date(0).toISOString());
+                this.state.scroll.autoScroll = false;
+            }
+
+            ChatState.apiFetchChatMessages(this.model, query);
             this.state.messagesFetched = true;
         }
         this.inputSyncWithPreview();
@@ -391,7 +501,7 @@ export default class ChatViewport extends Component
         {
 		    this.redrawTimeout = setTimeout(() => {
                 m.redraw();
-                callback();
+                if(callback) callback();
                 this.redrawTimeout = null;
             }, timeout);
         }

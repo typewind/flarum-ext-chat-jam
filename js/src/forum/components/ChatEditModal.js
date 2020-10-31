@@ -4,6 +4,7 @@ import ChatModal from './ChatModal';
 import Stream from 'flarum/utils/Stream';
 
 import ChatAvatar from './ChatAvatar';
+import ChatState from '../states/ChatState';
 
 export default class ChatEditModal extends ChatModal
 {
@@ -25,7 +26,12 @@ export default class ChatEditModal extends ChatModal
 
 	onsubmit()
 	{
-		
+		this.model.save({
+			title: this.getInput().title(),
+			color: this.getInput().color(),
+			icon: this.getInput().icon(),
+			relationships: {users: this.getSelectedUsers()}
+		});
 
 		this.hide();
 	}

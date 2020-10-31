@@ -19,6 +19,7 @@ use Xelson\Chat\Api\Controllers\DeleteMessageController;
 use Xelson\Chat\Api\Controllers\ShowUserSafeController;
 use Xelson\Chat\Api\Controllers\ListChatsController;
 use Xelson\Chat\Api\Controllers\CreateChatController;
+use Xelson\Chat\Api\Controllers\EditChatController;
 use Xelson\Chat\Api\Controllers\DeleteChatController;
 
 return [
@@ -32,6 +33,7 @@ return [
     (new Extend\Routes('api'))
         ->get('/chats', 'neonchat.chats.get', ListChatsController::class)
         ->post('/chats', 'neonchat.chats.create', CreateChatController::class)
+        ->patch('/chats/{id}', 'neonchat.chats.edit', EditChatController::class)
         ->delete('/chats/{id}', 'neonchat.chats.delete', DeleteChatController::class)
         ->get('/chatmessages', 'neonchat.chatmessages.fetch', FetchMessageController::class)
         ->post('/chatmessages', 'neonchat.chatmessages.post', PostMessageController::class)

@@ -10,8 +10,12 @@ return [
         });
 
         $schema->table('neonchat_chat_user', function (Blueprint $table) {
-            $table->integer('unreaded')->default(0);
-            $table->boolean('is_ignoring')->default(0);
+            $table->integer('removed_by')->unsigned()->nullable();
+            $table->dateTime('readed_at')->nullable();
+            $table->dateTime('removed_at')->nullable();
+            $table->dateTime('joined_at')->nullable();
+
+            $table->foreign('removed_by')->references('id')->on('users')->onDelete('cascade');
         });
     },
 
@@ -21,8 +25,10 @@ return [
         });
 
         $schema->table('neonchat_chat_user', function (Blueprint $table) {
-            $table->dropColumn('unreaded');
-            $table->dropColumn('is_ignoring');
+            $table->dropColumn('removed_by');
+            $table->dropColumn('readed_at');
+            $table->dropColumn('removed_at');
+            $table->dropColumn('joined_at');
         });
     }
 ];

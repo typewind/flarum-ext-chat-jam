@@ -16,6 +16,8 @@ use Flarum\Settings\SettingsRepositoryInterface;
 
 class MessageRepository
 {
+    public $messages_per_fetch = 50;
+
     /**
      * Get a new query builder for the posts table.
      *
@@ -72,15 +74,37 @@ class MessageRepository
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function fetch($id, User $actor, Chat $chat_id)
+    public function fetch($time, User $actor, Chat $chat)
     {
         $messages = $this->queryVisible($actor);
+        $chatUser = $chat->getChatUser($actor);
 
-        $list = $id ? 
-            $messages->where('id', '<', $id)->where('chat_id', $chat_id->id)->orderBy('id', 'desc')->limit(20) 
-            :
-            $messages->where('chat_id', $chat_id->id)->orderBy('id', 'desc')->limit(20);
+        if($chatUser->removed_at)
+            $messages->where('created_at', '<=', $chatUser->removed_at);
 
-        return $list->get()->reverse();
+        if($time)
+        {
+            if($time[0] != '-') 
+                $messages
+                    ->where('chat_id', $chat->id)
+                    ->where('created_at', '<', new Carbon($time))
+                    ->orderBy('id', 'desc')
+                    ->limit($this->messages_per_fetch);
+            else 
+            {
+                $time = substr($time, 1);
+                $messages
+                    ->where('chat_id', $chat->id)
+                    ->where('created_at', '>', new Carbon($time))
+                    ->limit($this->messages_per_fetch);
+            }
+        }
+        else 
+            $messages
+            ->where('chat_id', $chat->id)
+            ->orderBy('id', 'desc')
+            ->limit($this->messages_per_fetch);
+
+        return $messages->get();
     }
 }

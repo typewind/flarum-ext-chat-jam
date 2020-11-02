@@ -92,9 +92,14 @@ export default class ChatModal extends Modal
 		];
 	}
 
+	userMentionContent(user)
+	{
+		return '@' + user.displayName();
+	}
+
 	userMentionClassname(user)
 	{
-		return 'deleteable';
+		return 'deletable';
 	}
 
 	userMentionOnClick(event, user)
@@ -109,10 +114,10 @@ export default class ChatModal extends Modal
 			<div className="UsersTags">
 				{this.getSelectedUsers().map(u => 
 					<div 
-						className={classList(['UserMention', this.userMentionClassname.apply(this, u)])}
+						className={classList(['UserMention', this.userMentionClassname(u)])}
 						onclick={this.userMentionOnClick.bind(this, u)}
 					>
-						{'@' + u.displayName()}
+						{this.userMentionContent(u)}
 					</div>
 				)}
 			</div>,

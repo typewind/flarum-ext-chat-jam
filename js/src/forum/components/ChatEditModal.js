@@ -1,4 +1,5 @@
 import Button from 'flarum/components/Button';
+import Dropdown from 'flarum/components/Dropdown';
 
 import ChatModal from './ChatModal';
 import Stream from 'flarum/utils/Stream';
@@ -47,8 +48,32 @@ export default class ChatEditModal extends ChatModal
 		return 'editable';
 	}
 
-	userMentionOnClick()
+	userMentionContent(user)
 	{
+		return [
+			'@' + user.displayName(),
+			<Dropdown 
+				buttonClassName="Button Button--icon Button--flat Button--mention-edit"
+				menuClassName="Dropdown-menu--top Dropdown-menu--bottom Dropdown-menu--left Dropdown-menu--right"
+				icon="fas fa-chevron-down"
+			>
+				<Button 
+					icon='fas fa-crown'
+				>
+					Модер
+				</Button>
+				<Button 
+					icon='fas fa-trash-alt'
+				>
+					Кикнуть
+				</Button>
+			</Dropdown>
+		];
+	}
+
+	userMentionOnClick(user, e)
+	{
+		this.$(e.target).find('.Dropdown').trigger('shown.bs.dropdown');
 		// Переделать под мини дропдаун для выдачи прав или исключения/добавления в чат. При исключении перечеркивать mention
 	}
 

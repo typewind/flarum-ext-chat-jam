@@ -395,9 +395,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_esm_inheritsLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inheritsLoose */ "./node_modules/@babel/runtime/helpers/esm/inheritsLoose.js");
 /* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flarum/components/Button */ "flarum/components/Button");
 /* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Button__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _ChatModal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ChatModal */ "./src/forum/components/ChatModal.js");
-/* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/utils/Stream */ "flarum/utils/Stream");
-/* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/components/Dropdown */ "flarum/components/Dropdown");
+/* harmony import */ var flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _ChatModal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ChatModal */ "./src/forum/components/ChatModal.js");
+/* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! flarum/utils/Stream */ "flarum/utils/Stream");
+/* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_4__);
+
 
 
 
@@ -417,9 +420,9 @@ function (_ChatModal) {
   _proto.oninit = function oninit(vnode) {
     _ChatModal.prototype.oninit.call(this, vnode);
 
-    this.getInput().title = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default()(this.model.title());
-    this.getInput().color = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default()(this.model.color());
-    this.getInput().icon = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default()(this.model.icon());
+    this.getInput().title = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_4___default()(this.model.title());
+    this.getInput().color = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_4___default()(this.model.color());
+    this.getInput().icon = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_4___default()(this.model.icon());
     this.setSelectedUsers(this.model.users());
   };
 
@@ -465,7 +468,20 @@ function (_ChatModal) {
     return 'editable';
   };
 
-  _proto.userMentionOnClick = function userMentionOnClick() {// Переделать под мини дропдаун для выдачи прав или исключения/добавления в чат. При исключении перечеркивать mention
+  _proto.userMentionContent = function userMentionContent(user) {
+    return ['@' + user.displayName(), m(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_2___default.a, {
+      buttonClassName: "Button Button--icon Button--flat Button--mention-edit",
+      menuClassName: "Dropdown-menu--top Dropdown-menu--bottom Dropdown-menu--left Dropdown-menu--right",
+      icon: "fas fa-chevron-down"
+    }, m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_1___default.a, {
+      icon: "fas fa-crown"
+    }, "\u041C\u043E\u0434\u0435\u0440"), m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_1___default.a, {
+      icon: "fas fa-trash-alt"
+    }, "\u041A\u0438\u043A\u043D\u0443\u0442\u044C"))];
+  };
+
+  _proto.userMentionOnClick = function userMentionOnClick(user, e) {
+    this.$(e.target).find('.Dropdown').trigger('shown.bs.dropdown'); // Переделать под мини дропдаун для выдачи прав или исключения/добавления в чат. При исключении перечеркивать mention
   };
 
   _proto.componentFormInputIcon = function componentFormInputIcon() {
@@ -531,7 +547,7 @@ function (_ChatModal) {
   };
 
   return ChatEditModal;
-}(_ChatModal__WEBPACK_IMPORTED_MODULE_2__["default"]);
+}(_ChatModal__WEBPACK_IMPORTED_MODULE_3__["default"]);
 
 
 
@@ -1382,8 +1398,12 @@ function (_Modal) {
     return [m("label", null, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.users')), this.componentUsersSelect()];
   };
 
+  _proto.userMentionContent = function userMentionContent(user) {
+    return '@' + user.displayName();
+  };
+
   _proto.userMentionClassname = function userMentionClassname(user) {
-    return 'deleteable';
+    return 'deletable';
   };
 
   _proto.userMentionOnClick = function userMentionOnClick(event, user) {
@@ -1397,9 +1417,9 @@ function (_Modal) {
       className: "UsersTags"
     }, this.getSelectedUsers().map(function (u) {
       return m("div", {
-        className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_4___default()(['UserMention', _this.userMentionClassname.apply(_this, u)]),
+        className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_4___default()(['UserMention', _this.userMentionClassname(u)]),
         onclick: _this.userMentionOnClick.bind(_this, u)
-      }, '@' + u.displayName());
+      }, _this.userMentionContent(u));
     })), m("div", {
       className: "UsersSearch"
     }, m(_ChatSearchUser__WEBPACK_IMPORTED_MODULE_2__["default"], {

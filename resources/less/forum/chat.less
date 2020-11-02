@@ -119,14 +119,44 @@
         margin: 5px 0px 0px 5px;
         border: 0 !important;
         position: relative;
+        cursor: pointer;
 
-        &.deleteable
+        &.moder
+        {
+            &:before
+            {
+                .fa();
+                content: @fa-var-crown;
+
+                padding-right: 2px;
+            }
+        }
+
+        &.removed
+        {
+            text-decoration: line-through;
+            color: #878e9c;
+        }
+
+        .Button--mention-edit
+        {
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            margin-left: 2px;
+        }
+
+        .Dropdown-menu
+        {
+            right: -80px;
+        }
+
+        &.deletable
         {
             &:hover
             {
                 background: #afb2b9;
                 color: #3e495d;
-                cursor: pointer;
                 
                 &:after
                 {

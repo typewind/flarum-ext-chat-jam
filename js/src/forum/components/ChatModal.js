@@ -1,7 +1,7 @@
 import Modal from 'flarum/components/Modal';
 import ChatSearchUser from './ChatSearchUser';
 import Stream from 'flarum/utils/Stream';
-import ItemList from 'flarum/utils/ItemList';
+import classList from 'flarum/utils/classList';
 
 import ChatState from '../states/ChatState';
 
@@ -92,6 +92,16 @@ export default class ChatModal extends Modal
 		];
 	}
 
+	userMentionClassname(user)
+	{
+		return 'deleteable';
+	}
+
+	userMentionOnClick(event, user)
+	{
+		return this.getSelectedUsers().splice(this.getSelectedUsers().indexOf(user), 1)
+	}
+
 	componentUsersSelect()
 	{
 		return [
@@ -99,8 +109,8 @@ export default class ChatModal extends Modal
 			<div className="UsersTags">
 				{this.getSelectedUsers().map(u => 
 					<div 
-						className='UserMention deleteable' 
-						onclick={() => this.getSelectedUsers().splice(this.getSelectedUsers().indexOf(u), 1)}
+						className={classList(['UserMention', this.userMentionClassname.apply(this, u)])}
+						onclick={this.userMentionOnClick.bind(this, u)}
 					>
 						{'@' + u.displayName()}
 					</div>
@@ -127,7 +137,7 @@ export default class ChatModal extends Modal
 						onupdate={vnode => $('.Chat-FullColor').css({color: this.input.color(), backgroundColor: this.input.color()})}
 					/>
 					<icon className='Chat-FullColor'>
-						<i className={this.input.icon()} />
+						<i className={this.input.icon()?.length ? this.input.icon() : 'fas fa-bolt'} />
 					</icon>
 				</div>
 			</div>

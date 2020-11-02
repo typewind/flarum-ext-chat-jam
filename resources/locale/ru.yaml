@@ -26,8 +26,6 @@ pushedx-chat:
           placeholder: Поиск пользователей
           failed: Ничего не найдено по запросу
           invited: Приглашены
-        alerts:
-          chat_to_pm: Вы не можете преобразовать публичный чат в ЛС!
         save_button: => core.ref.save_changes
       list:
         pin: Закрепить панель

@@ -26,8 +26,6 @@ pushedx-chat:
           placeholder: Search Users
           failed: No matching users found
           invited: Invited
-        alerts:
-          chat_to_pm: You can't convert a public chat to a PM!
         save_button: => core.ref.save_changes
       list:
         pin: Pin panel

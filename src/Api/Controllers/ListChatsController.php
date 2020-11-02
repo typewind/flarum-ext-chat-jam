@@ -9,6 +9,7 @@
 namespace Xelson\Chat\Api\Controllers;
 
 use Xelson\Chat\Api\Serializers\ChatUserSerializer;
+use Xelson\Chat\Chat;
 use Xelson\Chat\ChatRepository;
 use Illuminate\Support\Arr;
 use Tobscure\JsonApi\Document;
@@ -32,7 +33,8 @@ class ListChatsController extends AbstractListController
         'creator', 
         'users', 
         'last_message', 
-        'last_message.user'
+        'last_message.user',
+        'first_message'
     ];
 
     /**

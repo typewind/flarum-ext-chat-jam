@@ -16,7 +16,7 @@ use Flarum\Settings\SettingsRepositoryInterface;
 
 class MessageRepository
 {
-    public $messages_per_fetch = 50;
+    public $messages_per_fetch = 20;
 
     /**
      * Get a new query builder for the posts table.
@@ -76,6 +76,7 @@ class MessageRepository
      */
     public function fetch($time, User $actor, Chat $chat)
     {
+        /*
         $messages = $this->queryVisible($actor);
         $chatUser = $chat->getChatUser($actor);
 
@@ -104,6 +105,21 @@ class MessageRepository
             ->where('chat_id', $chat->id)
             ->orderBy('id', 'desc')
             ->limit($this->messages_per_fetch);
+        */
+
+        $chatUser = $chat->getChatUser($actor);
+
+        $top = $this->queryVisible($actor)->where('chat_id', $chat->id);
+        if($chatUser && $chatUser->removed_at)
+            $top->where('created_at', '<=', $chatUser->removed_at);
+        $top->where('created_at', '>=', new Carbon($time))->limit($this->messages_per_fetch + 1);
+
+        $bottom = $this->queryVisible($actor)->where('chat_id', $chat->id);
+        if($chatUser && $chatUser->removed_at)
+            $bottom->where('created_at', '<=', $chatUser->removed_at);
+        $bottom->where('created_at', '<', new Carbon($time))->orderBy('id', 'desc')->limit($this->messages_per_fetch);
+
+        $messages = $top->union($bottom);
 
         return $messages->get();
     }

@@ -2,6 +2,7 @@ import humanTime from 'flarum/utils/humanTime';
 import Component from 'flarum/Component';
 import classList from 'flarum/utils/classList';
 import extractText from 'flarum/utils/extractText';
+import SubtreeRetainer from 'flarum/utils/SubtreeRetainer';
 
 import ChatState from '../states/ChatState';
 import ChatAvatar from './ChatAvatar';
@@ -13,6 +14,22 @@ export default class ChatPreview extends Component
 		super.oninit(vnode);
 		
 		this.model = this.attrs.model;
+
+		this.subtree = new SubtreeRetainer(
+			() => this.model.freshness,
+			() => ChatState.getCurrentChat(),
+
+			// Reactive attrs
+			() => this.model.isNeedToFlash
+		);
+	}
+
+	onbeforeupdate(vnode) 
+	{
+		super.onbeforeupdate(vnode);
+		this.model = this.attrs.model;
+
+		return this.subtree.needsRebuild();
 	}
 
 	view(vnode)

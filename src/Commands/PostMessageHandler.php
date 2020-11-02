@@ -69,6 +69,12 @@ class PostMessageHandler
         if(!$command->bypassFloodgate)
             $this->floodgate->assertNotFlooding($actor, $chat);
 
+        $chatUser = $chat->getChatUser($actor);
+
+        $this->assertPermission(
+            $chatUser && !$chatUser->removed_at
+        );
+
         $message = Message::build(
             $content,
             $actor->id,
@@ -80,6 +86,8 @@ class PostMessageHandler
         $this->validator->assertValid($message->getDirty());
 
         $message->save();
+
+        $chat->users()->updateExistingPivot($actor->id, ['readed_at' => Carbon::now()]);
 
         return $message;
     }

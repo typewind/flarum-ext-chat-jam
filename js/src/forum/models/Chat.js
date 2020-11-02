@@ -11,6 +11,7 @@ Object.assign(Chat.prototype,
 	created_at: Model.attribute('created_at', Model.transformDate),
 	creator: Model.hasOne('creator'),
 	users: Model.hasMany('users'),
+	first_message: Model.hasOne('first_message'),
 	last_message: Model.hasOne('last_message'),
 	icon: Model.attribute('icon'),
 

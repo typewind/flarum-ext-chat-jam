@@ -2,6 +2,7 @@ import ChatPreview from '../components/ChatPreview';
 import ChatViewport from '../components/ChatViewport';
 import ChatMessage from '../components/ChatMessage';
 import ChatEventMessage from '../components/ChatEventMessage';
+import Message from '../models/Message';
 
 import Model from 'flarum/Model';
 import evented from 'flarum/utils/evented';
@@ -61,7 +62,7 @@ class ChatState
 	{
 		return {
 			loadingSend: false,
-			scroll: {autoScroll: true, oldScroll: 0, loadingTop: false, loadginBottom: false, needToScroll: false},
+			scroll: {autoScroll: true, oldScroll: 0, loading: {all: false, queries: {}}, needToScroll: false},
 			input: {messageLength: 0, rows: 1, content: ''},
 			messagesFetched: false,
 		}
@@ -204,7 +205,12 @@ class ChatState
 	apiReadChat(chat, message)
 	{
 		if(this.readingTimeout) clearTimeout(this.readingTimeout);
-		this.readingTimeout = setTimeout(() => chat.save({actions: {reading: message.created_at().toISOString()}}), 1000);
+		
+		let timestamp;
+		if(message instanceof Date) timestamp = message.toISOString();
+		else if(message instanceof Message) timestamp = message.created_at().toISOString()
+
+		this.readingTimeout = setTimeout(() => chat.save({actions: {reading: timestamp}}), 1000);
 	}
 
 	deleteChat(model)
@@ -261,11 +267,10 @@ class ChatState
 		let viewport = this.getViewportState(model);
 		let self = this;
 
-		let loaderProp = 'loadingTop';
-		if(typeof query == "string") loaderProp = query[0] == '-' ? 'loadingBottom' : 'loadingTop';
+		if(viewport.scroll.loading.queries[query]) return;
 
-		if(!options.disableLoader) viewport.scroll[loaderProp] = true;
-		
+		viewport.scroll.loading.queries[query] = true;
+	
         return app.store.find('chatmessages', {chat_id: model.id(), query})
             .then(r => {
 
@@ -277,9 +282,7 @@ class ChatState
 					});
 					if(options.notify) this.messageNotify(r[0]);
 
-					viewport.scroll[loaderProp] = false;
-					if(loaderProp == 'loadingBottom') viewport.scroll.autoScroll = false;
-
+					viewport.scroll.loading.queries[query] = false;
 					m.redraw();
 				}
             });
@@ -331,6 +334,7 @@ class ChatState
 
 		if(element)
 		{
+			element.innerText = content;
 			s9e.TextFormatter.preview(content, element);
 
 			if(this.executeScriptsTimeout) clearTimeout(this.executeScriptsTimeout);

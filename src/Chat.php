@@ -43,10 +43,16 @@ class Chat extends AbstractModel
         return $chat;
     }
 
-    public function unreadedCount($start)
+    public function unreadedCount($chatUser)
     {
+        $start = $chatUser->readed_at;
         if($start == null) $start = 0;
-        return $this->messages()->where('created_at', '>', $start)->count();
+
+        $query = $this->messages()->where('created_at', '>', $start);
+        if($chatUser->removed_at) 
+            $query->where('created_at', '<=', $chatUser->removed_at);
+
+        return $query->count();
     }
 
     public function getChatUser(User $user)
@@ -85,5 +91,10 @@ class Chat extends AbstractModel
     public function last_message()
     {
         return $this->hasOne(Message::class)->orderBy('id', 'desc')->whereNull('deleted_by');
+    }
+
+    public function first_message()
+    {
+        return $this->hasOne(Message::class)->orderBy('id', 'asc')->whereNull('deleted_by');
     }
 }

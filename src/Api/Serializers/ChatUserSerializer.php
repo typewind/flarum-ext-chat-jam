@@ -30,7 +30,7 @@ class ChatUserSerializer extends ChatSerializer
 			$attributes['readed_at'] = $this->formatDate($chatUser->readed_at);
 			$attributes['removed_at'] = $this->formatDate($chatUser->removed_at);
 			$attributes['removed_by'] = $chatUser->removed_by;
-			$attributes['unreaded'] = $chat->unreadedCount($chatUser->readed_at);
+            $attributes['unreaded'] = $chat->unreadedCount($chatUser);
 		}
         return $attributes;
     }

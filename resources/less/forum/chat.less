@@ -77,6 +77,7 @@
     icon.Chat-FullColor
     {
         background: none !important;
+        color: #000;
     }
 
     .Icon-Input
@@ -198,14 +199,17 @@
 
         .UserSearchResult
         {
+            span.username
+            {
+                display: inline-block;
+                max-width: 110px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
             span
             {
                 .user-select(none);
-
-                span
-                {
-                    max-width: 200px;
-                }
 
                 &:hover
                 {
@@ -217,6 +221,7 @@
                     .fa();
                     content: @fa-var-check;
 
+                    line-height: inherit;
                     margin-left: 175px;
                     position: fixed;
                 }

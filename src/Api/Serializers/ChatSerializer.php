@@ -85,4 +85,12 @@ class ChatSerializer extends AbstractSerializer
     {
         return $this->hasOne($chat, MessageSerializer::class);
     }
+
+    /**
+     * @return \Tobscure\JsonApi\Relationship
+     */
+    protected function first_message($chat)
+    {
+        return $this->hasOne($chat, MessageSerializer::class);
+    }
 }

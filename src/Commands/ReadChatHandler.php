@@ -12,9 +12,13 @@ use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
 use Xelson\Chat\ChatRepository;
+use Xelson\Chat\Exceptions\ChatEditException;
+use Flarum\User\AssertPermissionTrait;
 
 class ReadChatHandler
 {
+    use AssertPermissionTrait;
+
 	/**
 	 * @param BusDispatcher $bus
 	 */
@@ -38,8 +42,15 @@ class ReadChatHandler
 
         $chat = $this->chats->findOrFail($chat_id, $actor);
 
-		$chatUser = $chat->getChatUser($actor);
-		if($chatUser) $chat->users()->updateExistingPivot($actor->id, ['readed_at' => new Carbon($readed_at)]);
+        $chatUser = $chat->getChatUser($actor);
+
+        $this->assertPermission(
+            $chatUser
+        );
+
+        $time = new Carbon($readed_at);
+        if($chatUser->removed_at && $time > $chatUser->removed_at) $time = $chatUser->removed_at;
+        $chat->users()->updateExistingPivot($actor->id, ['readed_at' => $time]);
         
         return $chat;
     }

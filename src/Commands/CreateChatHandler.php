@@ -58,8 +58,14 @@ class CreateChatHandler
             $isChannel ? 'pushedx-chat.permissions.create.channel' : 'pushedx-chat.permissions.create'
         );
 
+        $invited = [];
+
         foreach($users as $key => $user)
         {
+            if(array_key_exists($user['id'], $invited))
+                throw new ChatEditException;
+
+            $invited[$user['id']] = true;
             if($user['id'] == $actor->id)
                 array_splice($users, $key, 1);
         }
@@ -88,6 +94,7 @@ class CreateChatHandler
             }
         }
 
+        $now = Carbon::now();
         $color = Arr::get($data, 'attributes.color', sprintf('#%06X', mt_rand(0x222222, 0xFFFF00)));
         $icon = Arr::get($data, 'attributes.icon', '');
 
@@ -103,15 +110,21 @@ class CreateChatHandler
         $this->validator->assertValid($chat->getDirty());
         $chat->save();
 
-        $user_ids = [];
-        foreach($users as $user) if($user['id'] != $actor->id) $user_ids[] = $user['id'];
+        if(!$isChannel)
+        {
+            $user_ids = [];
+            foreach($users as $user) if($user['id'] != $actor->id) $user_ids[] = $user['id'];
 
-        try {
-            $chat->users()->sync(array_merge($user_ids, [$actor->id]));
-        } catch (Exception $e) {
-            $chat->delete();
+            $pairs = array_merge($user_ids, [$actor->id]);
+            foreach($pairs as $k => $v)
+                $pairs[$v] = ['joined_at' => $now];
 
-            throw $e;
+            try {
+                $chat->users()->sync($pairs);
+            } catch (Exception $e) {
+                $chat->delete();
+                throw $e;
+            }
         }
 
         $eventMessage = $this->bus->dispatch(

@@ -3,9 +3,6 @@ import Button from 'flarum/components/Button';
 import ChatModal from './ChatModal';
 import Stream from 'flarum/utils/Stream';
 
-import ChatAvatar from './ChatAvatar';
-import ChatState from '../states/ChatState';
-
 export default class ChatEditModal extends ChatModal
 {
 	oninit(vnode)
@@ -26,22 +23,33 @@ export default class ChatEditModal extends ChatModal
 
 	onsubmit()
 	{
+		let added = this.getSelectedUsers().map(mdl => !this.model.users().includes(mdl) ? mdl : null).filter(e => e);
+		let removed = this.model.users().map(mdl => !this.getSelectedUsers().includes(mdl) ? mdl : null).filter(e => e);
+
 		this.model.save({
 			title: this.getInput().title(),
 			color: this.getInput().color(),
 			icon: this.getInput().icon(),
-			relationships: {users: this.getSelectedUsers()}
+			relationships: {added, removed}
 		});
+		this.model.pushData({relationships: {users: this.getSelectedUsers()}});
 
 		this.hide();
 	}
 
 	alertText()
 	{
-		if(this.isChatExists()) return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.alerts.exists');
-		if(!(!!this.model.getPMUser()) && this.getSelectedUsers().length < 3) return app.translator.trans('pushedx-chat.forum.chat.edit_modal.alerts.chat_to_pm');
-
 		return null;
+	}
+
+	userMentionClassname(user)
+	{
+		return 'editable';
+	}
+
+	userMentionOnClick()
+	{
+		// Переделать под мини дропдаун для выдачи прав или исключения/добавления в чат. При исключении перечеркивать mention
 	}
 
 	componentFormInputIcon()

@@ -13,7 +13,7 @@ class EventMessageChatCreated extends AbstractEventMessage
 	public $id = 'chatCreated';
 
 	/**
-	 * @param mixed $data
+	 * @param array $users
 	 */
 	public function __construct($users)
 	{

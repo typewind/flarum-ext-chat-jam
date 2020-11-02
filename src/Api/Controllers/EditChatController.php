@@ -63,7 +63,7 @@ class EditChatController extends AbstractShowController
         $ip_address = Arr::get($request->getServerParams(), 'REMOTE_ADDR', '127.0.0.1');
 
         $readed_at = Arr::get($data, 'attributes.actions.reading');
-        if($readed_at )
+        if($readed_at)
         {   
             return $this->bus->dispatch(
                 new ReadChat($id, $actor, $readed_at)

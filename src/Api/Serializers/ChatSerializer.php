@@ -11,7 +11,7 @@ namespace Xelson\Chat\Api\Serializers;
 use Flarum\User\User;
 use Flarum\Api\Serializer\AbstractSerializer;
 use Flarum\Settings\SettingsRepositoryInterface;
-use Flarum\Api\Serializer\BasicUserSerializer;
+use Flarum\Api\Serializer\UserSerializer;
 
 class ChatSerializer extends AbstractSerializer
 {
@@ -59,7 +59,7 @@ class ChatSerializer extends AbstractSerializer
      */
     protected function creator($chat)
     {
-        return $this->hasOne($chat, BasicUserSerializer::class);
+        return $this->hasOne($chat, UserSerializer::class);
     }
 
     /**
@@ -67,7 +67,7 @@ class ChatSerializer extends AbstractSerializer
      */
     protected function users($chat)
     {
-        return $this->hasMany($chat, BasicUserSerializer::class);
+        return $this->hasMany($chat, UserChatSerializer::class);
     }
 
     /**

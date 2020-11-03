@@ -91,6 +91,20 @@ export default class ChatCreateModal extends ChatModal
 		]
 	}
 
+	isCanCreateChat()
+	{
+		if(this.getSelectedUsers().length > 1 && !this.getInput().title().length) return false;
+		if(!this.getSelectedUsers().length) return false;
+		if(this.alertText()) return false;
+
+		return true;
+	}
+
+	isCanCreateChannel()
+	{
+		return this.getInput().title().length;
+	}
+
 	content() {
 		return (
 			<div className="Modal-body Modal-body--neonchat">

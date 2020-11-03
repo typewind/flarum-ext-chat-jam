@@ -54,20 +54,6 @@ export default class ChatModal extends Modal
 		return this.getSelectedUsers().length == 1 && ChatState.isExistsPMChat(app.session.user, this.getSelectedUsers()[0]);
 	}
 
-	isCanCreateChat()
-	{
-		if(this.getSelectedUsers().length > 1 && !this.input.title().length) return false;
-		if(!this.getSelectedUsers().length) return false;
-		if(this.alertText()) return false;
-
-		return true;
-	}
-
-	isCanCreateChannel()
-	{
-		return this.input.title().length;
-	}
-
 	alertText()
 	{
 		if(this.isChatExists()) return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.alerts.exists');
@@ -84,10 +70,10 @@ export default class ChatModal extends Modal
 		);
 	}
 
-	componentFormUsersSelect()
+	componentFormUsersSelect(label = 'pushedx-chat.forum.chat.list.add_modal.form.users')
 	{
 		return [
-			<label>{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.users')}</label>,
+			<label>{app.translator.trans(label)}</label>,
 			this.componentUsersSelect()
 		];
 	}

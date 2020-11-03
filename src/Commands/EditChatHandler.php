@@ -47,24 +47,28 @@ class EditChatHandler
         $ip_address = $command->ip_address;
 
         $chat = $this->chats->findOrFail($chat_id, $actor);
+        $current_users = $chat->users()->get();
+        foreach($current_users as $user) $current_ids[] = $user['id'];
   
         $editable_colums = ['title', 'icon', 'color'];
 
         $events_list = [];
-        $edited = false;
+        $attrsChanged = false;
 
         $chatUser = $chat->getChatUser($actor);
-        $this->assetPermission(
-            !$chatUser || ($chatUser->removed_at && $chatUser->removed_by != $actor->id)
+        $this->assertPermission(
+            $chatUser && (!$chatUser->removed_at || $chatUser->removed_by == $actor->id)
         );
 
+        $now = Carbon::now();
+        $isCreator = $actor->id == $chat->creator_id;
         $isPM = $chat->users()->count() <= 2;
 
         foreach($editable_colums as $column)
         {
             if(Arr::get($data, 'attributes.' . $column, 0) && $chat[$column] != $attributes[$column])
             {
-                $this->assetPermission(
+                $this->assertPermission(
                     $chat->type == 1 || !$isPM
                 );
 
@@ -74,39 +78,38 @@ class EditChatHandler
                 $events_list[] = $message->id;
                 $chat[$column] = $attributes[$column];
 
-                $edited = true;
+                $attrsChanged = true;
             }
         }
 
-        $added = Arr::get($data, 'relationships.added', 0);
-        $removed = Arr::get($data, 'relationships.removed', 0);
+        $added = Arr::get($data, 'users.added', 0);
+        $removed = Arr::get($data, 'users.removed', 0);
 
         if($added || $removed)
         {
-            $this->assetPermission(
+            $this->assertPermission(
                 !$isPM
             );
 
             // Редактирование списка пользователей:
+            // Учесть работу для каналов (если это вообще надо)
             // Большая красная кнопка удалить для админов
 
-            $isCreator = $actor->id == $chat->creator()->id;
-            $now = Carbon::now();
-
-            $added_ids = array_unique(array_map(function($e) {return $e['id'];}, $added));
-            $removed_ids = array_unique(array_map(function($e) {return $e['id'];}, $removed));
+            $added_ids = []; $removed = [];
+            foreach($added as $user) $added_ids[] = $user['id'];
+            foreach($removed as $user) $removed_ids[] = $user['id'];
+            $added_ids = array_unique($added_ids);
+            $removed_ids = array_unique($removed_ids);
 
             if(count(array_intersect($added_ids, $removed_ids))) 
                 throw new ChatEditException;
-
-            $current_ids = array_map(function($e) {return $e['id'];}, $chat->users());
 
             if(count(array_intersect($added_ids, $current_ids)) || !count(array_intersect($removed_ids, $current_ids)))
                 throw new ChatEditException;
 
             if(count($added_ids) || count($removed_ids))
             {
-                $this->assetPermission(
+                $this->assertPermission(
                     $isCreator
                 );
                 
@@ -116,7 +119,7 @@ class EditChatHandler
                 $events_list[] = $message->id;
 
                 foreach($added_ids as $k => $v)
-                $added_ids[$v] = ['removed_at' => null, 'removed_by' => null];
+                    $added_ids[$v] = ['removed_at' => null, 'removed_by' => null];
 
                 foreach($removed_ids as $k => $v)
                     $removed_ids[$v] = ['removed_at' => $now, 'removed_by' => $actor->id];
@@ -148,7 +151,36 @@ class EditChatHandler
             }
         }
 
-        if($edited) $chat->save();
+        $edited = Arr::get($data, 'users.edited', 0);
+        if($edited)
+        {
+            $this->assertPermission(
+                !$isPM && $isCreator
+            );
+
+            // Реализовать проверку доступа на действия как от лица модератора. Назначать модераторов может только создатель, но не себя
+            // Учесть работу для каналов (если это вообще надо)
+
+            $syncUsers = [];
+
+            foreach($edited as $user)
+            {
+                $id = $user['id'];
+                $role = $user['role'];
+
+                if(array_search($id, $current_ids) === false || $id == $actor->id)
+                    throw new ChatEditException;
+
+                if($role != 0 && $role != 1)
+                    throw new ChatEditException;
+
+                $syncUsers[$id] = ['role' => $role];
+            }
+
+            $chat->users()->syncWithoutDetaching($syncUsers);
+        }
+
+        if($attrsChanged) $chat->save();
         $chat->eventmsg_range = $events_list;
 
         return $chat;

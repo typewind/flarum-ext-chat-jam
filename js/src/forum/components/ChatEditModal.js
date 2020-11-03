@@ -1,5 +1,6 @@
 import Button from 'flarum/components/Button';
 import Dropdown from 'flarum/components/Dropdown';
+import classList from 'flarum/utils/classList';
 
 import ChatModal from './ChatModal';
 import Stream from 'flarum/utils/Stream';
@@ -15,6 +16,7 @@ export default class ChatEditModal extends ChatModal
 		this.getInput().icon = Stream(this.model.icon());
 
 		this.setSelectedUsers(this.model.users());
+		this.edited = {};
 	}
 
 	title() 
@@ -26,14 +28,15 @@ export default class ChatEditModal extends ChatModal
 	{
 		let added = this.getSelectedUsers().map(mdl => !this.model.users().includes(mdl) ? mdl : null).filter(e => e);
 		let removed = this.model.users().map(mdl => !this.getSelectedUsers().includes(mdl) ? mdl : null).filter(e => e);
+		let edited = Object.keys(this.edited).map(k => this.edited[k] = {id: k, ...this.edited[k]});
 
 		this.model.save({
 			title: this.getInput().title(),
 			color: this.getInput().color(),
 			icon: this.getInput().icon(),
-			relationships: {added, removed}
+			users: {added, removed, edited},
+			relationships: {users: this.getSelectedUsers()}
 		});
-		this.model.pushData({relationships: {users: this.getSelectedUsers()}});
 
 		this.hide();
 	}
@@ -43,9 +46,38 @@ export default class ChatEditModal extends ChatModal
 		return null;
 	}
 
+	isModer(user)
+	{
+		return this.edited[user.id()]?.role ?? user.chat_pivot(this.model.id()).role() == 1;
+	}
+
+	isCreator(user)
+	{
+		return user.chat_pivot(this.model.id()).role() == 2;
+	}
+
 	userMentionClassname(user)
 	{
-		return 'editable';
+		return classList({editable: true, moder: this.isModer(user), creator: this.isCreator(user)});
+	}
+
+	userMentionDropdownOnclick(user, button)
+	{
+		switch(button)
+		{
+			case 'moder':
+			{
+				if(this.isModer(user)) this.edited[user.id()] = {role: 0};
+				else this.edited[user.id()] = {role: 1};
+
+				break;
+			}
+			case 'kick':
+			{
+				this.getSelectedUsers().splice(this.getSelectedUsers().indexOf(user), 1);
+				break;
+			}
+		}
 	}
 
 	userMentionContent(user)
@@ -58,14 +90,17 @@ export default class ChatEditModal extends ChatModal
 				icon="fas fa-chevron-down"
 			>
 				<Button 
-					icon='fas fa-crown'
+					icon={this.isModer(user) ? 'fas fa-times' : 'fas fa-users-cog'}
+					onclick={this.userMentionDropdownOnclick.bind(this, user, 'moder')}
+					disabled={user == app.session.user}
 				>
-					Модер
+					{app.translator.trans('pushedx-chat.forum.chat.moder')}
 				</Button>
 				<Button 
 					icon='fas fa-trash-alt'
+					onclick={this.userMentionDropdownOnclick.bind(this, user, 'kick')}
 				>
-					Кикнуть
+					{app.translator.trans('pushedx-chat.forum.chat.kick')}
 				</Button>
 			</Dropdown>
 		];
@@ -74,7 +109,6 @@ export default class ChatEditModal extends ChatModal
 	userMentionOnClick(user, e)
 	{
 		this.$(e.target).find('.Dropdown').trigger('shown.bs.dropdown');
-		// Переделать под мини дропдаун для выдачи прав или исключения/добавления в чат. При исключении перечеркивать mention
 	}
 
 	componentFormInputIcon()
@@ -119,7 +153,8 @@ export default class ChatEditModal extends ChatModal
 		return [
 			this.componentFormInputTitle(),
 			this.componentFormInputColor(),
-			this.componentFormInputIcon()
+			this.componentFormInputIcon(),
+			this.componentFormUsersSelect('pushedx-chat.forum.chat.edit_modal.form.users.edit')
 		];
 	}
 
@@ -141,6 +176,18 @@ export default class ChatEditModal extends ChatModal
 		return this.componentFormChat();
 	}
 
+	isCanEditChannel()
+	{
+		return this.getInput().title().length;
+	}
+
+	isCanEditChat()
+	{
+		if(this.alertText()) return false;
+
+		return true;
+	}
+
 	content() {
 		return (
 			<div className="Modal-body Modal-body--neonchat">
@@ -149,7 +196,7 @@ export default class ChatEditModal extends ChatModal
 					<Button
 						className='Button Button--primary Button--block ButtonCreate'
 						onclick={this.onsubmit.bind(this)}
-						disabled={this.model.type() ? !this.isCanCreateChannel() : !this.isCanCreateChat()}
+						disabled={this.model.type() ? !this.isCanEditChannel() : !this.isCanEditChat()}
 					>
 						{app.translator.trans('pushedx-chat.forum.chat.edit_modal.save_button')}
 					</Button>

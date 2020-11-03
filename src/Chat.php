@@ -80,19 +80,28 @@ class Chat extends AbstractModel
      */
     public function users()
     {
-        return $this->belongsToMany(User::class, 'neonchat_chat_user');
+        return $this->belongsToMany(User::class, 'neonchat_chat_user')->withPivot('joined_at', 'removed_by', 'role', 'readed_at', 'removed_at');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\hasMany
+     */
     public function messages()
     {
         return $this->hasMany(Message::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\hasOne
+     */
     public function last_message()
     {
         return $this->hasOne(Message::class)->orderBy('id', 'desc')->whereNull('deleted_by');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\hasOne
+     */
     public function first_message()
     {
         return $this->hasOne(Message::class)->orderBy('id', 'asc')->whereNull('deleted_by');

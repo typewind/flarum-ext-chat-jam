@@ -10,6 +10,7 @@ return [
         });
 
         $schema->table('neonchat_chat_user', function (Blueprint $table) {
+            $table->tinyInteger('role')->default(0);
             $table->integer('removed_by')->unsigned()->nullable();
             $table->dateTime('readed_at')->nullable();
             $table->dateTime('removed_at')->nullable();
@@ -25,6 +26,7 @@ return [
         });
 
         $schema->table('neonchat_chat_user', function (Blueprint $table) {
+            $table->dropColumn('role');
             $table->dropColumn('removed_by');
             $table->dropColumn('readed_at');
             $table->dropColumn('removed_at');

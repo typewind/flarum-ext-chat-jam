@@ -222,7 +222,7 @@ export default class ChatViewport extends Component
                 {
                     message.isReaded = true;
 
-                    ChatState.apiReadChat(this.model, message);
+                    ChatState.apiReadChat(this.model, this.model.unreaded() == 1 ? new Date() : message);
 
                     this.model.pushAttributes({unreaded: this.model.unreaded() - 1});
                     m.redraw();
@@ -243,12 +243,12 @@ export default class ChatViewport extends Component
 
         if(!this.state.messageEditing && this.state.scroll.oldScroll >= 0)
         {
-            if(el.scrollTop <= 100)
+            if(el.scrollTop <= 500)
             {
                 let topMessage = ChatState.getChatMessages(model => model.chat() == this.model)[0];
                 if(topMessage && topMessage != this.model.first_message()) ChatState.apiFetchChatMessages(this.model, topMessage.created_at().toISOString());
             }
-            else if(el.scrollTop + el.offsetHeight >= currentHeight - 100)
+            else if(el.scrollTop + el.offsetHeight >= currentHeight - 500)
             {
                 let bottomMessage = ChatState.getChatMessages(model => model.chat() == this.model).slice(-1)[0];
                 if(bottomMessage && bottomMessage != this.model.last_message()) ChatState.apiFetchChatMessages(this.model, bottomMessage.created_at().toISOString()); 

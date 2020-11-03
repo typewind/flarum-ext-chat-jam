@@ -12,6 +12,8 @@ pushedx-chat:
     chat:
       welcome: Please select a chat on the left for the conversation
       welcome.header: Welcome to Neon Chat!
+      moder: Moderator
+      kick: Kick
       edit_modal:
         title: Chat settings
         form:
@@ -22,6 +24,7 @@ pushedx-chat:
           icon: => core.ref.icon
           icon.validator: => core.ref.icon_text
           users: Selected users
+          users.edit: Select and edit users
         search:
           placeholder: Search Users
           failed: No matching users found

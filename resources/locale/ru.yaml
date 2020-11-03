@@ -12,6 +12,8 @@ pushedx-chat:
     chat:
       welcome: Пожалуйста, выберите чат слева для беседы
       welcome.header: Добро пожаловать в Neon Chat!
+      moder: Модератор
+      kick: Кикнуть
       edit_modal:
         title: Настройки чата
         form:
@@ -22,6 +24,7 @@ pushedx-chat:
           icon: => core.ref.icon
           icon.validator: => core.ref.icon_text
           users: Выбранные пользователи
+          users.edit: Выбор и редактирование пользователей
         search:
           placeholder: Поиск пользователей
           failed: Ничего не найдено по запросу

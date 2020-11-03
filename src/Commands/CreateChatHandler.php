@@ -117,8 +117,11 @@ class CreateChatHandler
 
             $pairs = array_merge($user_ids, [$actor->id]);
             foreach($pairs as $k => $v)
+            {
                 $pairs[$v] = ['joined_at' => $now];
-
+                if($v == $actor->id) $pairs[$v]['role'] = 2;
+            }
+            
             try {
                 $chat->users()->sync($pairs);
             } catch (Exception $e) {

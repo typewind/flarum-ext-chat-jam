@@ -69,6 +69,7 @@ class EditMessageHandler
                 'pushedx-chat.permissions.edit'
             );
             $this->assertPermission($actor->id == $message->user_id);
+            $this->assertPermission($message->message != $actions['msg']);
 
             $message->message = $actions['msg'];
             $message->edited_at = Carbon::now();

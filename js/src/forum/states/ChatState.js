@@ -135,7 +135,25 @@ class ChatState
 			{
 				this.editChat(chat, true);
 				let range = r.response.eventmsg_range;
-				if(range) this.apiFetchChatMessages(chat, range, {notify: true, withFlash: true, disableLoader: true});
+				if(range.length) this.apiFetchChatMessages(chat, range, {notify: true, withFlash: true, disableLoader: true});
+
+				if(app.session.user && r.response.roles_updated_for && r.response.roles_updated_for.includes(app.session.user.id()))
+				{
+					let role = app.session.user.chat_pivot(chat.id()).role();
+					switch(role)
+					{
+						case 0:
+						{
+							app.alerts.show({type: 'error'}, app.translator.trans('pushedx-chat.forum.chat.edit_modal.moderator.lost', {chatname: <b>{chat.title()}</b>}));
+							break;
+						}
+						case 1:
+						{
+							app.alerts.show({type: 'success'}, app.translator.trans('pushedx-chat.forum.chat.edit_modal.moderator.got', {chatname: <b>{chat.title()}</b>}));
+							break;
+						}
+					}
+				}
 
 				m.redraw();
 				
@@ -179,7 +197,14 @@ class ChatState
 
 	componentsChats()
 	{
-		return this.getChats().map(model => (
+		return this.getChats()
+			.sort((a, b) => {
+				if(b.last_message() && a.last_message()) {
+					return b.last_message()?.created_at() - a.last_message()?.created_at();
+				}
+				return 0;
+			})
+			.map(model => (
 			<div onclick={this.onChatChanged.bind(this, model)}>
 				<ChatPreview key={model.id()} model={model} />
 			</div>
@@ -318,11 +343,12 @@ class ChatState
 		{
 			this.messageNotify(model);
 			model.isNeedToFlash = true;
+			model.chat().isNeedToFlash = true;
 			model.pushAttributes({unreaded: model.unreaded() + 1});
 		}
 
 		let list = this.getChatMessages(mdl => mdl.chat() == model.chat());
-		if(notify && model.id() && list[list.length - 1] == model)
+		if((notify || model.chat().removed_at()) && model.id() && list[list.length - 1] == model)
 			model.chat().pushData({relationships: {last_message: model}})
 	}
 

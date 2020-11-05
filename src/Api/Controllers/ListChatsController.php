@@ -63,7 +63,7 @@ class ListChatsController extends AbstractListController
     {
         $actor = $request->getAttribute('actor');
         $include = $this->extractInclude($request);
-		
+
 		return $this->chats->queryVisible($actor)->get()->load($include);
     }
 }

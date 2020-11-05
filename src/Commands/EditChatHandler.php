@@ -11,6 +11,7 @@ namespace Xelson\Chat\Commands;
 use Carbon\Carbon;
 use Flarum\User\AssertPermissionTrait;
 use Illuminate\Support\Arr;
+use Xelson\Chat\ChatValidator;
 use Xelson\Chat\ChatRepository;
 use Xelson\Chat\EventMessageChatEdited;
 use Xelson\Chat\EventMessageChatAddRemoveUser;
@@ -23,11 +24,13 @@ class EditChatHandler
 	use AssertPermissionTrait;
 
 	/**
-     * @param ChatRepository $chats
-     * @param ChatSocket $socket
-     */
-	public function __construct(ChatRepository $chats, BusDispatcher $bus) 
+	 * @param ChatValidator $validator
+	 * @param ChatRepository $chats
+	 * @param BusDispatcher $bus
+	 */
+	public function __construct(ChatValidator $validator, ChatRepository $chats, BusDispatcher $bus) 
 	{
+        $this->validator = $validator;
         $this->chats  = $chats;
         $this->bus = $bus;
 	}
@@ -47,22 +50,35 @@ class EditChatHandler
         $ip_address = $command->ip_address;
 
         $chat = $this->chats->findOrFail($chat_id, $actor);
-        $current_users = $chat->users()->get();
-        foreach($current_users as $user) $current_ids[] = $user['id'];
+        $all_users = $chat->users()->get();
+        $all_ids = []; $current_ids = [];
+        $users = [];
+
+        foreach($all_users as $user) 
+        {
+            $all_ids[] = $user->id;
+            $users[$user->id] = $user;
+            if(!$user->pivot->removed_at) $current_ids[] = $user->id;
+        }
   
         $editable_colums = ['title', 'icon', 'color'];
 
         $events_list = [];
         $attrsChanged = false;
 
-        $chatUser = $chat->getChatUser($actor);
         $this->assertPermission(
-            $chatUser && (!$chatUser->removed_at || $chatUser->removed_by == $actor->id)
+            array_key_exists($actor->id, $all_ids)
+        );
+
+        $localUser = $users[$actor->id];
+
+        $this->assertPermission(
+            !$localUser->pivot->removed_at || $localUser->pivot->removed_by == $actor->id
         );
 
         $now = Carbon::now();
         $isCreator = $actor->id == $chat->creator_id;
-        $isPM = $chat->users()->count() <= 2;
+        $isPM = count($all_users) <= 2;
 
         foreach($editable_colums as $column)
         {
@@ -70,6 +86,10 @@ class EditChatHandler
             {
                 $this->assertPermission(
                     $chat->type == 1 || !$isPM
+                );
+
+                $this->assertPermission(
+                    $localUser->pivot->role
                 );
 
                 $message = $this->bus->dispatch(
@@ -82,76 +102,63 @@ class EditChatHandler
             }
         }
 
-        $added = Arr::get($data, 'users.added', 0);
-        $removed = Arr::get($data, 'users.removed', 0);
+        $added = Arr::get($data, 'attributes.users.added', 0);
+        $removed = Arr::get($data, 'attributes.users.removed', 0);
 
         if($added || $removed)
         {
             $this->assertPermission(
-                !$isPM
+                $localUser->pivot->role
             );
 
             // Редактирование списка пользователей:
             // Учесть работу для каналов (если это вообще надо)
             // Большая красная кнопка удалить для админов
 
-            $added_ids = []; $removed = [];
+            $added_ids = []; $removed_ids = [];
             foreach($added as $user) $added_ids[] = $user['id'];
             foreach($removed as $user) $removed_ids[] = $user['id'];
             $added_ids = array_unique($added_ids);
             $removed_ids = array_unique($removed_ids);
 
             if(count(array_intersect($added_ids, $removed_ids))) 
-                throw new ChatEditException;
+                throw new ChatEditException('Trying to add and remove users in the same time');
 
-            if(count(array_intersect($added_ids, $current_ids)) || !count(array_intersect($removed_ids, $current_ids)))
-                throw new ChatEditException;
+            if(count($added_ids) && count(array_intersect($added_ids, $current_ids)))
+                throw new ChatEditException(sprintf('Cannot add new users: one of them already in chat (%s and %s)', json_encode($added_ids), json_encode($current_ids)));
+
+            if(count($removed_ids) && !count(array_intersect($removed_ids, $current_ids)))
+                throw new ChatEditException('Cannot kick users: one of them already kicked');
+
+            if($isPM && (count($added_ids) > 1 || count($removed_ids) > 1 || (count($added_ids) && $added_ids[0] != $actor->id) || (count($removed_ids) && $removed_ids[0] != $actor->id)))
+                throw new ChatEditException('Invalid user array for PM chat room');
 
             if(count($added_ids) || count($removed_ids))
-            {
-                $this->assertPermission(
-                    $isCreator
-                );
-                
+            {                
                 $message = $this->bus->dispatch(
                     new PostEventMessage($chat->id, $actor, new EventMessageChatAddRemoveUser($added_ids, $removed_ids), $ip_address)
                 );
                 $events_list[] = $message->id;
 
-                foreach($added_ids as $k => $v)
-                    $added_ids[$v] = ['removed_at' => null, 'removed_by' => null];
+                $added_pairs = []; $removed_pairs = [];
 
-                foreach($removed_ids as $k => $v)
-                    $removed_ids[$v] = ['removed_at' => $now, 'removed_by' => $actor->id];
+                foreach($added_ids as $v)
+                    $added_pairs[$v] = ['removed_at' => null, 'removed_by' => null];
 
-                $chat->users()->syncWithoutDetaching(array_merge($added_ids, $removed_ids));
-            }
+                foreach($removed_ids as $v)
+                {
+                    $this->assertPermission(
+                        $v == $actor->id || $users[$v]->pivot->role < $localUser->pivot->role
+                    );
+                    $removed_pairs[$v] = ['removed_at' => $now, 'removed_by' => $actor->id];
+                }
 
-            $index = 0;
-            if(($index = array_search($actor->id, $added_ids)) !== false) 
-            {
-                $event = new EventMessageChatAddRemoveUser([$user['id']], []);
-                array_splice($added_ids, $index, 1);
-
-                $chat->users()->updateExistingPivot($actor->id, ['removed_at' => null, 'removed_by' => null]);
-            }
-            if(($index = array_search($actor->id, $removed_ids)) !== false) 
-            {
-                $event = new EventMessageChatAddRemoveUser([], [$user['id']]);
-                array_splice($removed_ids, $index, 1);
-
-                $chat->users()->updateExistingPivot($actor->id, ['removed_at' => $now, 'removed_by' => $actor->id]);
-            }
-            if($event)
-            {
-                $message = $this->bus->dispatch(
-                    new PostEventMessage($chat->id, $actor, $event, $ip_address)
-                );
-                $events_list[] = $message->id;
+                $chat->users()->syncWithoutDetaching($added_pairs + $removed_pairs);
             }
         }
 
-        $edited = Arr::get($data, 'users.edited', 0);
+        $roles_updated_for = [];
+        $edited = Arr::get($data, 'attributes.users.edited', 0);
         if($edited)
         {
             $this->assertPermission(
@@ -168,20 +175,29 @@ class EditChatHandler
                 $id = $user['id'];
                 $role = $user['role'];
 
-                if(array_search($id, $current_ids) === false || $id == $actor->id)
-                    throw new ChatEditException;
+                if(array_search($id, $all_ids) === false)
+                    continue;
+
+                if($id == $actor->id)
+                    throw new ChatEditException('Сannot set a role for yourself');
 
                 if($role != 0 && $role != 1)
-                    throw new ChatEditException;
+                    throw new ChatEditException('Unacceptable role');
 
                 $syncUsers[$id] = ['role' => $role];
+                if($role != $users[$id]->pivot->role) $roles_updated_for[] = $id;
             }
 
             $chat->users()->syncWithoutDetaching($syncUsers);
         }
 
-        if($attrsChanged) $chat->save();
+        if($attrsChanged) 
+        {
+            $this->validator->assertValid($chat->getDirty());
+            $chat->save();
+        }
         $chat->eventmsg_range = $events_list;
+        $chat->roles_updated_for = $roles_updated_for;
 
         return $chat;
     }

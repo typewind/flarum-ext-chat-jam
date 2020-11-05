@@ -1,6 +1,7 @@
 import Button from 'flarum/components/Button';
 import Dropdown from 'flarum/components/Dropdown';
 import classList from 'flarum/utils/classList';
+import Model from 'flarum/Model';
 
 import ChatModal from './ChatModal';
 import Stream from 'flarum/utils/Stream';
@@ -15,8 +16,11 @@ export default class ChatEditModal extends ChatModal
 		this.getInput().color = Stream(this.model.color());
 		this.getInput().icon = Stream(this.model.icon());
 
-		this.setSelectedUsers(this.model.users());
+		this.initialUsers = this.model.users().filter(mdl => !mdl.chat_pivot(this.model.id()).removed_at());
+		this.setSelectedUsers(this.model.users().filter(mdl => !mdl.chat_pivot(this.model.id()).removed_at()));
 		this.edited = {};
+
+		this.isLocalModerator = app.session.user.chat_pivot(this.model.id()).role();
 	}
 
 	title() 
@@ -26,8 +30,8 @@ export default class ChatEditModal extends ChatModal
 
 	onsubmit()
 	{
-		let added = this.getSelectedUsers().map(mdl => !this.model.users().includes(mdl) ? mdl : null).filter(e => e);
-		let removed = this.model.users().map(mdl => !this.getSelectedUsers().includes(mdl) ? mdl : null).filter(e => e);
+		let added = this.getSelectedUsers().map(mdl => !this.initialUsers.includes(mdl) ? Model.getIdentifier(mdl) : null).filter(e => e);
+		let removed = this.initialUsers.map(mdl => !this.getSelectedUsers().includes(mdl) ? Model.getIdentifier(mdl) : null).filter(e => e);
 		let edited = Object.keys(this.edited).map(k => this.edited[k] = {id: k, ...this.edited[k]});
 
 		this.model.save({
@@ -92,15 +96,16 @@ export default class ChatEditModal extends ChatModal
 				<Button 
 					icon={this.isModer(user) ? 'fas fa-times' : 'fas fa-users-cog'}
 					onclick={this.userMentionDropdownOnclick.bind(this, user, 'moder')}
-					disabled={user == app.session.user}
+					disabled={user == app.session.user || !this.isCreator(app.session.user)}
 				>
 					{app.translator.trans('pushedx-chat.forum.chat.moder')}
 				</Button>
 				<Button 
 					icon='fas fa-trash-alt'
 					onclick={this.userMentionDropdownOnclick.bind(this, user, 'kick')}
+					disabled={user.chat_pivot(this.model.id()).role() >= this.isLocalModerator && user != app.session.user}
 				>
-					{app.translator.trans('pushedx-chat.forum.chat.kick')}
+					{app.translator.trans(`pushedx-chat.forum.chat.${user == app.session.user ? 'leave' : 'kick'}`)}
 				</Button>
 			</Dropdown>
 		];
@@ -150,22 +155,22 @@ export default class ChatEditModal extends ChatModal
 
 	componentFormChannel()
 	{
-		return [
+		return this.isLocalModerator ? [
 			this.componentFormInputTitle(),
 			this.componentFormInputColor(),
 			this.componentFormInputIcon(),
 			this.componentFormUsersSelect('pushedx-chat.forum.chat.edit_modal.form.users.edit')
-		];
+		] : null;
 	}
 
 	componentFormChat()
 	{
-		return [
+		return this.isLocalModerator ? [
 			this.componentFormInputTitle(),
 			this.componentFormInputColor(),
 			this.componentFormInputIcon(),
 			this.componentFormUsersSelect()
-		];
+		] : null;
 	}
 
 	componentForm()

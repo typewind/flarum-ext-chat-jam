@@ -45,15 +45,13 @@ export default class UsersSearchResults
 	view(query) 
 	{
 		query = query.toLowerCase();
-		let localUserId;
-		if(app.session.user) localUserId = app.session.user.id();
 
 		const usersList = (this.results[query] || [])
 		.concat(
 			app.store
 			.all('users')
 			.filter(user => [user.username(), user.displayName()].some((value) => value.toLowerCase().substr(0, query.length) === query))
-		).filter(user => user.id() != localUserId);
+		)
 		
 		const resultsFind = usersList
 		.filter((e, i, arr) => arr.lastIndexOf(e) === i)
@@ -80,7 +78,7 @@ export default class UsersSearchResults
 					data-index={'users' + id}
 					onclick={this.userClick.bind(this, user)}
 				>
-					<span class={(this.usersSelected[id] ? 'selected' : null)}>
+					<span class={(this.isUserSelected(user) ? 'selected' : null)}>
 						{avatar(user)}
 						{{ ...name, text: undefined, children }}
 					</span>

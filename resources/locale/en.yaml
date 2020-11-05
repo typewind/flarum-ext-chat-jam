@@ -14,8 +14,11 @@ pushedx-chat:
       welcome.header: Welcome to Neon Chat!
       moder: Moderator
       kick: Kick
+      leave: Leave
       edit_modal:
         title: Chat settings
+        moderator.got: You just received Moderator rights in the chat {chatname}!
+        moderator.lost: You just lost your Moderator rights in the chat {chatname}.
         form:
           title: Chat name
           title.validator: At least 1 symbol
@@ -78,6 +81,11 @@ pushedx-chat:
           title.edited: "{editorname} changed chat's title from {old} to {new}"
           icon.edited: "{editorname} changed chat's icon from {old} to {new}"
           color.edited: "{editorname} changed chat's color from {old} to {new}"
+          users.invited: "{editorname} invited {usernames}"
+          users.kicked: "{editorname} kicked {usernames}"
+          users.invited_kicked: "{editorname} invited {invitednames} and kicked {kickednames}"
+          self.leaved: "{username} leaved the chat"
+          self.entered: "{username} entered the chat"
     errors:
       unauthenticated: Only registered users can use the chat
       chatdenied: Your user group is not allowed to write messages

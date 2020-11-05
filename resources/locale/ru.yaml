@@ -14,8 +14,11 @@ pushedx-chat:
       welcome.header: Добро пожаловать в Neon Chat!
       moder: Модератор
       kick: Кикнуть
+      leave: Выйти
       edit_modal:
         title: Настройки чата
+        moderator.got: Вы получили права Модератора в чате {chatname}!
+        moderator.lost: Вы потеряли Модератора в чате {chatname}.
         form:
           title: Название чата
           title.validator: Хотя бы один символ
@@ -77,6 +80,11 @@ pushedx-chat:
           title.edited: "{editorname} изменил название чата с {old} на {new}"
           icon.edited: "{editorname} изменил иконку с {old} на {new}"
           color.edited: "{editorname} изменил цвет с {old} на {new}"
+          users.invited: "{editorname} пригласил {usernames}"
+          users.kicked: "{editorname} исключил {usernames}"
+          users.invited_kicked: "{editorname} пригласил {invtednames} и исключил {kickednames}"
+          self.leaved: "{username} покинул чат"
+          self.entered: "{username} вошел в чат"
     errors:
       unauthenticated: Писать в чате могут только зарегистрированные пользователи
       chatdenied: Вашей группе пользователей запрещено писать сообщения

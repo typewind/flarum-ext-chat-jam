@@ -23,6 +23,11 @@ export default class ChatEventMessage extends ChatMessage
 		);
 	}
 
+	componentUserMentionsByIds(ids)
+	{
+		return ids.map(id => this.componentUserMention(app.store.getById('users', id)));
+	}
+
 	componentEventText()
 	{
 		switch(this.parsedContent.id)
@@ -40,7 +45,7 @@ export default class ChatEventMessage extends ChatMessage
 				return app.translator.trans(`pushedx-chat.forum.chat.message.events.${transKey}.created`, {
 					creatorname: this.componentUserMention(this.model.user()), 
 					chatname: <b className='chat-title'>{this.model.chat().title()}</b>,
-					usernames: this.parsedContent.users.map(user_id => this.componentUserMention(app.store.getById('users', user_id))),
+					usernames: this.componentUserMentionsByIds(this.parsedContent.users),
 					username: this.parsedContent.users.length ? this.componentUserMention(app.store.getById('users', this.parsedContent.users[0])) : null
 				});
 			}
@@ -70,6 +75,49 @@ export default class ChatEventMessage extends ChatMessage
 					old: componentOld,
 					new: componentNew
 				});
+			}
+			case 'chatAddRemoveUser':
+			{
+				if(this.parsedContent.add.length && this.parsedContent.remove.length)
+				{
+					return app.translator.trans('pushedx-chat.forum.chat.message.events.users.invited_kicked', {
+						editorname: this.componentUserMention(this.model.user()),
+						invitednames: this.componentUserMentionsByIds(this.parsedContent.add),
+						kickednames: this.componentUserMentionsByIds(this.parsedContent.remove)
+					});
+				}
+				else if(this.parsedContent.add.length)
+				{
+					if(this.parsedContent.add[0] == this.model.user().id())
+					{
+						return app.translator.trans('pushedx-chat.forum.chat.message.events.self.entered', {
+							username: this.componentUserMention(this.model.user())
+						});
+					}
+					else
+					{
+						return app.translator.trans('pushedx-chat.forum.chat.message.events.users.invited', {
+							editorname: this.componentUserMention(this.model.user()),
+							usernames: this.componentUserMentionsByIds(this.parsedContent.add)
+						});
+					}
+				}
+				else if(this.parsedContent.remove.length)
+				{
+					if(this.parsedContent.remove[0] == this.model.user().id())
+					{
+						return app.translator.trans('pushedx-chat.forum.chat.message.events.self.leaved', {
+							username: this.componentUserMention(this.model.user())
+						});
+					}
+					else
+					{
+						return app.translator.trans('pushedx-chat.forum.chat.message.events.users.kicked', {
+							editorname: this.componentUserMention(this.model.user()),
+							usernames: this.componentUserMentionsByIds(this.parsedContent.remove)
+						});
+					}
+				}
 			}
 		}
 	}

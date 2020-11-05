@@ -9,6 +9,7 @@
 namespace Xelson\Chat\Api\Serializers;
 
 use Flarum\User\User;
+use Xelson\Chat\Chat;
 
 class ChatUserSerializer extends ChatSerializer
 {
@@ -31,7 +32,8 @@ class ChatUserSerializer extends ChatSerializer
 			$attributes['removed_at'] = $this->formatDate($chatUser->removed_at);
 			$attributes['removed_by'] = $chatUser->removed_by;
             $attributes['unreaded'] = $chat->unreadedCount($chatUser);
-		}
+        }
+
         return $attributes;
     }
 }

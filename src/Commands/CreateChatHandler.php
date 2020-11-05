@@ -129,6 +129,15 @@ class CreateChatHandler
                 throw $e;
             }
         }
+        else
+        {
+            try {
+                $chat->users()->sync([$actor->id => ['role' => 2, 'joined_at' => $now]]);
+            } catch (Exception $e) {
+                $chat->delete();
+                throw $e;
+            }
+        }
 
         $eventMessage = $this->bus->dispatch(
             new PostEventMessage($chat->id, $actor, new EventMessageChatCreated($user_ids), $ip_address)

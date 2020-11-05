@@ -48,7 +48,7 @@ Object.assign(Chat.prototype,
 		{
 			for(const user of users)
 			{
-				if(user && user.id() != app.session.user.id())
+				if(user && user != app.session.user)
 					return user;
 			}
 		}

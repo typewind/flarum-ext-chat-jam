@@ -20,6 +20,14 @@ class ChatValidator extends AbstractValidator
 			[
 				"max:100"
 			],
+			'color' =>
+			[
+				"max:20"
+			],
+			'icon' =>
+			[
+				"max:100"
+			],
 			'type' => 
 			[
 				'required',

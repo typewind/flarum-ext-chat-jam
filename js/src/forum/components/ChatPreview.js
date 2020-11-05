@@ -133,7 +133,7 @@ export default class ChatPreview extends Component
 		let senderName, users = this.model.users(), sender = lastMessage.user();
 		if(app.session.user)
 		{
-			if(app.session.user.id() == sender.id()) senderName = `${app.translator.trans('pushedx-chat.forum.chat.message.you')}: `
+			if(app.session.user == sender) senderName = `${app.translator.trans('pushedx-chat.forum.chat.message.you')}: `
 			else if(users.length > 2 || this.model.type()) 
 				senderName = sender.displayName() + ': ';
 		}

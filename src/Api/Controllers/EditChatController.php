@@ -94,7 +94,8 @@ class EditChatController extends AbstractShowController
         $chat = $data;
         $this->socket->sendChatEvent($chat->id, 'chat.edit', [
             'chat' => $response,
-            'eventmsg_range' => $chat->eventmsg_range
+            'eventmsg_range' => $chat->eventmsg_range,
+            'roles_updated_for' => $chat->roles_updated_for
         ]);
     }
 }

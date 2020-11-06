@@ -109,7 +109,7 @@ export default class ChatCreateModal extends ChatModal
 		return (
 			<div className="Modal-body Modal-body--neonchat">
 				<div class="Form-group InputTitle">
-					<div className="ChatType">
+					{ChatState.getPermissions().create.channel ? <div className="ChatType">
 						<div className={classList({'Tab Tab--left': true, 'Tab--active': !this.isChannel})}
 							onclick={(() => this.isChannel = false).bind(this)}
 						>
@@ -120,10 +120,11 @@ export default class ChatCreateModal extends ChatModal
 						>
 							{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.channel')}
 						</div>
-					</div>
+					</div> : null}
 					{this.isChannel ? this.componentFormChannel() : this.componentFormChat()}
+					<div className="ButtonsPadding"></div>
 					<Button 
-						className='Button Button--primary Button--block ButtonCreate'
+						className='Button Button--primary Button--block'
 						disabled={this.isChannel ? !this.isCanCreateChannel() : !this.isCanCreateChat()}
 						onclick={this.onsubmit.bind(this)}
 					>

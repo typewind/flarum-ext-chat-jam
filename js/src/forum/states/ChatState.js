@@ -44,7 +44,12 @@ class ChatState
 		{
             post: app.forum.attribute('pushedx-chat.permissions.chat'),
             edit: app.forum.attribute('pushedx-chat.permissions.edit'),
-            delete: app.forum.attribute('pushedx-chat.permissions.delete'),
+			delete: app.forum.attribute('pushedx-chat.permissions.delete'),
+			create:
+			{
+				channel: app.forum.attribute('pushedx-chat.permissions.create.channel'),
+				chat: app.forum.attribute('pushedx-chat.permissions.create')
+			},
 			moderate: 
 			{
 				delete: app.forum.attribute('pushedx-chat.permissions.moderate.delete'),
@@ -240,8 +245,13 @@ class ChatState
 
 	deleteChat(model)
 	{
-		this.chats = this.chats.map(mdl => mdl != model);
+		this.chats = this.chats.filter(mdl => mdl != model);
 		if(this.getCurrentChat() == model) this.setCurrentChat(null);
+	}
+
+	isChatPM(model)
+	{
+		return model.users().length <= 2
 	}
 
 	isExistsPMChat(user1, user2)
@@ -478,7 +488,7 @@ class ChatState
 	setCurrentChat(model)
 	{
 		this.curChat = model;
-		this.saveFrameState('selectedChat', model.id());
+		this.saveFrameState('selectedChat', model ? model.id() : null);
 	}
 
 	getCurrentChat()

@@ -107,17 +107,14 @@ class EditChatHandler
 
         if($added || $removed)
         {
-            $this->assertPermission(
-                $localUser->pivot->role
-            );
-
             // Редактирование списка пользователей:
-            // Учесть работу для каналов (если это вообще надо)
-            // Большая красная кнопка удалить для админов
+            // Решить проблему с сокетами. Для публичного сокета сообщения приходят безусловно, а для приватного сокета
+            // есть кейс, что если игрок ливнет с чата, то для него не придет сокет, так как он ливнул до отправки сообщения по сокету, а сокет фильтрует сообщения
+            // по отношению к ливнутым
 
             $added_ids = []; $removed_ids = [];
-            foreach($added as $user) $added_ids[] = $user['id'];
-            foreach($removed as $user) $removed_ids[] = $user['id'];
+            if($added) foreach($added as $user) $added_ids[] = $user['id'];
+            if($removed) foreach($removed as $user) $removed_ids[] = $user['id'];
             $added_ids = array_unique($added_ids);
             $removed_ids = array_unique($removed_ids);
 
@@ -135,11 +132,6 @@ class EditChatHandler
 
             if(count($added_ids) || count($removed_ids))
             {                
-                $message = $this->bus->dispatch(
-                    new PostEventMessage($chat->id, $actor, new EventMessageChatAddRemoveUser($added_ids, $removed_ids), $ip_address)
-                );
-                $events_list[] = $message->id;
-
                 $added_pairs = []; $removed_pairs = [];
 
                 foreach($added_ids as $v)
@@ -154,6 +146,11 @@ class EditChatHandler
                 }
 
                 $chat->users()->syncWithoutDetaching($added_pairs + $removed_pairs);
+
+                $message = $this->bus->dispatch(
+                    new PostEventMessage($chat->id, $actor, new EventMessageChatAddRemoveUser($added_ids, $removed_ids), $ip_address)
+                );
+                $events_list[] = $message->id;
             }
         }
 
@@ -164,9 +161,6 @@ class EditChatHandler
             $this->assertPermission(
                 !$isPM && $isCreator
             );
-
-            // Реализовать проверку доступа на действия как от лица модератора. Назначать модераторов может только создатель, но не себя
-            // Учесть работу для каналов (если это вообще надо)
 
             $syncUsers = [];
 

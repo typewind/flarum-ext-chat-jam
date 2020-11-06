@@ -6,6 +6,8 @@ import Model from 'flarum/Model';
 import ChatModal from './ChatModal';
 import Stream from 'flarum/utils/Stream';
 
+import ChatState from '../states/ChatState';
+
 export default class ChatEditModal extends ChatModal
 {
 	oninit(vnode)
@@ -16,11 +18,15 @@ export default class ChatEditModal extends ChatModal
 		this.getInput().color = Stream(this.model.color());
 		this.getInput().icon = Stream(this.model.icon());
 
+		this.deleteChatTitleInput = Stream('');
+		this.deleteState = 0;
+
 		this.initialUsers = this.model.users().filter(mdl => !mdl.chat_pivot(this.model.id()).removed_at());
 		this.setSelectedUsers(this.model.users().filter(mdl => !mdl.chat_pivot(this.model.id()).removed_at()));
 		this.edited = {};
 
 		this.isLocalModerator = app.session.user.chat_pivot(this.model.id()).role();
+		this.isLocalLeaved = !this.initialUsers.includes(app.session.user);
 	}
 
 	title() 
@@ -84,10 +90,9 @@ export default class ChatEditModal extends ChatModal
 		}
 	}
 
-	userMentionContent(user)
+	componentUserMentionDropdown(user)
 	{
-		return [
-			'@' + user.displayName(),
+		return (
 			<Dropdown 
 				buttonClassName="Button Button--icon Button--flat Button--mention-edit"
 				menuClassName="Dropdown-menu--top Dropdown-menu--bottom Dropdown-menu--left Dropdown-menu--right"
@@ -108,6 +113,14 @@ export default class ChatEditModal extends ChatModal
 					{app.translator.trans(`pushedx-chat.forum.chat.${user == app.session.user ? 'leave' : 'kick'}`)}
 				</Button>
 			</Dropdown>
+		);
+	}
+
+	userMentionContent(user)
+	{
+		return [
+			'@' + user.displayName(),
+			this.isLocalModerator && !ChatState.isChatPM(this.model) ? this.componentUserMentionDropdown(user) : null
 		];
 	}
 
@@ -146,11 +159,17 @@ export default class ChatEditModal extends ChatModal
 		});
 	}
 
-	componentFormPM()
+	componentChatInfo()
 	{
 		return [
-
+			<label><h2>{this.model.title()}</h2></label>,
+			this.componentUsersMentions()
 		];
+	}
+
+	componentFormPM()
+	{
+		return this.componentChatInfo();
 	}
 
 	componentFormChannel()
@@ -160,7 +179,8 @@ export default class ChatEditModal extends ChatModal
 			this.componentFormInputColor(),
 			this.componentFormInputIcon(),
 			this.componentFormUsersSelect('pushedx-chat.forum.chat.edit_modal.form.users.edit')
-		] : null;
+		] 
+		: this.componentChatInfo();
 	}
 
 	componentFormChat()
@@ -170,15 +190,69 @@ export default class ChatEditModal extends ChatModal
 			this.componentFormInputColor(),
 			this.componentFormInputIcon(),
 			this.componentFormUsersSelect()
-		] : null;
+		] 
+		: this.componentChatInfo();
 	}
 
 	componentForm()
 	{
 		if(this.model.type()) return this.componentFormChannel();
-		if(this.model.users().length == 2) return this.componentFormPM();
+		if(ChatState.isChatPM(this.model)) return this.componentFormPM();
 		
 		return this.componentFormChat();
+	}
+
+	copmonentFormButtons()
+	{
+		let buttons = [];
+
+		if(this.isLocalModerator && !ChatState.isChatPM(this.model))
+			buttons.push(
+				<Button
+					className='Button Button--primary Button--block ButtonSave'
+					onclick={this.onsubmit.bind(this)}
+					disabled={this.model.type() ? !this.isCanEditChannel() : !this.isCanEditChat()}
+				>
+					{app.translator.trans('pushedx-chat.forum.chat.edit_modal.save_button')}
+				</Button>
+			)
+
+		buttons.push(
+			<Button
+				className='Button Button--primary Button--block ButtonLeave'
+				onclick={this.onleave.bind(this)}
+				disabled={this.model.type() ? !this.isCanEditChannel() : !this.isCanEditChat()}
+			>
+				{app.translator.trans(`pushedx-chat.forum.chat.edit_modal.form.${this.isLocalLeaved ? 'return' : 'leave'}`)}
+			</Button>
+		)
+
+		if(!ChatState.isChatPM(this.model) && ChatState.getPermissions().create.channel)
+			buttons.push(this.componentDeleteChat())
+
+		return buttons;
+	}
+
+	onleave()
+	{
+		if(!this.isLocalLeaved)
+		{
+			this.model.save({
+				users: {removed: [Model.getIdentifier(app.session.user)]},
+				relationships: {users: this.getSelectedUsers()}
+			});
+		}
+		else
+		{
+			this.getSelectedUsers().push(app.session.user);
+
+			this.model.save({
+				users: {added: [Model.getIdentifier(app.session.user)]},
+				relationships: {users: this.getSelectedUsers()}
+			});
+		}
+
+		this.hide();
 	}
 
 	isCanEditChannel()
@@ -193,18 +267,60 @@ export default class ChatEditModal extends ChatModal
 		return true;
 	}
 
+	componentDeleteChat()
+	{
+		return [
+			this.deleteState == 1 ? [<br></br>, this.componentFormInput({
+				title: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.delete.title'),
+				desc: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.delete.desc'),
+				placeholder: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.delete.placeholder'),
+				stream: this.deleteChatTitleInput
+			})] : null,
+			<Button
+				className='Button Button--primary Button--block ButtonDelete'
+				onclick={this.ondelete.bind(this)}
+				disabled={this.deleteState == 1 && !this.isValidTitleCopy()}
+			>
+				{app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.delete.button')}
+			</Button>
+		];
+	}
+
+	isValidTitleCopy()
+	{
+		return this.deleteChatTitleInput() == this.model.title();
+	}
+
+	ondelete()
+	{
+		switch(this.deleteState)
+		{
+			case 0: 
+			{
+				this.deleteState = 1;
+				break;
+			}
+			case 1:
+			{
+				if(this.isValidTitleCopy())
+				{
+					ChatState.deleteChat(this.model);
+					this.model.delete();
+
+					this.hide();
+				}
+				break;
+			}
+		}
+	}
+
 	content() {
 		return (
 			<div className="Modal-body Modal-body--neonchat">
 				<div class="Form-group InputTitle">
 					{this.componentForm()}
-					<Button
-						className='Button Button--primary Button--block ButtonCreate'
-						onclick={this.onsubmit.bind(this)}
-						disabled={this.model.type() ? !this.isCanEditChannel() : !this.isCanEditChat()}
-					>
-						{app.translator.trans('pushedx-chat.forum.chat.edit_modal.save_button')}
-					</Button>
+					<div className="ButtonsPadding"></div>
+					{this.copmonentFormButtons()}
 				</div>
 			</div>
 		);

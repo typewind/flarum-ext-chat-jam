@@ -93,10 +93,9 @@ export default class ChatModal extends Modal
 		return this.getSelectedUsers().splice(this.getSelectedUsers().indexOf(user), 1)
 	}
 
-	componentUsersSelect()
+	componentUsersMentions()
 	{
-		return [
-			this.componentAlert(),
+		return (
 			<div className="UsersTags">
 				{this.getSelectedUsers().map(u => 
 					<div 
@@ -106,7 +105,15 @@ export default class ChatModal extends Modal
 						{this.userMentionContent(u)}
 					</div>
 				)}
-			</div>,
+			</div>
+		);
+	}
+
+	componentUsersSelect()
+	{
+		return [
+			this.componentAlert(),
+			this.componentUsersMentions(),
 			<div className="UsersSearch">
 				<ChatSearchUser state={app.search} />
 			</div>

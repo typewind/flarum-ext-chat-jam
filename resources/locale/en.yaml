@@ -28,6 +28,13 @@ pushedx-chat:
           icon.validator: => core.ref.icon_text
           users: Selected users
           users.edit: Select and edit users
+          leave: Leave the chat
+          return: Enter the chat
+          delete:
+            title: Are you sure you want to delete this chat?
+            desc: Copy and paste the chat name to continue
+            placeholder: Chat name
+            button: Delete chat
         search:
           placeholder: Search Users
           failed: No matching users found

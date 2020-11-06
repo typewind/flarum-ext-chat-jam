@@ -105,6 +105,26 @@
     {
         width: 225px;
         margin: auto;
+
+        .ButtonsPadding
+        {
+            height: 350px;
+        }
+
+        .ButtonSave
+        {
+            margin-bottom: 25px;
+        }
+
+        .ButtonLeave
+        {
+            background-color: #1A6696;
+        }
+
+        .ButtonDelete
+        {
+            background-color: @error-color;
+        }
     }
 
     .UserMention
@@ -215,11 +235,6 @@
         .user-select(none);
     }
 
-    .ButtonCreate
-    {
-        margin-top: 350px;
-    }
-
     .UsersSearch
     {
         .SearchFailed
@@ -328,6 +343,7 @@
         {
             box-shadow: inset 0px 0px 0px 1000px #dedede;
             color: #dedede !important;
+            line-break: anywhere;
             cursor: pointer;
             .user-select(none);
         }

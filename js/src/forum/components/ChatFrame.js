@@ -135,7 +135,7 @@ export default class ChatFrame extends Component
                         </div>
                         <div className='list' style={{'max-height': ChatState.getFrameState('transform').y + 'px'}}>
                             {ChatState.componentsChats()}
-                            {app.session.user ? <div class="panel-add" onclick={() => app.modal.show(ChatCreateModal)}></div> : null}
+                            {app.session.user && ChatState.getPermissions().create.chat ? <div class="panel-add" onclick={() => app.modal.show(ChatCreateModal)}></div> : null}
                         </div>
                     </div>
 

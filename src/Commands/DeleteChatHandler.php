@@ -40,10 +40,12 @@ class DeleteChatHandler
 		$chat_id = $command->chat_id;
 		$actor = $command->actor;
 
-		$chat = $this->chats->findOrFail($chat_id, $actor);
+        $chat = $this->chats->findOrFail($chat_id, $actor);
+        
+        $users = $chat->users()->get();
 
         $this->assertPermission(
-            $chat->creator_id == $actor->id
+            $chat->creator_id == $actor->id && count($users) > 2
 		);
 		
 		$chat->users()->detach();

@@ -28,6 +28,13 @@ pushedx-chat:
           icon.validator: => core.ref.icon_text
           users: Выбранные пользователи
           users.edit: Выбор и редактирование пользователей
+          leave: Покинуть чат
+          return: Вернутся в чат
+          delete:
+            title: Вы уверены, что хотите удалить этот чат?
+            desc: Чтобы удалить чат, скопируйте его название и введите в поле снизу
+            placeholder: Название чата
+            button: Удалить чат
         search:
           placeholder: Поиск пользователей
           failed: Ничего не найдено по запросу

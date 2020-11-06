@@ -361,7 +361,7 @@ function (_ChatModal) {
       className: "Modal-body Modal-body--neonchat"
     }, m("div", {
       "class": "Form-group InputTitle"
-    }, m("div", {
+    }, _states_ChatState__WEBPACK_IMPORTED_MODULE_6__["default"].getPermissions().create.channel ? m("div", {
       className: "ChatType"
     }, m("div", {
       className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_2___default()({
@@ -379,8 +379,10 @@ function (_ChatModal) {
       onclick: function () {
         return _this.isChannel = true;
       }.bind(this)
-    }, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.channel'))), this.isChannel ? this.componentFormChannel() : this.componentFormChat(), m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_1___default.a, {
-      className: "Button Button--primary Button--block ButtonCreate",
+    }, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.channel'))) : null, this.isChannel ? this.componentFormChannel() : this.componentFormChat(), m("div", {
+      className: "ButtonsPadding"
+    }), m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_1___default.a, {
+      className: "Button Button--primary Button--block",
       disabled: this.isChannel ? !this.isCanCreateChannel() : !this.isCanCreateChat(),
       onclick: this.onsubmit.bind(this)
     }, app.translator.trans('pushedx-chat.forum.chat.list.add_modal.create.chat'))));
@@ -416,6 +418,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ChatModal__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ChatModal */ "./src/forum/components/ChatModal.js");
 /* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! flarum/utils/Stream */ "flarum/utils/Stream");
 /* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _states_ChatState__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../states/ChatState */ "./src/forum/states/ChatState.js");
+
 
 
 
@@ -444,6 +448,8 @@ function (_ChatModal) {
     this.getInput().title = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_7___default()(this.model.title());
     this.getInput().color = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_7___default()(this.model.color());
     this.getInput().icon = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_7___default()(this.model.icon());
+    this.deleteChatTitleInput = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_7___default()('');
+    this.deleteState = 0;
     this.initialUsers = this.model.users().filter(function (mdl) {
       return !mdl.chat_pivot(_this.model.id()).removed_at();
     });
@@ -452,6 +458,7 @@ function (_ChatModal) {
     }));
     this.edited = {};
     this.isLocalModerator = app.session.user.chat_pivot(this.model.id()).role();
+    this.isLocalLeaved = !this.initialUsers.includes(app.session.user);
   };
 
   _proto.title = function title() {
@@ -534,8 +541,8 @@ function (_ChatModal) {
     }
   };
 
-  _proto.userMentionContent = function userMentionContent(user) {
-    return ['@' + user.displayName(), m(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_3___default.a, {
+  _proto.componentUserMentionDropdown = function componentUserMentionDropdown(user) {
+    return m(flarum_components_Dropdown__WEBPACK_IMPORTED_MODULE_3___default.a, {
       buttonClassName: "Button Button--icon Button--flat Button--mention-edit",
       menuClassName: "Dropdown-menu--top Dropdown-menu--bottom Dropdown-menu--left Dropdown-menu--right",
       icon: "fas fa-chevron-down"
@@ -547,7 +554,11 @@ function (_ChatModal) {
       icon: "fas fa-trash-alt",
       onclick: this.userMentionDropdownOnclick.bind(this, user, 'kick'),
       disabled: user.chat_pivot(this.model.id()).role() >= this.isLocalModerator && user != app.session.user
-    }, app.translator.trans("pushedx-chat.forum.chat." + (user == app.session.user ? 'leave' : 'kick'))))];
+    }, app.translator.trans("pushedx-chat.forum.chat." + (user == app.session.user ? 'leave' : 'kick'))));
+  };
+
+  _proto.userMentionContent = function userMentionContent(user) {
+    return ['@' + user.displayName(), this.isLocalModerator && !_states_ChatState__WEBPACK_IMPORTED_MODULE_8__["default"].isChatPM(this.model) ? this.componentUserMentionDropdown(user) : null];
   };
 
   _proto.userMentionOnClick = function userMentionOnClick(user, e) {
@@ -586,22 +597,67 @@ function (_ChatModal) {
     });
   };
 
+  _proto.componentChatInfo = function componentChatInfo() {
+    return [m("label", null, m("h2", null, this.model.title())), this.componentUsersMentions()];
+  };
+
   _proto.componentFormPM = function componentFormPM() {
-    return [];
+    return this.componentChatInfo();
   };
 
   _proto.componentFormChannel = function componentFormChannel() {
-    return this.isLocalModerator ? [this.componentFormInputTitle(), this.componentFormInputColor(), this.componentFormInputIcon(), this.componentFormUsersSelect('pushedx-chat.forum.chat.edit_modal.form.users.edit')] : null;
+    return this.isLocalModerator ? [this.componentFormInputTitle(), this.componentFormInputColor(), this.componentFormInputIcon(), this.componentFormUsersSelect('pushedx-chat.forum.chat.edit_modal.form.users.edit')] : this.componentChatInfo();
   };
 
   _proto.componentFormChat = function componentFormChat() {
-    return this.isLocalModerator ? [this.componentFormInputTitle(), this.componentFormInputColor(), this.componentFormInputIcon(), this.componentFormUsersSelect()] : null;
+    return this.isLocalModerator ? [this.componentFormInputTitle(), this.componentFormInputColor(), this.componentFormInputIcon(), this.componentFormUsersSelect()] : this.componentChatInfo();
   };
 
   _proto.componentForm = function componentForm() {
     if (this.model.type()) return this.componentFormChannel();
-    if (this.model.users().length == 2) return this.componentFormPM();
+    if (_states_ChatState__WEBPACK_IMPORTED_MODULE_8__["default"].isChatPM(this.model)) return this.componentFormPM();
     return this.componentFormChat();
+  };
+
+  _proto.copmonentFormButtons = function copmonentFormButtons() {
+    var buttons = [];
+    if (this.isLocalModerator && !_states_ChatState__WEBPACK_IMPORTED_MODULE_8__["default"].isChatPM(this.model)) buttons.push(m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default.a, {
+      className: "Button Button--primary Button--block ButtonSave",
+      onclick: this.onsubmit.bind(this),
+      disabled: this.model.type() ? !this.isCanEditChannel() : !this.isCanEditChat()
+    }, app.translator.trans('pushedx-chat.forum.chat.edit_modal.save_button')));
+    buttons.push(m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default.a, {
+      className: "Button Button--primary Button--block ButtonLeave",
+      onclick: this.onleave.bind(this),
+      disabled: this.model.type() ? !this.isCanEditChannel() : !this.isCanEditChat()
+    }, app.translator.trans("pushedx-chat.forum.chat.edit_modal.form." + (this.isLocalLeaved ? 'return' : 'leave'))));
+    if (!_states_ChatState__WEBPACK_IMPORTED_MODULE_8__["default"].isChatPM(this.model) && _states_ChatState__WEBPACK_IMPORTED_MODULE_8__["default"].getPermissions().create.channel) buttons.push(this.componentDeleteChat());
+    return buttons;
+  };
+
+  _proto.onleave = function onleave() {
+    if (!this.isLocalLeaved) {
+      this.model.save({
+        users: {
+          removed: [flarum_Model__WEBPACK_IMPORTED_MODULE_5___default.a.getIdentifier(app.session.user)]
+        },
+        relationships: {
+          users: this.getSelectedUsers()
+        }
+      });
+    } else {
+      this.getSelectedUsers().push(app.session.user);
+      this.model.save({
+        users: {
+          added: [flarum_Model__WEBPACK_IMPORTED_MODULE_5___default.a.getIdentifier(app.session.user)]
+        },
+        relationships: {
+          users: this.getSelectedUsers()
+        }
+      });
+    }
+
+    this.hide();
   };
 
   _proto.isCanEditChannel = function isCanEditChannel() {
@@ -613,16 +669,52 @@ function (_ChatModal) {
     return true;
   };
 
+  _proto.componentDeleteChat = function componentDeleteChat() {
+    return [this.deleteState == 1 ? [m("br", null), this.componentFormInput({
+      title: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.delete.title'),
+      desc: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.delete.desc'),
+      placeholder: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.delete.placeholder'),
+      stream: this.deleteChatTitleInput
+    })] : null, m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default.a, {
+      className: "Button Button--primary Button--block ButtonDelete",
+      onclick: this.ondelete.bind(this),
+      disabled: this.deleteState == 1 && !this.isValidTitleCopy()
+    }, app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.delete.button'))];
+  };
+
+  _proto.isValidTitleCopy = function isValidTitleCopy() {
+    return this.deleteChatTitleInput() == this.model.title();
+  };
+
+  _proto.ondelete = function ondelete() {
+    switch (this.deleteState) {
+      case 0:
+        {
+          this.deleteState = 1;
+          break;
+        }
+
+      case 1:
+        {
+          if (this.isValidTitleCopy()) {
+            _states_ChatState__WEBPACK_IMPORTED_MODULE_8__["default"].deleteChat(this.model);
+            this.model["delete"]();
+            this.hide();
+          }
+
+          break;
+        }
+    }
+  };
+
   _proto.content = function content() {
     return m("div", {
       className: "Modal-body Modal-body--neonchat"
     }, m("div", {
       "class": "Form-group InputTitle"
-    }, this.componentForm(), m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default.a, {
-      className: "Button Button--primary Button--block ButtonCreate",
-      onclick: this.onsubmit.bind(this),
-      disabled: this.model.type() ? !this.isCanEditChannel() : !this.isCanEditChat()
-    }, app.translator.trans('pushedx-chat.forum.chat.edit_modal.save_button'))));
+    }, this.componentForm(), m("div", {
+      className: "ButtonsPadding"
+    }), this.copmonentFormButtons()));
   };
 
   return ChatEditModal;
@@ -967,7 +1059,7 @@ function (_Component) {
       style: {
         'max-height': _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('transform').y + 'px'
       }
-    }, _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentsChats(), app.session.user ? m("div", {
+    }, _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentsChats(), app.session.user && _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getPermissions().create.chat ? m("div", {
       "class": "panel-add",
       onclick: function onclick() {
         return app.modal.show(_ChatCreateModal__WEBPACK_IMPORTED_MODULE_3__["default"]);
@@ -1519,17 +1611,21 @@ function (_Modal) {
     return this.getSelectedUsers().splice(this.getSelectedUsers().indexOf(user), 1);
   };
 
-  _proto.componentUsersSelect = function componentUsersSelect() {
+  _proto.componentUsersMentions = function componentUsersMentions() {
     var _this = this;
 
-    return [this.componentAlert(), m("div", {
+    return m("div", {
       className: "UsersTags"
     }, this.getSelectedUsers().map(function (u) {
       return m("div", {
         className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_4___default()(['UserMention', _this.userMentionClassname(u)]),
         onclick: _this.userMentionOnClick.bind(_this, u)
       }, _this.userMentionContent(u));
-    })), m("div", {
+    }));
+  };
+
+  _proto.componentUsersSelect = function componentUsersSelect() {
+    return [this.componentAlert(), this.componentUsersMentions(), m("div", {
       className: "UsersSearch"
     }, m(_ChatSearchUser__WEBPACK_IMPORTED_MODULE_2__["default"], {
       state: app.search
@@ -2949,6 +3045,10 @@ function () {
       post: app.forum.attribute('pushedx-chat.permissions.chat'),
       edit: app.forum.attribute('pushedx-chat.permissions.edit'),
       "delete": app.forum.attribute('pushedx-chat.permissions.delete'),
+      create: {
+        channel: app.forum.attribute('pushedx-chat.permissions.create.channel'),
+        chat: app.forum.attribute('pushedx-chat.permissions.create')
+      },
       moderate: {
         "delete": app.forum.attribute('pushedx-chat.permissions.moderate.delete'),
         vision: app.forum.attribute('pushedx-chat.permissions.moderate.vision')
@@ -3167,10 +3267,14 @@ function () {
   };
 
   _proto.deleteChat = function deleteChat(model) {
-    this.chats = this.chats.map(function (mdl) {
+    this.chats = this.chats.filter(function (mdl) {
       return mdl != model;
     });
     if (this.getCurrentChat() == model) this.setCurrentChat(null);
+  };
+
+  _proto.isChatPM = function isChatPM(model) {
+    return model.users().length <= 2;
   };
 
   _proto.isExistsPMChat = function isExistsPMChat(user1, user2) {
@@ -3482,7 +3586,7 @@ function () {
 
   _proto.setCurrentChat = function setCurrentChat(model) {
     this.curChat = model;
-    this.saveFrameState('selectedChat', model.id());
+    this.saveFrameState('selectedChat', model ? model.id() : null);
   };
 
   _proto.getCurrentChat = function getCurrentChat() {

@@ -5,10 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 return [
     'up' => function (Builder $schema) {
-        $schema->table('neonchat_chats', function (Blueprint $table) {
-            $table->string('icon', 100)->nullable();
-        });
-
         $schema->table('neonchat_chat_user', function (Blueprint $table) {
             $table->tinyInteger('role')->default(0);
             $table->integer('removed_by')->unsigned()->nullable();
@@ -21,10 +17,6 @@ return [
     },
 
     'down' => function (Builder $schema) {
-        $schema->table('neonchat_chats', function (Blueprint $table) {
-            $table->dropColumn('icon');
-        });
-
         $schema->table('neonchat_chat_user', function (Blueprint $table) {
             $table->dropColumn('role');
             $table->dropColumn('removed_by');

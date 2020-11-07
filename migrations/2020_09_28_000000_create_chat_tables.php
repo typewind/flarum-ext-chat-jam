@@ -11,6 +11,7 @@ return [
 			$table->increments('id');
 			$table->string('title', 100)->default('PM');
 			$table->string('color', 20)->nullable();
+			$table->string('icon', 100)->nullable();
 			$table->tinyInteger('type')->default(0);
 			$table->integer('creator_id')->unsigned()->default(0);
 			$table->dateTime('created_at')->nullable();

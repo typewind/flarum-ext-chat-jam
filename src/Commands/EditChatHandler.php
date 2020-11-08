@@ -77,7 +77,7 @@ class EditChatHandler
         );
 
         $now = Carbon::now();
-        $isCreator = $actor->id == $chat->creator_id;
+        $isCreator = $actor->id == $chat->creator_id || (!$chat->creator_id && $actor->isAdmin());
         $isPM = count($all_users) <= 2;
 
         foreach($editable_colums as $column)
@@ -111,6 +111,7 @@ class EditChatHandler
             // Решить проблему с сокетами. Для публичного сокета сообщения приходят безусловно, а для приватного сокета
             // есть кейс, что если игрок ливнет с чата, то для него не придет сокет, так как он ливнул до отправки сообщения по сокету, а сокет фильтрует сообщения
             // по отношению к ливнутым
+            // Удалить текущие permissions для модераторов и перенести их в каждый отдельный чат
 
             $added_ids = []; $removed_ids = [];
             if($added) foreach($added as $user) $added_ids[] = $user['id'];

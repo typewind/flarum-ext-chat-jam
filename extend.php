@@ -22,6 +22,9 @@ use Xelson\Chat\Api\Controllers\CreateChatController;
 use Xelson\Chat\Api\Controllers\EditChatController;
 use Xelson\Chat\Api\Controllers\DeleteChatController;
 
+use Flarum\User\User;
+use Xelson\Chat\Chat;
+
 return [
     (new Extend\Frontend('admin'))
         ->css(__DIR__ . '/resources/less/admin/settingsPage.less')
@@ -41,6 +44,13 @@ return [
         ->delete('/chatmessages/{id}', 'neonchat.chatmessages.delete', DeleteMessageController::class)
 
         ->get('/chat/user/{id}', 'neonchat.chat.user', ShowUserSafeController::class),
+
+   (new Extend\Model(User::class))
+        ->relationship('chats', function ($user) {
+
+            return $user->belongsToMany(Chat::class, 'neonchat_chat_user')
+                ->withPivot('joined_at', 'removed_by', 'role', 'readed_at', 'removed_at');
+        }),
 
     function (Dispatcher $events, Application $app) {
         $events->subscribe(Listeners\AddChatApi::class);

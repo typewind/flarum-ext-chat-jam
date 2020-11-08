@@ -8,6 +8,7 @@
 
 namespace Xelson\Chat\Api\Serializers;
 
+use Xelson\Chat\Chat;
 use Flarum\Api\Serializer\UserSerializer;
 
 class UserChatSerializer extends UserSerializer
@@ -19,18 +20,12 @@ class UserChatSerializer extends UserSerializer
     protected function getDefaultAttributes($user)
     {
 		$attributes = parent::getDefaultAttributes($user);
+
+		$attributes['chat_pivot'] = [];
+		$chats = $user->chats()->get();
 		
-		$attributes += [
-			'chat_pivot' => [
-				$user->pivot->chat_id => [
-					'role' => $user->pivot->role,
-					'joined_at' => $user->pivot->joined_at,
-					'readed_at' => $user->pivot->readed_at,
-					'removed_at' => $user->pivot->removed_at,
-					'removed_by' => $user->pivot->removed_by
-				]
-			]
-		];
+		foreach($chats as $chat)
+			$attributes['chat_pivot'][$chat->id] = $chat->pivot;
 		
 		return $attributes;
 	}

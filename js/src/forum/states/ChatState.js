@@ -353,8 +353,10 @@ class ChatState
 		{
 			this.messageNotify(model);
 			model.isNeedToFlash = true;
-			model.chat().isNeedToFlash = true;
-			model.pushAttributes({unreaded: model.unreaded() + 1});
+
+			let chatModel = model.chat();
+			chatModel.isNeedToFlash = true;
+			chatModel.pushAttributes({unreaded: chatModel.unreaded() + 1});
 		}
 
 		let list = this.getChatMessages(mdl => mdl.chat() == model.chat());

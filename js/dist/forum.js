@@ -3398,9 +3398,10 @@ function () {
     if (notify) {
       this.messageNotify(model);
       model.isNeedToFlash = true;
-      model.chat().isNeedToFlash = true;
-      model.pushAttributes({
-        unreaded: model.unreaded() + 1
+      var chatModel = model.chat();
+      chatModel.isNeedToFlash = true;
+      chatModel.pushAttributes({
+        unreaded: chatModel.unreaded() + 1
       });
     }
 

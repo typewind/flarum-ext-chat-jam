@@ -10,6 +10,7 @@ namespace Xelson\Chat\Commands;
 
 use Carbon\Carbon;
 use Xelson\Chat\Message;
+use Xelson\Chat\ChatRepository;
 use Xelson\Chat\MessageRepository;
 use Xelson\Chat\MessageValidator;
 use Flarum\User\AssertPermissionTrait;
@@ -31,15 +32,23 @@ class EditMessageHandler
     protected $validator;
 
     /**
+     * @var ChatRepository
+     */
+    protected $chats;
+
+    /**
      * @param MessageRepository             $messages
      * @param MessageValidator              $validator
+     * @param ChatRepository                $chats
      */
     public function __construct(
         MessageRepository $messages,
-        MessageValidator $validator
+        MessageValidator $validator,
+        ChatRepository $chats
     ) {
         $this->messages  = $messages;
         $this->validator = $validator;
+        $this->chats = $chats;
     }
 
     /**
@@ -50,17 +59,20 @@ class EditMessageHandler
      */
     public function handle(EditMessage $command)
     {
-        $messageid = $command->id;
+        $message_id = $command->id;
         $actor = $command->actor;
         $data = $command->data;
         $attributes = Arr::get($data, 'attributes', []);
         $actions = $attributes['actions'];
 
-        $message = $this->messages->findOrFail($messageid);
+        $message = $this->messages->findOrFail($message_id);
 
         $this->assertPermission(
             !$message->type
         );
+
+        $chat = $this->chats->findOrFail($message->chat_id, $actor);
+        $chatUser = $chat->getChatUser($actor);
 
         if(isset($actions['msg']))
         {
@@ -89,9 +101,8 @@ class EditMessageHandler
             {
                 if($message->user_id != $actor->id)
                 {
-                    $this->assertCan(
-                        $actor,
-                        'pushedx-chat.permissions.moderate.edit'
+                    $this->assertPermission(
+                        $chatUser && $chatUser->role != 0
                     );
                 }	
                 $message->deleted_by = $actor->id;
@@ -100,9 +111,8 @@ class EditMessageHandler
             {
                 if($message->deleted_by != $actor->id)
                 {
-                    $this->assertCan(
-                        $actor,
-                        'pushedx-chat.permissions.moderate.edit'
+                    $this->assertPermission(
+                        $chatUser && $chatUser->role != 0
                     );
                 }	
                 $message->deleted_by = null;

@@ -15,6 +15,7 @@ Object.assign(Chat.prototype,
 	last_message: Model.hasOne('last_message'),
 	icon: Model.attribute('icon'),
 
+	role: Model.attribute('role'),
 	unreaded: Model.attribute('unreaded'),
 	readed_at: Model.attribute('readed_at', Model.transformDate),
 	removed_at: Model.attribute('removed_at', Model.transformDate),

@@ -8,7 +8,7 @@
 
 namespace Xelson\Chat\Api\Controllers;
 
-use Xelson\Chat\Api\Serializers\ChatSerializer;
+use Xelson\Chat\Api\Serializers\ChatUserSerializer;
 use Flarum\Api\Controller\AbstractShowController;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Psr\Http\Message\ServerRequestInterface;
@@ -25,9 +25,9 @@ class EditChatController extends AbstractShowController
     /**
      * The serializer instance for this request.
      *
-     * @var ChatSerializer
+     * @var ChatUserSerializer
      */
-	public $serializer = ChatSerializer::class;
+	public $serializer = ChatUserSerializer::class;
 
     /**
      * {@inheritdoc}

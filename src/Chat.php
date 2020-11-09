@@ -62,7 +62,7 @@ class Chat extends AbstractModel
         {
             $now = Carbon::now();
             $this->users()->attach($user->id, ['readed_at' => $now]);
-            $chatUser = ChatUser::build($this->id, $user->id, $now, $now);
+            $chatUser = ChatUser::build($this->id, $user->id, 0, $now, $now);
         }
         return $chatUser;
     }

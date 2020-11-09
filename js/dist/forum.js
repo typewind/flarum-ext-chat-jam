@@ -317,7 +317,8 @@ function (_ChatModal) {
       desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.icon.validator', {
         a: m("a", {
           href: "https://fontawesome.com/icons?m=free",
-          tabindex: "-1"
+          tabindex: "-1",
+          target: "blank"
         })
       }),
       stream: this.getInput().icon,
@@ -571,7 +572,8 @@ function (_ChatModal) {
       desc: app.translator.trans('pushedx-chat.forum.chat.edit_modal.form.icon.validator', {
         a: m("a", {
           href: "https://fontawesome.com/icons?m=free",
-          tabindex: "-1"
+          tabindex: "-1",
+          target: "blank"
         })
       }),
       stream: this.getInput().icon,
@@ -1410,7 +1412,7 @@ function (_Component) {
 
     items.add('separator', m(flarum_components_Separator__WEBPACK_IMPORTED_MODULE_12___default.a, null));
 
-    if (_states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getPermissions().moderate["delete"] || _states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getPermissions()["delete"] && this.model.user() == app.session.user) {
+    if (this.model.chat().role() || _states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getPermissions()["delete"] && this.model.user() == app.session.user) {
       if (this.model.deleted_by()) {
         items.add('dropdownRestore', m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_11___default.a, {
           onclick: this.modelEvent.bind(this, 'dropdownRestore'),
@@ -1426,7 +1428,7 @@ function (_Component) {
       }
     }
 
-    if (_states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getPermissions().moderate["delete"] && (this.model.deleted_by() || _states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].totalHidden() >= 3)) {
+    if (this.model.chat().role() && (this.model.deleted_by() || _states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].totalHidden() >= 3)) {
       items.add('dropdownDelete', m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_11___default.a, {
         onclick: this.modelEvent.bind(this, 'dropdownDelete'),
         icon: "fas fa-trash-alt",
@@ -1489,10 +1491,8 @@ function (_Component) {
 
   _proto.isVisible = function isVisible() {
     if (this.model.chat() != _states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getCurrentChat()) return false;
-    if (this.model.isDeletedForever
-    /*&& (!ChatState.getPermissions().moderate.vision || !this.model.id())*/
-    ) return false;
-    if (this.model.deleted_by() && !(_states_ChatState__WEBPACK_IMPORTED_MODULE_14__["default"].getPermissions().moderate.vision || this.model.user() == app.session.user)) return false;
+    if (this.model.isDeletedForever) return false;
+    if (this.model.deleted_by() && !(this.model.chat().role() || this.model.user() == app.session.user)) return false;
     return true;
   };
 
@@ -2050,7 +2050,7 @@ function (_Component) {
     this.model = this.attrs.model;
     this.state = _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getViewportState(this.model);
     this.messageCharLimit = (_app$forum$attribute = app.forum.attribute('pushedx-chat.settings.charlimit')) != null ? _app$forum$attribute : 512;
-    if (!app.session.user) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.unauthenticated');else this.inputPlaceholder = app.translator.trans(_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getPermissions().post ? 'pushedx-chat.forum.chat.placeholder' : 'pushedx-chat.forum.errors.chatdenied');
+    if (!app.session.user) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.unauthenticated');else if (!_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getPermissions().post) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.chatdenied');else if (this.model.removed_at()) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.removed');else this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.chat.placeholder');
     _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].evented.on('onChatChanged', this.onChatChanged.bind(this));
     _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].evented.on('onClickMessage', this.onChatMessageClicked.bind(this));
   };
@@ -2060,12 +2060,15 @@ function (_Component) {
 
     this.model = this.attrs.model;
     this.state = _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getViewportState(this.model);
+    if (this.model.removed_at()) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.removed');else this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.chat.placeholder');
   };
 
   _proto.onupdate = function onupdate(vnode) {//ChatState.colorizeOddChatMessages();
   };
 
   _proto.view = function view(vnode) {
+    var _m;
+
     return m("div", null, m("div", {
       className: "wrapper",
       oncreate: this.wrapperOnCreate.bind(this),
@@ -2077,16 +2080,15 @@ function (_Component) {
       }
     }, this.componentLoader(this.state.scroll.loading.all), _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentsChatMessages().concat(this.state.input.writingPreview ? _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentChatMessage(this.state.input.previewModel) : [])), m("div", {
       className: "input-wrapper"
-    }, m("textarea", {
+    }, m("textarea", (_m = {
       id: "chat-input",
       maxlength: this.messageCharLimit,
       disabled: !_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getPermissions().post,
       placeholder: this.inputPlaceholder,
       onkeypress: this.inputPressEnter.bind(this),
       oninput: this.inputProcess.bind(this),
-      onpaste: this.inputProcess.bind(this),
-      rows: this.state.input.rows
-    }), this.state.messageEditing ? m("div", {
+      onpaste: this.inputProcess.bind(this)
+    }, _m["disabled"] = this.model.removed_at(), _m.rows = this.state.input.rows, _m)), this.state.messageEditing ? m("div", {
       className: "icon edit",
       onclick: this.messageEditEnd.bind(this)
     }, m("i", {
@@ -2220,7 +2222,7 @@ function (_Component) {
 
     if (wrapper && this.model.unreaded()) {
       var list = _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getChatMessages(function (mdl) {
-        return mdl.chat() == _this2.model && mdl.created_at() > _this2.model.readed_at() && !mdl.isReaded;
+        return mdl.chat() == _this2.model && mdl.created_at() >= _this2.model.readed_at() && !mdl.isReaded;
       });
 
       for (var _iterator = list, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
@@ -2240,10 +2242,19 @@ function (_Component) {
 
         if (msg && wrapper.scrollTop + wrapper.offsetHeight >= msg.offsetTop) {
           message.isReaded = true;
-          _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].apiReadChat(this.model, this.model.unreaded() == 1 ? new Date() : message);
-          this.model.pushAttributes({
-            unreaded: this.model.unreaded() - 1
-          });
+
+          if (this.state.scroll.autoScroll && _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat() == this.model) {
+            _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].apiReadChat(this.model, new Date());
+            this.model.pushAttributes({
+              unreaded: 0
+            });
+          } else {
+            _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].apiReadChat(this.model, message);
+            this.model.pushAttributes({
+              unreaded: this.model.unreaded() - 1
+            });
+          }
+
           m.redraw();
         }
       }
@@ -2860,6 +2871,7 @@ Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"
   first_message: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.hasOne('first_message'),
   last_message: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.hasOne('last_message'),
   icon: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('icon'),
+  role: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('role'),
   unreaded: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('unreaded'),
   readed_at: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('readed_at', flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.transformDate),
   removed_at: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('removed_at', flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.transformDate),

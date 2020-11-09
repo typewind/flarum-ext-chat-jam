@@ -43,7 +43,7 @@ class FetchMessageHandler
  
         $chat = $this->chats->findOrFail($command->chat_id, $actor);
 
-        if(is_array($query)) $messages = $this->messages->queryVisible($actor)->whereIn('id', $query)->get();
+        if(is_array($query)) $messages = $this->messages->queryVisible($chat, $actor)->whereIn('id', $query)->get();
         else $messages = $this->messages->fetch($query, $actor, $chat);
 
         return $messages;

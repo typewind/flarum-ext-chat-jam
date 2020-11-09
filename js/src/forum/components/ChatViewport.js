@@ -14,8 +14,10 @@ export default class ChatViewport extends Component
         this.state = ChatState.getViewportState(this.model);
 
         this.messageCharLimit = app.forum.attribute('pushedx-chat.settings.charlimit') ?? 512;
-        if(!app.session.user) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.unauthenticated')
-        else this.inputPlaceholder = app.translator.trans(ChatState.getPermissions().post ? 'pushedx-chat.forum.chat.placeholder' : 'pushedx-chat.forum.errors.chatdenied')
+        if(!app.session.user) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.unauthenticated');
+        else if(!ChatState.getPermissions().post) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.chatdenied');
+        else if(this.model.removed_at()) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.removed');
+        else this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.chat.placeholder');
 
         ChatState.evented.on('onChatChanged', this.onChatChanged.bind(this))
         ChatState.evented.on('onClickMessage', this.onChatMessageClicked.bind(this))
@@ -27,6 +29,9 @@ export default class ChatViewport extends Component
         
         this.model = this.attrs.model;
         this.state = ChatState.getViewportState(this.model);
+
+        if(this.model.removed_at()) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.removed');
+        else this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.chat.placeholder');
     }
 
     onupdate(vnode)
@@ -56,7 +61,8 @@ export default class ChatViewport extends Component
 						placeholder = {this.inputPlaceholder}
 						onkeypress = {this.inputPressEnter.bind(this)}
 						oninput = {this.inputProcess.bind(this)}
-						onpaste = {this.inputProcess.bind(this)}
+                        onpaste = {this.inputProcess.bind(this)}
+                        disabled = {this.model.removed_at()}
 
 						rows = {this.state.input.rows}
 					/>
@@ -212,7 +218,7 @@ export default class ChatViewport extends Component
         if(wrapper && this.model.unreaded())
         {
             let list = ChatState.getChatMessages(mdl => 
-                mdl.chat() == this.model && mdl.created_at() > this.model.readed_at() && !mdl.isReaded
+                mdl.chat() == this.model && mdl.created_at() >= this.model.readed_at() && !mdl.isReaded
             );
 
             for(const message of list)
@@ -222,9 +228,17 @@ export default class ChatViewport extends Component
                 {
                     message.isReaded = true;
 
-                    ChatState.apiReadChat(this.model, this.model.unreaded() == 1 ? new Date() : message);
-
-                    this.model.pushAttributes({unreaded: this.model.unreaded() - 1});
+                    if(this.state.scroll.autoScroll && ChatState.getCurrentChat() == this.model)
+                    {
+                        ChatState.apiReadChat(this.model, new Date());
+                        this.model.pushAttributes({unreaded: 0});
+                    }
+                    else
+                    {
+                        ChatState.apiReadChat(this.model, message);
+                        this.model.pushAttributes({unreaded: this.model.unreaded() - 1});
+                    }
+                    
                     m.redraw();
                 }
             }

@@ -170,7 +170,7 @@ export default class ChatMessage extends Component
 
 		items.add('separator', <Separator />);
 
-		if(ChatState.getPermissions().moderate.delete || (ChatState.getPermissions().delete && this.model.user() == app.session.user))
+		if(this.model.chat().role() || (ChatState.getPermissions().delete && this.model.user() == app.session.user))
 		{
 			if(this.model.deleted_by())
 			{
@@ -199,7 +199,7 @@ export default class ChatMessage extends Component
 			}
 		}
 
-		if(ChatState.getPermissions().moderate.delete && (this.model.deleted_by() || ChatState.totalHidden() >= 3))
+		if(this.model.chat().role() && (this.model.deleted_by() || ChatState.totalHidden() >= 3))
 		{
 			items.add('dropdownDelete',
 				<Button 
@@ -288,10 +288,10 @@ export default class ChatMessage extends Component
 		if(this.model.chat() != ChatState.getCurrentChat())
 			return false;
 
-		if(this.model.isDeletedForever /*&& (!ChatState.getPermissions().moderate.vision || !this.model.id())*/)
+		if(this.model.isDeletedForever)
 			return false;
 
-		if(this.model.deleted_by() && !(ChatState.getPermissions().moderate.vision || this.model.user() == app.session.user))
+		if(this.model.deleted_by() && !(this.model.chat().role() || this.model.user() == app.session.user))
 			return false;
 
 		return true;

@@ -47,9 +47,7 @@ class AddChatApi
                 'pushedx-chat.permissions.create.channel',
                 'pushedx-chat.permissions.enabled',
                 'pushedx-chat.permissions.edit',
-                'pushedx-chat.permissions.delete', 
-                'pushedx-chat.permissions.moderate.delete',
-                'pushedx-chat.permissions.moderate.vision'
+                'pushedx-chat.permissions.delete'
             ];
 
             $attributes = [

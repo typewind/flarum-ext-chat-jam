@@ -45,17 +45,20 @@ class MessageRepository
     /**
      * Query for visible messages
      *
+     * @param  Chat     $chat
      * @param  User 	$actor
      * @return Builder
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function queryVisible(User $actor)
+    public function queryVisible(Chat $chat, User $actor)
     {
         $settings = app(SettingsRepositoryInterface::class);
 
         $query = $this->query();
-        if(!$actor->can('pushedx-chat.permissions.moderate.vision')) 
+        $chatUser = $chat->getChatUser($actor);
+
+        if(!$chatUser || !$chatUser->role)
             $query->where(function ($query) use ($actor) {
                 $query->whereNull('deleted_by')
                 ->orWhere('deleted_by', $actor->id);
@@ -76,45 +79,14 @@ class MessageRepository
      */
     public function fetch($time, User $actor, Chat $chat)
     {
-        /*
-        $messages = $this->queryVisible($actor);
         $chatUser = $chat->getChatUser($actor);
 
-        if($chatUser->removed_at)
-            $messages->where('created_at', '<=', $chatUser->removed_at);
-
-        if($time)
-        {
-            if($time[0] != '-') 
-                $messages
-                    ->where('chat_id', $chat->id)
-                    ->where('created_at', '<', new Carbon($time))
-                    ->orderBy('id', 'desc')
-                    ->limit($this->messages_per_fetch);
-            else 
-            {
-                $time = substr($time, 1);
-                $messages
-                    ->where('chat_id', $chat->id)
-                    ->where('created_at', '>', new Carbon($time))
-                    ->limit($this->messages_per_fetch);
-            }
-        }
-        else 
-            $messages
-            ->where('chat_id', $chat->id)
-            ->orderBy('id', 'desc')
-            ->limit($this->messages_per_fetch);
-        */
-
-        $chatUser = $chat->getChatUser($actor);
-
-        $top = $this->queryVisible($actor)->where('chat_id', $chat->id);
+        $top = $this->queryVisible($chat, $actor)->where('chat_id', $chat->id);
         if($chatUser && $chatUser->removed_at)
             $top->where('created_at', '<=', $chatUser->removed_at);
         $top->where('created_at', '>=', new Carbon($time))->limit($this->messages_per_fetch + 1);
 
-        $bottom = $this->queryVisible($actor)->where('chat_id', $chat->id);
+        $bottom = $this->queryVisible($chat, $actor)->where('chat_id', $chat->id);
         if($chatUser && $chatUser->removed_at)
             $bottom->where('created_at', '<=', $chatUser->removed_at);
         $bottom->where('created_at', '<', new Carbon($time))->orderBy('id', 'desc')->limit($this->messages_per_fetch);

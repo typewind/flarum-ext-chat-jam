@@ -54,7 +54,7 @@ export default class ChatCreateModal extends ChatModal
 	{
 		return this.componentFormIcon({
 			title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.icon'),
-			desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.icon.validator', {a: <a href="https://fontawesome.com/icons?m=free" tabindex="-1" />}),
+			desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.icon.validator', {a: <a href="https://fontawesome.com/icons?m=free" tabindex="-1" target="blank"/>}),
 			stream: this.getInput().icon,
 			placeholder: 'fas fa-bolt'
 		});

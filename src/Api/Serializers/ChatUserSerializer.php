@@ -27,6 +27,7 @@ class ChatUserSerializer extends ChatSerializer
 		$chatUser = $chat->getChatUser($this->actor);
 		if($chatUser)
 		{
+            $attributes['role'] = $chatUser->role;
 			$attributes['joined_at'] = $this->formatDate($chatUser->joined_at);
 			$attributes['readed_at'] = $this->formatDate($chatUser->readed_at);
 			$attributes['removed_at'] = $this->formatDate($chatUser->removed_at);

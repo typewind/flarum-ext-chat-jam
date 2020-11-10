@@ -8,6 +8,7 @@
 
 namespace Xelson\Chat\Api\Controllers;
 
+use Xelson\Chat\Api\Serializers\ChatSerializer;
 use Xelson\Chat\Api\Serializers\ChatUserSerializer;
 use Flarum\Api\Controller\AbstractShowController;
 use Illuminate\Contracts\Bus\Dispatcher;
@@ -82,7 +83,7 @@ class EditChatController extends AbstractShowController
         $request = $event->request;
         $data = $event->data;
         $document = $event->document;
-        $serializer = AbstractShowController::getContainer()->make($this->serializer);
+        $serializer = AbstractShowController::getContainer()->make(ChatSerializer::class);
         $serializer->setRequest($request);
 
         $element = $this->createElement($data, $serializer)

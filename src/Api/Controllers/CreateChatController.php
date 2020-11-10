@@ -72,7 +72,7 @@ class CreateChatController extends AbstractCreateController
         $request = $event->request;
         $data = $event->data;
         $document = $event->document;
-        $serializer = AbstractCreateController::getContainer()->make($this->serializer);
+        $serializer = AbstractCreateController::getContainer()->make(ChatSerializer::class);
         $serializer->setRequest($request);
 
         $element = $this->createElement($data, $serializer)

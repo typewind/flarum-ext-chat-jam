@@ -10,7 +10,7 @@ export default class ChatEventMessage extends ChatMessage
 	{
 		super.oninit(vnode);
 
-		if(this.model.message()[0] == '*') this.parsedContent = {id: 'chatCensored'}
+		if(this.model.message().split('').every(c => c == '*')) this.parsedContent = {id: 'chatCensored'}
 		else this.parsedContent = JSON.parse(this.model.message());
 	}
 
@@ -34,13 +34,13 @@ export default class ChatEventMessage extends ChatMessage
 		{
 			case 'chatCensored':
 			{
-				return <div className='censored'>{this.model.message()}</div>
+				return <div className='censored' title={app.translator.trans('pushedx-chat.forum.chat.message.censored')}>{this.model.message()}</div>
 			}
 			case 'chatCreated':
 			{
 				let transKey = 'chat';
-				if(this.parsedContent.users.length == 1) transKey = 'pm';
-				else if(this.model.chat().type() == 1) transKey = 'channel';
+				if(this.model.chat().type() == 1) transKey = 'channel';
+				else if(this.parsedContent && this.parsedContent.users.length == 1) transKey = 'pm';
 
 				return app.translator.trans(`pushedx-chat.forum.chat.message.events.${transKey}.created`, {
 					creatorname: this.componentUserMention(this.model.user()), 

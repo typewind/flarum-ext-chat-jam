@@ -94,6 +94,9 @@ class ChatState
 		let chat = r.response.chat;
 		if(chat) chat = app.store.pushPayload(chat);
 
+		// Workaround for blocking events from a socket if we need it
+		if((message && (message.chat().removed_at() || message.user() == app.session.user)) || (chat && chat.removed_at())) return;
+
 		switch(r.event.id)
 		{
 			case 'message.post':

@@ -30,7 +30,9 @@ export default class ChatViewport extends Component
         this.model = this.attrs.model;
         this.state = ChatState.getViewportState(this.model);
 
-        if(this.model.removed_at()) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.removed');
+        if(!app.session.user) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.unauthenticated');
+        else if(!ChatState.getPermissions().post) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.chatdenied');
+        else if(this.model.removed_at()) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.removed');
         else this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.chat.placeholder');
     }
 
@@ -57,12 +59,11 @@ export default class ChatViewport extends Component
 					<textarea
 						id = 'chat-input'
 						maxlength = {this.messageCharLimit}
-						disabled = {!ChatState.getPermissions().post}
+						disabled = {!ChatState.getPermissions().post || this.model.removed_at()}
 						placeholder = {this.inputPlaceholder}
 						onkeypress = {this.inputPressEnter.bind(this)}
 						oninput = {this.inputProcess.bind(this)}
                         onpaste = {this.inputProcess.bind(this)}
-                        disabled = {this.model.removed_at()}
 
 						rows = {this.state.input.rows}
 					/>

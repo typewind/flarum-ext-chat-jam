@@ -767,7 +767,9 @@ function (_ChatMessage) {
   _proto.oninit = function oninit(vnode) {
     _ChatMessage.prototype.oninit.call(this, vnode);
 
-    if (this.model.message()[0] == '*') this.parsedContent = {
+    if (this.model.message().split('').every(function (c) {
+      return c == '*';
+    })) this.parsedContent = {
       id: 'chatCensored'
     };else this.parsedContent = JSON.parse(this.model.message());
   };
@@ -793,14 +795,15 @@ function (_ChatMessage) {
       case 'chatCensored':
         {
           return m("div", {
-            className: "censored"
+            className: "censored",
+            title: app.translator.trans('pushedx-chat.forum.chat.message.censored')
           }, this.model.message());
         }
 
       case 'chatCreated':
         {
           var transKey = 'chat';
-          if (this.parsedContent.users.length == 1) transKey = 'pm';else if (this.model.chat().type() == 1) transKey = 'channel';
+          if (this.model.chat().type() == 1) transKey = 'channel';else if (this.parsedContent && this.parsedContent.users.length == 1) transKey = 'pm';
           return app.translator.trans("pushedx-chat.forum.chat.message.events." + transKey + ".created", {
             creatorname: this.componentUserMention(this.model.user()),
             chatname: m("b", {
@@ -1080,7 +1083,7 @@ function (_Component) {
         color: _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat().color(),
         'margin-right': '3px'
       }
-    }) : null, _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat().title()] : app.translator.trans('pushedx-chat.forum.toolbar.title')), !_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat() ? null : m("div", {
+    }) : null, _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat().title()] : app.translator.trans('pushedx-chat.forum.toolbar.title')), !_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getCurrentChat() || !app.session.user ? null : m("div", {
       className: "icon",
       "data-title": app.translator.trans('pushedx-chat.forum.toolbar.chat.settings'),
       onclick: function onclick() {
@@ -2060,15 +2063,13 @@ function (_Component) {
 
     this.model = this.attrs.model;
     this.state = _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getViewportState(this.model);
-    if (this.model.removed_at()) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.removed');else this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.chat.placeholder');
+    if (!app.session.user) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.unauthenticated');else if (!_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getPermissions().post) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.chatdenied');else if (this.model.removed_at()) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.removed');else this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.chat.placeholder');
   };
 
   _proto.onupdate = function onupdate(vnode) {//ChatState.colorizeOddChatMessages();
   };
 
   _proto.view = function view(vnode) {
-    var _m;
-
     return m("div", null, m("div", {
       className: "wrapper",
       oncreate: this.wrapperOnCreate.bind(this),
@@ -2080,15 +2081,16 @@ function (_Component) {
       }
     }, this.componentLoader(this.state.scroll.loading.all), _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentsChatMessages().concat(this.state.input.writingPreview ? _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].componentChatMessage(this.state.input.previewModel) : [])), m("div", {
       className: "input-wrapper"
-    }, m("textarea", (_m = {
+    }, m("textarea", {
       id: "chat-input",
       maxlength: this.messageCharLimit,
-      disabled: !_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getPermissions().post,
+      disabled: !_states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getPermissions().post || this.model.removed_at(),
       placeholder: this.inputPlaceholder,
       onkeypress: this.inputPressEnter.bind(this),
       oninput: this.inputProcess.bind(this),
-      onpaste: this.inputProcess.bind(this)
-    }, _m["disabled"] = this.model.removed_at(), _m.rows = this.state.input.rows, _m)), this.state.messageEditing ? m("div", {
+      onpaste: this.inputProcess.bind(this),
+      rows: this.state.input.rows
+    }), this.state.messageEditing ? m("div", {
       className: "icon edit",
       onclick: this.messageEditEnd.bind(this)
     }, m("i", {
@@ -3106,7 +3108,9 @@ function () {
     var message = r.response.message;
     if (message) message = app.store.pushPayload(message);
     var chat = r.response.chat;
-    if (chat) chat = app.store.pushPayload(chat);
+    if (chat) chat = app.store.pushPayload(chat); // Workaround for blocking events from a socket if we need it
+
+    if (message && (message.chat().removed_at() || message.user() == app.session.user) || chat && chat.removed_at()) return;
 
     switch (r.event.id) {
       case 'message.post':

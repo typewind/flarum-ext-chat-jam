@@ -339,6 +339,11 @@
         outline: none;
         height: 100%;
 
+        @media @phone
+        {
+            max-height: 500px;
+        }
+
         .censored
         {
             box-shadow: inset 0px 0px 0px 1000px #dedede;
@@ -655,6 +660,26 @@
         #chat-panel
         {
             width: 650px;
+
+            @media @phone
+            {
+                max-width: 500px;
+            }
+
+            @media (max-width: 600px)
+            {
+                max-width: 350px;
+            }
+
+            @media (max-width: 500px)
+            {
+                max-width: 300px;
+            }
+
+            @media (max-width: 400px)
+            {
+                max-width: 250px;
+            }
         }
 
         #chat-header
@@ -827,6 +852,11 @@
             overflow-x: hidden;
             min-height: 300px;
 
+            @media @phone
+            {
+                height: 400px !important;
+            }
+
             .welcome
             {
                 margin: auto;
@@ -961,11 +991,10 @@
                         word-break: break-word;
                         white-space: normal;
                         min-height: 30px;
-    
-                        a > img
+
+                        img
                         {
-                            max-width: 300px;
-                            vertical-align: top;
+                            max-height: 290px;
                         }
                         
                         a

@@ -38,16 +38,22 @@ export default class ChatEventMessage extends ChatMessage
 			}
 			case 'chatCreated':
 			{
-				let transKey = 'chat';
-				if(this.model.chat().type() == 1) transKey = 'channel';
-				else if(this.parsedContent && this.parsedContent.users.length == 1) transKey = 'pm';
-
-				return app.translator.trans(`pushedx-chat.forum.chat.message.events.${transKey}.created`, {
-					creatorname: this.componentUserMention(this.model.user()), 
-					chatname: <b className='chat-title'>{this.model.chat().title()}</b>,
-					usernames: this.componentUserMentionsByIds(this.parsedContent.users),
-					username: this.parsedContent.users.length ? this.componentUserMention(app.store.getById('users', this.parsedContent.users[0])) : null
-				});
+				if(this.model.chat().type() == 1)
+				{
+					return app.translator.trans(`pushedx-chat.forum.chat.message.events.channel.created`, {
+						creatorname: this.componentUserMention(this.model.user()), 
+						chatname: <b className='chat-title'>{this.model.chat().title()}</b>,
+					})
+				}
+				else
+				{
+					return app.translator.trans(`pushedx-chat.forum.chat.message.events.chat.created`, {
+						creatorname: this.componentUserMention(this.model.user()), 
+						chatname: <b className='chat-title'>{this.model.chat().title()}</b>,
+						usernames: this.componentUserMentionsByIds(this.parsedContent.users),
+						username: this.parsedContent.users.length ? this.componentUserMention(app.store.getById('users', this.parsedContent.users[0])) : null
+					});
+				}
 			}
 			case 'chatEdited':
 			{

@@ -802,16 +802,23 @@ function (_ChatMessage) {
 
       case 'chatCreated':
         {
-          var transKey = 'chat';
-          if (this.model.chat().type() == 1) transKey = 'channel';else if (this.parsedContent && this.parsedContent.users.length == 1) transKey = 'pm';
-          return app.translator.trans("pushedx-chat.forum.chat.message.events." + transKey + ".created", {
-            creatorname: this.componentUserMention(this.model.user()),
-            chatname: m("b", {
-              className: "chat-title"
-            }, this.model.chat().title()),
-            usernames: this.componentUserMentionsByIds(this.parsedContent.users),
-            username: this.parsedContent.users.length ? this.componentUserMention(app.store.getById('users', this.parsedContent.users[0])) : null
-          });
+          if (this.model.chat().type() == 1) {
+            return app.translator.trans("pushedx-chat.forum.chat.message.events.channel.created", {
+              creatorname: this.componentUserMention(this.model.user()),
+              chatname: m("b", {
+                className: "chat-title"
+              }, this.model.chat().title())
+            });
+          } else {
+            return app.translator.trans("pushedx-chat.forum.chat.message.events.chat.created", {
+              creatorname: this.componentUserMention(this.model.user()),
+              chatname: m("b", {
+                className: "chat-title"
+              }, this.model.chat().title()),
+              usernames: this.componentUserMentionsByIds(this.parsedContent.users),
+              username: this.parsedContent.users.length ? this.componentUserMention(app.store.getById('users', this.parsedContent.users[0])) : null
+            });
+          }
         }
 
       case 'chatEdited':

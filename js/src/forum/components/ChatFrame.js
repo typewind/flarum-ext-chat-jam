@@ -150,7 +150,7 @@ export default class ChatFrame extends Component
                                     : null,
                                 ChatState.getCurrentChat().title() 
                             ]: app.translator.trans('pushedx-chat.forum.toolbar.title')}</h2>
-                            {!ChatState.getCurrentChat() || !app.session.user ? null :<div 
+                            {!ChatState.getCurrentChat() || !app.session.user ? null : <div 
                                 className='icon'
                                 data-title={app.translator.trans('pushedx-chat.forum.toolbar.chat.settings')}
 

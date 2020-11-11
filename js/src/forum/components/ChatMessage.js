@@ -106,7 +106,7 @@ export default class ChatMessage extends Component
 					deleted: !this.isVisible()}
 					)}
 				data-id={this.model.id()}>
-				{this.content()}
+				{this.model ? this.content() : null}
 			</div>
 		)
 	}

@@ -153,7 +153,6 @@ export default class ChatFrame extends Component
                             {!ChatState.getCurrentChat() || !app.session.user ? null : <div 
                                 className='icon'
                                 data-title={app.translator.trans('pushedx-chat.forum.toolbar.chat.settings')}
-
                                 onclick={() => app.modal.show(ChatEditModal, {model: ChatState.getCurrentChat()})}
                             >
                                 <i className='fas fa-cog'></i>

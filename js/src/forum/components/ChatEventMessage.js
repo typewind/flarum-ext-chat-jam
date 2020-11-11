@@ -38,6 +38,8 @@ export default class ChatEventMessage extends ChatMessage
 			}
 			case 'chatCreated':
 			{
+				if(!this.model.chat()) return;
+				
 				if(this.model.chat().type() == 1)
 				{
 					return app.translator.trans(`pushedx-chat.forum.chat.message.events.channel.created`, {

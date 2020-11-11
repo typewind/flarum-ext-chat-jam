@@ -67,7 +67,7 @@ class EditChatHandler
         $attrsChanged = false;
 
         $this->assertPermission(
-            array_key_exists($actor->id, $all_ids)
+            in_array($actor->id, $all_ids)
         );
 
         $localUser = $users[$actor->id];
@@ -78,7 +78,8 @@ class EditChatHandler
 
         $now = Carbon::now();
         $isCreator = $actor->id == $chat->creator_id || (!$chat->creator_id && $actor->isAdmin());
-        $isPM = count($all_users) <= 2;
+        $isPM = count($all_users) <= 2 && $chat->type == 0;
+        $isChannel = $chat->type == 1;
 
         foreach($editable_colums as $column)
         {
@@ -148,10 +149,13 @@ class EditChatHandler
 
                 $chat->users()->syncWithoutDetaching($added_pairs + $removed_pairs);
 
-                $message = $this->bus->dispatch(
-                    new PostEventMessage($chat->id, $actor, new EventMessageChatAddRemoveUser($added_ids, $removed_ids), $ip_address)
-                );
-                $events_list[] = $message->id;
+                if(!$isChannel)
+                {
+                    $message = $this->bus->dispatch(
+                        new PostEventMessage($chat->id, $actor, new EventMessageChatAddRemoveUser($added_ids, $removed_ids), $ip_address)
+                    );
+                    $events_list[] = $message->id;
+                }
             }
         }
 
@@ -176,7 +180,7 @@ class EditChatHandler
                 if($id == $actor->id)
                     throw new ChatEditException('Сannot set a role for yourself');
 
-                if($role != 0 && $role != 1)
+                if(!in_array($role, [1, 2]))
                     throw new ChatEditException('Unacceptable role');
 
                 $syncUsers[$id] = ['role' => $role];

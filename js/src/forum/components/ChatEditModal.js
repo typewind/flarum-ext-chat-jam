@@ -2,6 +2,7 @@ import Button from 'flarum/components/Button';
 import Dropdown from 'flarum/components/Dropdown';
 import classList from 'flarum/utils/classList';
 import Model from 'flarum/Model';
+import Group from 'flarum/models/Group'
 
 import ChatModal from './ChatModal';
 import Stream from 'flarum/utils/Stream';
@@ -25,7 +26,7 @@ export default class ChatEditModal extends ChatModal
 		this.setSelectedUsers(this.model.users().filter(mdl => !mdl.chat_pivot(this.model.id()).removed_at()));
 		this.edited = {};
 
-		this.isLocalModerator = app.session.user.chat_pivot(this.model.id()).role();
+		this.isLocalModerator = this.isModer(app.session.user);
 		this.isLocalLeaved = !this.initialUsers.includes(app.session.user);
 	}
 
@@ -58,12 +59,16 @@ export default class ChatEditModal extends ChatModal
 
 	isModer(user)
 	{
-		return this.edited[user.id()]?.role ?? user.chat_pivot(this.model.id()).role() == 1;
+		if(!user) return false;
+		if(this.edited[user.id()]?.role ?? user.chat_pivot(this.model.id()).role()) return true;
+		if(this.isCreator(user)) return true;
+
+		return false;
 	}
 
 	isCreator(user)
 	{
-		return user.chat_pivot(this.model.id()).role() == 2;
+		return user.chat_pivot(this.model.id()).role() == 2 || (!this.model.creator() && user.groups() && user.groups().some(g => g.id() == Group.ADMINISTRATOR_ID));
 	}
 
 	userMentionClassname(user)
@@ -101,7 +106,7 @@ export default class ChatEditModal extends ChatModal
 				<Button 
 					icon={this.isModer(user) ? 'fas fa-times' : 'fas fa-users-cog'}
 					onclick={this.userMentionDropdownOnclick.bind(this, user, 'moder')}
-					disabled={user == app.session.user || !this.isCreator(app.session.user)}
+					disabled={user == app.session.user || !this.isCreator(app.session.user) || this.isCreator(user)}
 				>
 					{app.translator.trans('pushedx-chat.forum.chat.moder')}
 				</Button>

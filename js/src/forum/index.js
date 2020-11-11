@@ -32,14 +32,18 @@ app.initializers.add('pushedx-chat', app =>
                 pivot.hasOne = function(name, id, attr)
                 {
                     return function () {
-                        const relationship = this.data.attributes[name] && this.data.attributes[name][id][attr];
+                        const relationship = this.data.attributes[name] 
+                            && this.data.attributes[name][id]
+                            && this.data.attributes[name][id][attr];
                         if(relationship)
                             return app.store.getById(relationship.data.type, relationship.data.id);
                     }
                 }
 
                 return function () {
-                    const value = this.data.attributes[name] && this.data.attributes[name][id][attr];
+                    const value = this.data.attributes[name] 
+                        && this.data.attributes[name][id]
+                        && this.data.attributes[name][id][attr];
                     return transform ? transform(value) : value;
                 }
             }

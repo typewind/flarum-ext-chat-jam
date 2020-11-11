@@ -45,7 +45,7 @@ class DeleteChatHandler
         $users = $chat->users()->get();
 
         $this->assertPermission(
-            $chat->creator_id == $actor->id && count($users) > 2
+            $chat->creator_id == $actor->id && (count($users) > 2 || $chat->type == 1)
 		);
 		
 		$chat->users()->detach();

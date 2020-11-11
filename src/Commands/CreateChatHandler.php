@@ -110,9 +110,10 @@ class CreateChatHandler
         $this->validator->assertValid($chat->getDirty());
         $chat->save();
 
+        $user_ids = [];
+        
         if(!$isChannel)
         {
-            $user_ids = [];
             foreach($users as $user) if($user['id'] != $actor->id) $user_ids[] = $user['id'];
 
             $pairs = array_merge($user_ids, [$actor->id]);

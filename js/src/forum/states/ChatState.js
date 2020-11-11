@@ -203,7 +203,7 @@ class ChatState
 		return this.chats;
 	}
 
-	componentsChats()
+	getChatsSortedByLastUpdate()
 	{
 		return this.getChats()
 			.sort((a, b) => {
@@ -212,7 +212,11 @@ class ChatState
 				}
 				return 0;
 			})
-			.map(model => (
+	}
+
+	componentsChats()
+	{
+		return this.getChatsSortedByLastUpdate().map(model => (
 			<div onclick={this.onChatChanged.bind(this, model)}>
 				<ChatPreview key={model.id()} model={model} />
 			</div>
@@ -254,7 +258,7 @@ class ChatState
 
 	isChatPM(model)
 	{
-		return model.users().length <= 2
+		return model.type() == 0 && model.users().length <= 2
 	}
 
 	isExistsPMChat(user1, user2)
@@ -500,6 +504,7 @@ class ChatState
 	{
 		return this.curChat;
 	}
+	
 
     apiFetchChats()
     {

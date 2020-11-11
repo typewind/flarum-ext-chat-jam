@@ -45,17 +45,4 @@ app.initializers.add('pushedx-chat', app => {
             permission: 'pushedx-chat.permissions.delete'
         });
     });
-
-    extend(PermissionGrid.prototype, 'moderateItems', items => {
-        items.add('pushedx-chat.permissions.moderate.delete', {
-            icon: 'far fa-trash-alt',
-            label: app.translator.trans('pushedx-chat.admin.permissions.moderate.delete'),
-            permission: 'pushedx-chat.permissions.moderate.delete'
-        });
-        items.add('pushedx-chat.permissions.moderate.vision', {
-            icon: 'far fa-eye',
-            label: app.translator.trans('pushedx-chat.admin.permissions.moderate.vision'),
-            permission: 'pushedx-chat.permissions.moderate.vision'
-        });
-    });
 });

@@ -32,7 +32,7 @@ For development builds:
 ```
 composer require xelson/flarum-ext-chat:dev-master
 ```
-Make sure that Pusher extension is enabled
+Make sure that any socket extension is enabled
 
 # Updating
 Via composer:

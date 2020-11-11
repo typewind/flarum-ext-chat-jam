@@ -86,11 +86,11 @@ class EditChatHandler
             if(Arr::get($data, 'attributes.' . $column, 0) && $chat[$column] != $attributes[$column])
             {
                 $this->assertPermission(
-                    $chat->type == 1 || !$isPM
+                    $isChannel == 1 || !$isPM
                 );
 
                 $this->assertPermission(
-                    $localUser->pivot->role
+                    $localUser->pivot->role || $isCreator
                 );
 
                 $message = $this->bus->dispatch(
@@ -142,7 +142,7 @@ class EditChatHandler
                 foreach($removed_ids as $v)
                 {
                     $this->assertPermission(
-                        $v == $actor->id || $users[$v]->pivot->role < $localUser->pivot->role
+                        $v == $actor->id || $users[$v]->pivot->role < $localUser->pivot->role || $isCreator
                     );
                     $removed_pairs[$v] = ['removed_at' => $now, 'removed_by' => $actor->id];
                 }

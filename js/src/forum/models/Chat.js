@@ -20,7 +20,7 @@ Object.assign(Chat.prototype,
 	readed_at: Model.attribute('readed_at', Model.transformDate),
 	removed_at: Model.attribute('removed_at', Model.transformDate),
 	joined_at: Model.attribute('joined_at', Model.transformDate),
-	removed_by: Model.hasOne('removed_by'),
+	removed_by: Model.attribute('removed_by'),
 
 	pm_user: computed('freshness', function (updated) {
 		return this.getPMUser();

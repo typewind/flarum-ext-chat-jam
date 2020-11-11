@@ -226,7 +226,7 @@ export default class ChatEditModal extends ChatModal
 			<Button
 				className='Button Button--primary Button--block ButtonLeave'
 				onclick={this.onleave.bind(this)}
-				disabled={this.model.type() ? !this.isCanEditChannel() : !this.isCanEditChat()}
+				disabled={this.model.removed_by() && this.model.removed_by() != app.session.user.id()}
 			>
 				{app.translator.trans(`pushedx-chat.forum.chat.edit_modal.form.${this.isLocalLeaved ? 'return' : 'leave'}`)}
 			</Button>

@@ -86,7 +86,7 @@ class EditChatHandler
             if(Arr::get($data, 'attributes.' . $column, 0) && $chat[$column] != $attributes[$column])
             {
                 $this->assertPermission(
-                    $isChannel == 1 || !$isPM
+                    $isChannel || !$isPM
                 );
 
                 $this->assertPermission(

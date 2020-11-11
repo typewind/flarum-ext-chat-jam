@@ -639,7 +639,7 @@ function (_ChatModal) {
     buttons.push(m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default.a, {
       className: "Button Button--primary Button--block ButtonLeave",
       onclick: this.onleave.bind(this),
-      disabled: this.model.type() ? !this.isCanEditChannel() : !this.isCanEditChat()
+      disabled: this.model.removed_by() && this.model.removed_by() != app.session.user.id()
     }, app.translator.trans("pushedx-chat.forum.chat.edit_modal.form." + (this.isLocalLeaved ? 'return' : 'leave'))));
     if (!_states_ChatState__WEBPACK_IMPORTED_MODULE_9__["default"].isChatPM(this.model) && _states_ChatState__WEBPACK_IMPORTED_MODULE_9__["default"].getPermissions().create.channel) buttons.push(this.componentDeleteChat());
     return buttons;
@@ -2895,7 +2895,7 @@ Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"
   readed_at: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('readed_at', flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.transformDate),
   removed_at: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('removed_at', flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.transformDate),
   joined_at: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('joined_at', flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.transformDate),
-  removed_by: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.hasOne('removed_by'),
+  removed_by: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('removed_by'),
   pm_user: flarum_utils_computed__WEBPACK_IMPORTED_MODULE_3___default()('freshness', function (updated) {
     return this.getPMUser();
   }),

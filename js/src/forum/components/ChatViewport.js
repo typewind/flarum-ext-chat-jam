@@ -49,7 +49,7 @@ export default class ChatViewport extends Component
                     oncreate={this.wrapperOnCreate.bind(this)} 
                     onupdate={this.wrapperOnUpdate.bind(this)}
                     onscroll={this.wrapperOnScroll.bind(this)}
-                    onmousewheel={this.wrapperOnMouseWheel.bind(this)}
+                    onwheel={this.wrapperOnMouseWheel.bind(this)}
 					style={{height: ChatState.getFrameState('transform').y + 'px'}}
 				>
                     {this.componentLoader(this.state.scroll.loading.all)}

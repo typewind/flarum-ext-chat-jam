@@ -2096,7 +2096,7 @@ function (_Component) {
       oncreate: this.wrapperOnCreate.bind(this),
       onupdate: this.wrapperOnUpdate.bind(this),
       onscroll: this.wrapperOnScroll.bind(this),
-      onmousewheel: this.wrapperOnMouseWheel.bind(this),
+      onwheel: this.wrapperOnMouseWheel.bind(this),
       style: {
         height: _states_ChatState__WEBPACK_IMPORTED_MODULE_5__["default"].getFrameState('transform').y + 'px'
       }

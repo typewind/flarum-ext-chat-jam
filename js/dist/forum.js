@@ -1066,7 +1066,7 @@ function (_Component) {
     }, m("div", {
       className: "header"
     }, m("div", {
-      className: "input-wrapper"
+      className: "input-wrapper input--down"
     }, m("textarea", {
       id: "chat-find",
       placeholder: app.translator.trans('pushedx-chat.forum.chat.list.placeholder')
@@ -1140,9 +1140,13 @@ function (_Component) {
   };
 
   _proto.chatHeaderOnMouseDown = function chatHeaderOnMouseDown(e) {
-    for (var i = 0, el; i < e.path.length; i++) {
-      el = e.path[i];
-      if (el.classList && el.classList.contains('icon')) return;
+    var path = e.path || e.composedPath && e.composedPath();
+
+    if (path) {
+      for (var i = 0, el; i < path.length; i++) {
+        el = path[i];
+        if (el.classList && el.classList.contains('icon')) return;
+      }
     }
 
     if (!this.chatMoveStart(e)) {
@@ -2173,8 +2177,8 @@ function (_Component) {
     return this.model.unreaded() >= 30 || chatWrapper && chatWrapper.scrollHeight > 2000 && chatWrapper.scrollTop < chatWrapper.scrollHeight - 2000;
   };
 
-  _proto.fastScroll = function fastScroll() {
-    if (this.model.unreaded() >= 30) this.fastMessagesFetch.bind(this);else {
+  _proto.fastScroll = function fastScroll(e) {
+    if (this.model.unreaded() >= 30) this.fastMessagesFetch(e);else {
       var chatWrapper = this.getChatWrapper();
       chatWrapper.scrollTop = Math.max(chatWrapper.scrollTop, chatWrapper.scrollHeight - 3000);
       this.scrollToBottom();
@@ -2548,7 +2552,7 @@ function (_Component) {
           })[0];
 
           _this6.scrollToAnchor(anchor);
-        }
+        } else _this6.state.scroll.autoScroll = true;
 
         m.redraw();
       });
@@ -2891,7 +2895,9 @@ Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"
   last_message: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.hasOne('last_message'),
   icon: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('icon'),
   role: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('role'),
-  unreaded: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('unreaded'),
+  unreaded: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('unreaded', function (v) {
+    return Math.max(v, 0);
+  }),
   readed_at: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('readed_at', flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.transformDate),
   removed_at: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('removed_at', flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.transformDate),
   joined_at: flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.attribute('joined_at', flarum_Model__WEBPACK_IMPORTED_MODULE_2___default.a.transformDate),
@@ -3384,6 +3390,7 @@ function () {
         });
         if (options.notify) _this3.messageNotify(r[0]);
         viewport.scroll.loading.queries[query] = false;
+        viewport.scroll.autoScroll = false;
         m.redraw();
       }
     });

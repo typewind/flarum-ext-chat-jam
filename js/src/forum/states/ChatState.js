@@ -325,6 +325,8 @@ class ChatState
 					if(options.notify) this.messageNotify(r[0]);
 
 					viewport.scroll.loading.queries[query] = false;
+					viewport.scroll.autoScroll = false;
+
 					m.redraw();
 				}
             });

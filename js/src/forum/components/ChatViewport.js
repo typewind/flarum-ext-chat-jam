@@ -146,9 +146,9 @@ export default class ChatViewport extends Component
         );
     }
 
-    fastScroll()
+    fastScroll(e)
     {
-        if(this.model.unreaded() >= 30) this.fastMessagesFetch.bind(this)
+        if(this.model.unreaded() >= 30) this.fastMessagesFetch(e);
         else
         {
             let chatWrapper = this.getChatWrapper();
@@ -534,6 +534,7 @@ export default class ChatViewport extends Component
                     let anchor = ChatState.getChatMessages(mdl => mdl.chat() == this.model && mdl.created_at() > this.model.readed_at())[0];
                     this.scrollToAnchor(anchor);
                 }
+                else this.state.scroll.autoScroll = true;
 
                 m.redraw();
             });

@@ -16,7 +16,7 @@ Object.assign(Chat.prototype,
 	icon: Model.attribute('icon'),
 
 	role: Model.attribute('role'),
-	unreaded: Model.attribute('unreaded'),
+	unreaded: Model.attribute('unreaded', v => Math.max(v, 0)),
 	readed_at: Model.attribute('readed_at', Model.transformDate),
 	removed_at: Model.attribute('removed_at', Model.transformDate),
 	joined_at: Model.attribute('joined_at', Model.transformDate),

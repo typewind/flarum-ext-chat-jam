@@ -119,7 +119,7 @@ export default class ChatFrame extends Component
                 <div tabindex='0' className='frame' id='chat'>
                     <div id='chats-list' className={(ChatState.getFrameState('beingShownChatsList') ? 'toggled' : '')}>
                         <div className='header'>
-                            <div className='input-wrapper'>
+                            <div className='input-wrapper input--down'>
                                 <textarea
                                     id = 'chat-find'
                                     placeholder = {app.translator.trans('pushedx-chat.forum.chat.list.placeholder')}
@@ -197,11 +197,15 @@ export default class ChatFrame extends Component
 
     chatHeaderOnMouseDown(e)
     {
-        for(let i = 0, el; i < e.path.length; i++) 
+        var path = e.path || (e.composedPath && e.composedPath());
+        if(path)
         {
-            el = e.path[i];
-            if(el.classList && el.classList.contains('icon')) 
-                return;
+            for(let i = 0, el; i < path.length; i++) 
+            {
+                el = path[i];
+                if(el.classList && el.classList.contains('icon')) 
+                    return;
+            }
         }
 
         if(!this.chatMoveStart(e))

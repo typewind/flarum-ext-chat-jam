@@ -7,131 +7,129 @@ import Stream from 'flarum/utils/Stream';
 
 import ChatState from '../states/ChatState';
 
-export default class ChatCreateModal extends ChatModal
-{
-	oninit(vnode)
-	{
-		super.oninit(vnode);
+export default class ChatCreateModal extends ChatModal {
+    oninit(vnode) {
+        super.oninit(vnode);
 
-		this.isChannel = false;
-	}
+        this.isChannel = false;
+    }
 
-	title() 
-	{
-		return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.title');
-	}
+    title() {
+        return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.title');
+    }
 
-	onsubmit()
-	{
-		app.store.createRecord('chats').save({
-			title: this.getInput().title(), 
-			isChannel: this.isChannel, 
-			icon: this.getInput().icon(),
-			color: this.getInput().color(),
-			relationships: {users: this.getSelectedUsers()}
-		}).then(
-			model =>
-			{
-				ChatState.addChat(model);
-				ChatState.onChatChanged(model);
-				m.redraw();
-			}
-		);
-		this.hide();
-	}
+    onsubmit() {
+        app.store
+            .createRecord('chats')
+            .save({
+                title: this.getInput().title(),
+                isChannel: this.isChannel,
+                icon: this.getInput().icon(),
+                color: this.getInput().color(),
+                relationships: { users: this.getSelectedUsers() },
+            })
+            .then((model) => {
+                ChatState.addChat(model);
+                ChatState.onChatChanged(model);
+                m.redraw();
+            });
+        this.hide();
+    }
 
-	componentFormInputColor()
-	{
-		return this.componentFormColor({
-			title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.color'),
-			desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.color.validator'),
-			stream: this.getInput().color,
-			placeholder: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.color')
-		});
-	}
+    componentFormInputColor() {
+        return this.componentFormColor({
+            title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.color'),
+            desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.color.validator'),
+            stream: this.getInput().color,
+            placeholder: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.color'),
+        });
+    }
 
-	componentFormInputIcon()
-	{
-		return this.componentFormIcon({
-			title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.icon'),
-			desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.icon.validator', {a: <a href="https://fontawesome.com/icons?m=free" tabindex="-1" target="blank"/>}),
-			stream: this.getInput().icon,
-			placeholder: 'fas fa-bolt'
-		});
-	}
+    componentFormInputIcon() {
+        return this.componentFormIcon({
+            title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.icon'),
+            desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.icon.validator', {
+                a: <a href="https://fontawesome.com/icons?m=free" tabindex="-1" target="blank" />,
+            }),
+            stream: this.getInput().icon,
+            placeholder: 'fas fa-bolt',
+        });
+    }
 
-	componentFormChat()
-	{
-		return [
-			this.usersSelected.length > 1 ? [
-				this.componentFormInput({
-					title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat'),
-					desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator'),
-					stream: this.getInput().title,
-					placeholder: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat')
-				}),
-				this.componentFormInputColor(),
-				this.componentFormInputIcon()
-			] : null,
-			this.componentFormUsersSelect()
-		]
-	}
+    componentFormChat() {
+        return [
+            this.usersSelected.length > 1
+                ? [
+                      this.componentFormInput({
+                          title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat'),
+                          desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator'),
+                          stream: this.getInput().title,
+                          placeholder: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.chat'),
+                      }),
+                      this.componentFormInputColor(),
+                      this.componentFormInputIcon(),
+                  ]
+                : null,
+            this.componentFormUsersSelect(),
+        ];
+    }
 
-	componentFormChannel()
-	{
-		return [
-			this.componentFormInput({
-				title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.channel'),
-				desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator'),
-				stream: this.getInput().title,
-				placeholder: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.channel')
-			}),
-			this.componentFormInputColor(),
-			this.componentFormInputIcon()
-		]
-	}
+    componentFormChannel() {
+        return [
+            this.componentFormInput({
+                title: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.channel'),
+                desc: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.validator'),
+                stream: this.getInput().title,
+                placeholder: app.translator.trans('pushedx-chat.forum.chat.list.add_modal.form.title.channel'),
+            }),
+            this.componentFormInputColor(),
+            this.componentFormInputIcon(),
+        ];
+    }
 
-	isCanCreateChat()
-	{
-		if(this.getSelectedUsers().length > 1 && !this.getInput().title().length) return false;
-		if(!this.getSelectedUsers().length) return false;
-		if(this.alertText()) return false;
+    isCanCreateChat() {
+        if (this.getSelectedUsers().length > 1 && !this.getInput().title().length) return false;
+        if (!this.getSelectedUsers().length) return false;
+        if (this.alertText()) return false;
 
-		return true;
-	}
+        return true;
+    }
 
-	isCanCreateChannel()
-	{
-		return this.getInput().title().length;
-	}
+    isCanCreateChannel() {
+        return this.getInput().title().length;
+    }
 
-	content() {
-		return (
-			<div className="Modal-body Modal-body--neonchat">
-				<div class="Form-group InputTitle">
-					{ChatState.getPermissions().create.channel ? <div className="ChatType">
-						<div className={classList({'Tab Tab--left': true, 'Tab--active': !this.isChannel})}
-							onclick={(() => this.isChannel = false).bind(this)}
-						>
-							{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.chat')}
-						</div>
-						<div className={classList({'Tab Tab--right': true, 'Tab--active': this.isChannel})}
-							onclick={(() => this.isChannel = true).bind(this)}
-						>
-							{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.channel')}
-						</div>
-					</div> : null}
-					{this.isChannel ? this.componentFormChannel() : this.componentFormChat()}
-					<div className="ButtonsPadding"></div>
-					<Button 
-						className='Button Button--primary Button--block'
-						disabled={this.isChannel ? !this.isCanCreateChannel() : !this.isCanCreateChat()}
-						onclick={this.onsubmit.bind(this)}
-					>
-						{app.translator.trans('pushedx-chat.forum.chat.list.add_modal.create.chat')}
-					</Button>
-				</div>
-			</div>
-		);
-	}
+    content() {
+        return (
+            <div className="Modal-body Modal-body--neonchat">
+                <div class="Form-group InputTitle">
+                    {ChatState.getPermissions().create.channel ? (
+                        <div className="ChatType">
+                            <div
+                                className={classList({ 'Tab Tab--left': true, 'Tab--active': !this.isChannel })}
+                                onclick={(() => (this.isChannel = false)).bind(this)}
+                            >
+                                {app.translator.trans('pushedx-chat.forum.chat.list.add_modal.chat')}
+                            </div>
+                            <div
+                                className={classList({ 'Tab Tab--right': true, 'Tab--active': this.isChannel })}
+                                onclick={(() => (this.isChannel = true)).bind(this)}
+                            >
+                                {app.translator.trans('pushedx-chat.forum.chat.list.add_modal.channel')}
+                            </div>
+                        </div>
+                    ) : null}
+                    {this.isChannel ? this.componentFormChannel() : this.componentFormChat()}
+                    <div className="ButtonsPadding"></div>
+                    <Button
+                        className="Button Button--primary Button--block"
+                        disabled={this.isChannel ? !this.isCanCreateChannel() : !this.isCanCreateChat()}
+                        onclick={this.onsubmit.bind(this)}
+                    >
+                        {app.translator.trans('pushedx-chat.forum.chat.list.add_modal.create.chat')}
+                    </Button>
+                </div>
+            </div>
+        );
+    }
 }

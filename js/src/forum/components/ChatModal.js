@@ -5,176 +5,142 @@ import classList from 'flarum/utils/classList';
 
 import ChatState from '../states/ChatState';
 
-export default class ChatModal extends Modal
-{
-	oninit(vnode)
-	{
-		super.oninit(vnode);
+export default class ChatModal extends Modal {
+    oninit(vnode) {
+        super.oninit(vnode);
 
-		this.model = this.attrs.model;
+        this.model = this.attrs.model;
 
-		app.search.neonchat = {usersSelected: []};
-		this.usersSelected = app.search.neonchat.usersSelected;
+        app.search.neonchat = { usersSelected: [] };
+        this.usersSelected = app.search.neonchat.usersSelected;
 
-		this.input = {
-			title: Stream(''), 
-			color: Stream(''),
-			icon: Stream(''),
-		};
-	}
+        this.input = {
+            title: Stream(''),
+            color: Stream(''),
+            icon: Stream(''),
+        };
+    }
 
-	onremove(vnode)
-	{
-		app.search.neonchat = null;
-	}
+    onremove(vnode) {
+        app.search.neonchat = null;
+    }
 
-	getInput()
-	{
-		return this.input;
-	}
+    getInput() {
+        return this.input;
+    }
 
-	setSelectedUsers(users)
-	{
-		app.search.neonchat.usersSelected = users;
-		this.usersSelected = app.search.neonchat.usersSelected;
-	}
+    setSelectedUsers(users) {
+        app.search.neonchat.usersSelected = users;
+        this.usersSelected = app.search.neonchat.usersSelected;
+    }
 
-	getSelectedUsers()
-	{
-		return this.usersSelected;
-	}
+    getSelectedUsers() {
+        return this.usersSelected;
+    }
 
-	className() 
-	{
-		return 'Modal--small';
-	}
+    className() {
+        return 'Modal--small';
+    }
 
-	isChatExists()
-	{
-		return this.getSelectedUsers().length == 1 && ChatState.isExistsPMChat(app.session.user, this.getSelectedUsers()[0]);
-	}
+    isChatExists() {
+        return this.getSelectedUsers().length == 1 && ChatState.isExistsPMChat(app.session.user, this.getSelectedUsers()[0]);
+    }
 
-	alertText()
-	{
-		if(this.isChatExists()) return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.alerts.exists');
+    alertText() {
+        if (this.isChatExists()) return app.translator.trans('pushedx-chat.forum.chat.list.add_modal.alerts.exists');
 
-		return null;
-	}
+        return null;
+    }
 
-	componentAlert()
-	{
-		return !this.alertText() ? null : (
-			<div className="Alert">
-				{this.alertText()}
-			</div>
-		);
-	}
+    componentAlert() {
+        return !this.alertText() ? null : <div className="Alert">{this.alertText()}</div>;
+    }
 
-	componentFormUsersSelect(label = 'pushedx-chat.forum.chat.list.add_modal.form.users')
-	{
-		return [
-			<label>{app.translator.trans(label)}</label>,
-			this.componentUsersSelect()
-		];
-	}
+    componentFormUsersSelect(label = 'pushedx-chat.forum.chat.list.add_modal.form.users') {
+        return [<label>{app.translator.trans(label)}</label>, this.componentUsersSelect()];
+    }
 
-	userMentionContent(user)
-	{
-		return '@' + user.displayName();
-	}
+    userMentionContent(user) {
+        return '@' + user.displayName();
+    }
 
-	userMentionClassname(user)
-	{
-		return 'deletable';
-	}
+    userMentionClassname(user) {
+        return 'deletable';
+    }
 
-	userMentionOnClick(event, user)
-	{
-		return this.getSelectedUsers().splice(this.getSelectedUsers().indexOf(user), 1)
-	}
+    userMentionOnClick(event, user) {
+        return this.getSelectedUsers().splice(this.getSelectedUsers().indexOf(user), 1);
+    }
 
-	componentUsersMentions()
-	{
-		return (
-			<div className="UsersTags">
-				{this.getSelectedUsers().map(u => 
-					<div 
-						className={classList(['UserMention', this.userMentionClassname(u)])}
-						onclick={this.userMentionOnClick.bind(this, u)}
-					>
-						{this.userMentionContent(u)}
-					</div>
-				)}
-			</div>
-		);
-	}
+    componentUsersMentions() {
+        return (
+            <div className="UsersTags">
+                {this.getSelectedUsers().map((u) => (
+                    <div className={classList(['UserMention', this.userMentionClassname(u)])} onclick={this.userMentionOnClick.bind(this, u)}>
+                        {this.userMentionContent(u)}
+                    </div>
+                ))}
+            </div>
+        );
+    }
 
-	componentUsersSelect()
-	{
-		return [
-			this.componentAlert(),
-			this.componentUsersMentions(),
-			<div className="UsersSearch">
-				<ChatSearchUser state={app.search} />
-			</div>
-		]
-	}
+    componentUsersSelect() {
+        return [
+            this.componentAlert(),
+            this.componentUsersMentions(),
+            <div className="UsersSearch">
+                <ChatSearchUser state={app.search} />
+            </div>,
+        ];
+    }
 
-	componentFormIcon(options)
-	{
-		return [
-			options.title ? <label>{options.title}</label> : null,
-			<div>
-				{options.desc ? <label>{options.desc}</label> : null}
-				<div className='Icon-Input'>
-					<input 
-						class="FormControl" 
-						type="text" 
-						bidi={options.stream} 
-						placeholder={options.placeholder}
-						onupdate={vnode => $('.Chat-FullColor').css({color: this.input.color(), backgroundColor: this.input.color()})}
-					/>
-					<icon className='Chat-FullColor'>
-						<i className={this.input.icon()?.length ? this.input.icon() : 'fas fa-bolt'} />
-					</icon>
-				</div>
-			</div>
-		];
-	}
+    componentFormIcon(options) {
+        return [
+            options.title ? <label>{options.title}</label> : null,
+            <div>
+                {options.desc ? <label>{options.desc}</label> : null}
+                <div className="Icon-Input">
+                    <input
+                        class="FormControl"
+                        type="text"
+                        bidi={options.stream}
+                        placeholder={options.placeholder}
+                        onupdate={(vnode) => $('.Chat-FullColor').css({ color: this.input.color(), backgroundColor: this.input.color() })}
+                    />
+                    <icon className="Chat-FullColor">
+                        <i className={this.input.icon()?.length ? this.input.icon() : 'fas fa-bolt'} />
+                    </icon>
+                </div>
+            </div>,
+        ];
+    }
 
-	componentFormColor(options)
-	{
-		return [
-			options.title ? <label>{options.title}</label> : null,
-			<div>
-				{options.desc ? <label>{options.desc}</label> : null}
-				<div className='Color-Input'>
-					<input 
-						class="FormControl" 
-						type="text" 
-						bidi={options.stream} 
-						placeholder={options.placeholder}
-						onupdate={vnode => $('.Chat-FullColor').css({color: this.input.color(), backgroundColor: this.input.color()})}
-					/>
-					<color className='Chat-FullColor'/>
-				</div>
-			</div>
-		];
-	}
+    componentFormColor(options) {
+        return [
+            options.title ? <label>{options.title}</label> : null,
+            <div>
+                {options.desc ? <label>{options.desc}</label> : null}
+                <div className="Color-Input">
+                    <input
+                        class="FormControl"
+                        type="text"
+                        bidi={options.stream}
+                        placeholder={options.placeholder}
+                        onupdate={(vnode) => $('.Chat-FullColor').css({ color: this.input.color(), backgroundColor: this.input.color() })}
+                    />
+                    <color className="Chat-FullColor" />
+                </div>
+            </div>,
+        ];
+    }
 
-	componentFormInput(options)
-	{
-		return [
-			options.title ? <label>{options.title}</label> : null,
-			<div>
-				{options.desc ? <label>{options.desc}</label> : null}
-				<input 
-					class="FormControl" 
-					type="text" 
-					bidi={options.stream} 
-					placeholder={options.placeholder} 
-				/>
-			</div>
-		];
-	}
+    componentFormInput(options) {
+        return [
+            options.title ? <label>{options.title}</label> : null,
+            <div>
+                {options.desc ? <label>{options.desc}</label> : null}
+                <input class="FormControl" type="text" bidi={options.stream} placeholder={options.placeholder} />
+            </div>,
+        ];
+    }
 }

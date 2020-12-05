@@ -78,5 +78,21 @@ app.initializers.add('xelson-chat', (app) => {
                 permission: 'xelson-chat.permissions.delete',
             },
             'reply'
+        )
+        .registerPermission(
+            {
+                icon: 'fas fa-eye',
+                label: app.translator.trans('xelson-chat.admin.permissions.moderate.vision'),
+                permission: 'xelson-chat.permissions.moderate.vision',
+            },
+            'moderate'
+        )
+        .registerPermission(
+            {
+                icon: 'far fa-trash-alt',
+                label: app.translator.trans('xelson-chat.admin.permissions.moderate.delete'),
+                permission: 'xelson-chat.permissions.moderate.delete',
+            },
+            'moderate'
         );
 });

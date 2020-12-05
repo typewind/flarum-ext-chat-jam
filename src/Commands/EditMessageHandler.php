@@ -78,7 +78,7 @@ class EditMessageHandler
         {
             $this->assertCan(
                 $actor,
-                'pushedx-chat.permissions.edit'
+                'xelson-chat.permissions.edit'
             );
             $this->assertPermission($actor->id == $message->user_id);
             $this->assertPermission($message->message != $actions['msg']);
@@ -94,7 +94,7 @@ class EditMessageHandler
         {
             $this->assertCan(
                 $actor,
-                'pushedx-chat.permissions.delete'
+                'xelson-chat.permissions.delete'
             );
 
             if($actions['hide'])

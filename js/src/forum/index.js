@@ -11,9 +11,9 @@ import ChatState from './states/ChatState';
 
 var moduleInited = false;
 
-app.initializers.add('pushedx-chat', (app) => {
+app.initializers.add('xelson-chat', (app) => {
     extend(HeaderPrimary.prototype, 'items', function (items) {
-        if (!app.forum.attribute('pushedx-chat.permissions.enabled')) return;
+        if (!app.forum.attribute('xelson-chat.permissions.enabled')) return;
 
         if (!moduleInited) {
             moduleInited = true;
@@ -51,6 +51,6 @@ app.initializers.add('pushedx-chat', (app) => {
             });
         }
 
-        items.add('pushedx-chat-frame', <ChatFrame />);
+        items.add('xelson-chat-frame', <ChatFrame />);
     });
 });

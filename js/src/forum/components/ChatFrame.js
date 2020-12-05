@@ -104,13 +104,13 @@ export default class ChatFrame extends Component {
                     <div id="chats-list" className={ChatState.getFrameState('beingShownChatsList') ? 'toggled' : ''}>
                         <div className="header">
                             <div className="input-wrapper input--down">
-                                <textarea id="chat-find" placeholder={app.translator.trans('pushedx-chat.forum.chat.list.placeholder')} />
+                                <textarea id="chat-find" placeholder={app.translator.trans('xelson-chat.forum.chat.list.placeholder')} />
                             </div>
                             <div
                                 className="icon icon-toggle"
                                 onclick={this.toggleChatsList.bind(this)}
                                 data-title={app.translator.trans(
-                                    'pushedx-chat.forum.chat.list.' + (ChatState.getFrameState('beingShownChatsList') ? 'unpin' : 'pin')
+                                    'xelson-chat.forum.chat.list.' + (ChatState.getFrameState('beingShownChatsList') ? 'unpin' : 'pin')
                                 )}
                             >
                                 <i className="fas fa-paperclip"></i>
@@ -137,12 +137,12 @@ export default class ChatFrame extends Component {
                                           ) : null,
                                           ChatState.getCurrentChat().title(),
                                       ]
-                                    : app.translator.trans('pushedx-chat.forum.toolbar.title')}
+                                    : app.translator.trans('xelson-chat.forum.toolbar.title')}
                             </h2>
                             {!ChatState.getCurrentChat() || !app.session.user ? null : (
                                 <div
                                     className="icon"
-                                    data-title={app.translator.trans('pushedx-chat.forum.toolbar.chat.settings')}
+                                    data-title={app.translator.trans('xelson-chat.forum.toolbar.chat.settings')}
                                     onclick={() => app.modal.show(ChatEditModal, { model: ChatState.getCurrentChat() })}
                                 >
                                     <i className="fas fa-cog"></i>
@@ -153,7 +153,7 @@ export default class ChatFrame extends Component {
                                     className="icon"
                                     onclick={this.toggleSound.bind(this)}
                                     data-title={app.translator.trans(
-                                        'pushedx-chat.forum.toolbar.' + (ChatState.getFrameState('isMuted') ? 'enable_sounds' : 'disable_sounds')
+                                        'xelson-chat.forum.toolbar.' + (ChatState.getFrameState('isMuted') ? 'enable_sounds' : 'disable_sounds')
                                     )}
                                 >
                                     <i className={ChatState.getFrameState('isMuted') ? 'fas fa-volume-mute' : 'fas fa-volume-up'}></i>
@@ -162,7 +162,7 @@ export default class ChatFrame extends Component {
                                     className="icon"
                                     onclick={this.toggleNotifications.bind(this)}
                                     data-title={app.translator.trans(
-                                        'pushedx-chat.forum.toolbar.' +
+                                        'xelson-chat.forum.toolbar.' +
                                             (ChatState.getFrameState('notify') ? 'disable_notifications' : 'enable_notifications')
                                     )}
                                 >
@@ -172,7 +172,7 @@ export default class ChatFrame extends Component {
                                     className="icon"
                                     onclick={this.toggleChat.bind(this)}
                                     data-title={app.translator.trans(
-                                        'pushedx-chat.forum.toolbar.' + (ChatState.getFrameState('beingShown') ? 'minimize' : 'maximize')
+                                        'xelson-chat.forum.toolbar.' + (ChatState.getFrameState('beingShown') ? 'minimize' : 'maximize')
                                     )}
                                 >
                                     <i className={ChatState.getFrameState('beingShown') ? 'fas fa-window-minimize' : 'fas fa-window-maximize'}></i>

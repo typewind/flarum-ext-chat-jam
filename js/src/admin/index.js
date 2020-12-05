@@ -2,63 +2,81 @@ import { extend } from 'flarum/extend';
 import app from 'flarum/app';
 import PermissionGrid from 'flarum/components/PermissionGrid';
 
-app.initializers.add('pushedx-chat', (app) => {
+app.initializers.add('xelson-chat', (app) => {
     app.extensionData
-        .for('pushedx-chat')
+        .for('xelson-chat')
         .registerSetting({
-            setting: 'pushedx-chat.settings.charlimit',
-            label: app.translator.trans('pushedx-chat.admin.settings.charlimit'),
-            type: 'number'
+            setting: 'xelson-chat.settings.charlimit',
+            label: app.translator.trans('xelson-chat.admin.settings.charlimit'),
+            type: 'number',
         })
         .registerSetting({
-            setting: 'pushedx-chat.settings.floodgate.number',
-            label: app.translator.trans('pushedx-chat.admin.settings.floodgate.number'),
-            type: 'number'
+            setting: 'xelson-chat.settings.floodgate.number',
+            label: app.translator.trans('xelson-chat.admin.settings.floodgate.number'),
+            type: 'number',
         })
         .registerSetting({
-            setting: 'pushedx-chat.settings.floodgate.time',
-            label: app.translator.trans('pushedx-chat.admin.settings.floodgate.time'),
-            type: 'text'
+            setting: 'xelson-chat.settings.floodgate.time',
+            label: app.translator.trans('xelson-chat.admin.settings.floodgate.time'),
+            type: 'text',
         })
         .registerSetting({
-            setting: 'pushedx-chat.settings.display.minimize',
-            label: 'pushedx-chat.admin.settings.display.minimize',
-            type: 'switch'
+            setting: 'xelson-chat.settings.display.minimize',
+            label: 'xelson-chat.admin.settings.display.minimize',
+            type: 'switch',
         })
         .registerSetting({
-            setting: 'pushedx-chat.settings.display.censor',
-            label: app.translator.trans('pushedx-chat.admin.settings.display.censor'),
-            type: 'switch'
+            setting: 'xelson-chat.settings.display.censor',
+            label: app.translator.trans('xelson-chat.admin.settings.display.censor'),
+            type: 'switch',
         })
-        .registerPermission({
-            icon: 'fas fa-eye',
-            label: app.translator.trans('pushedx-chat.admin.permissions.enabled'),
-            permission: 'pushedx-chat.permissions.enabled',
-            allowGuest: true,
-        }, 'view')
-        .registerPermission({
-            icon: 'fas fa-comment-medical',
-            label: app.translator.trans('pushedx-chat.admin.permissions.create'),
-            permission: 'pushedx-chat.permissions.create'
-        }, 'start')
-        .registerPermission({
-            icon: 'fas fa-comment-medical',
-            label: app.translator.trans('pushedx-chat.admin.permissions.create.channel'),
-            permission: 'pushedx-chat.permissions.create.channel',
-        }, 'start')
-        .registerPermission({
-            icon: 'fas fa-comments',
-            label: app.translator.trans('pushedx-chat.admin.permissions.post'),
-            permission: 'pushedx-chat.permissions.chat',
-        }, 'reply')
-        .registerPermission({
-            icon: 'fas fa-pencil-alt',
-            label: app.translator.trans('pushedx-chat.admin.permissions.edit'),
-            permission: 'pushedx-chat.permissions.edit',
-        }, 'reply')
-        .registerPermission({
-            icon: 'far fa-trash-alt',
-            label: app.translator.trans('pushedx-chat.admin.permissions.delete'),
-            permission: 'pushedx-chat.permissions.delete',
-        }, 'reply')
+        .registerPermission(
+            {
+                icon: 'fas fa-eye',
+                label: app.translator.trans('xelson-chat.admin.permissions.enabled'),
+                permission: 'xelson-chat.permissions.enabled',
+                allowGuest: true,
+            },
+            'view'
+        )
+        .registerPermission(
+            {
+                icon: 'fas fa-comment-medical',
+                label: app.translator.trans('xelson-chat.admin.permissions.create'),
+                permission: 'xelson-chat.permissions.create',
+            },
+            'start'
+        )
+        .registerPermission(
+            {
+                icon: 'fas fa-comment-medical',
+                label: app.translator.trans('xelson-chat.admin.permissions.create.channel'),
+                permission: 'xelson-chat.permissions.create.channel',
+            },
+            'start'
+        )
+        .registerPermission(
+            {
+                icon: 'fas fa-comments',
+                label: app.translator.trans('xelson-chat.admin.permissions.post'),
+                permission: 'xelson-chat.permissions.chat',
+            },
+            'reply'
+        )
+        .registerPermission(
+            {
+                icon: 'fas fa-pencil-alt',
+                label: app.translator.trans('xelson-chat.admin.permissions.edit'),
+                permission: 'xelson-chat.permissions.edit',
+            },
+            'reply'
+        )
+        .registerPermission(
+            {
+                icon: 'far fa-trash-alt',
+                label: app.translator.trans('xelson-chat.admin.permissions.delete'),
+                permission: 'xelson-chat.permissions.delete',
+            },
+            'reply'
+        );
 });

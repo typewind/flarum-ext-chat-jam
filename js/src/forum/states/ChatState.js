@@ -28,7 +28,7 @@ class ChatState {
 
         let neonchatState = JSON.parse(localStorage.getItem('neonchat')) ?? {};
         this.frameState = {
-            beingShown: neonchatState.beingShown ?? app.forum.attribute('pushedx-chat.settings.display.minimize'),
+            beingShown: neonchatState.beingShown ?? app.forum.attribute('xelson-chat.settings.display.minimize'),
             beingShownChatsList: neonchatState.beingShownChatsList ?? 0,
             isMuted: neonchatState.isMuted ?? false,
             notify: neonchatState.notify ?? false,
@@ -38,16 +38,16 @@ class ChatState {
         };
 
         this.permissions = {
-            post: app.forum.attribute('pushedx-chat.permissions.chat'),
-            edit: app.forum.attribute('pushedx-chat.permissions.edit'),
-            delete: app.forum.attribute('pushedx-chat.permissions.delete'),
+            post: app.forum.attribute('xelson-chat.permissions.chat'),
+            edit: app.forum.attribute('xelson-chat.permissions.edit'),
+            delete: app.forum.attribute('xelson-chat.permissions.delete'),
             create: {
-                channel: app.forum.attribute('pushedx-chat.permissions.create.channel'),
-                chat: app.forum.attribute('pushedx-chat.permissions.create'),
+                channel: app.forum.attribute('xelson-chat.permissions.create.channel'),
+                chat: app.forum.attribute('xelson-chat.permissions.create'),
             },
             moderate: {
-                delete: app.forum.attribute('pushedx-chat.permissions.moderate.delete'),
-                vision: app.forum.attribute('pushedx-chat.permissions.moderate.vision'),
+                delete: app.forum.attribute('xelson-chat.permissions.moderate.delete'),
+                vision: app.forum.attribute('xelson-chat.permissions.moderate.vision'),
             },
         };
 
@@ -129,14 +129,14 @@ class ChatState {
                         case 0: {
                             app.alerts.show(
                                 { type: 'error' },
-                                app.translator.trans('pushedx-chat.forum.chat.edit_modal.moderator.lost', { chatname: <b>{chat.title()}</b> })
+                                app.translator.trans('xelson-chat.forum.chat.edit_modal.moderator.lost', { chatname: <b>{chat.title()}</b> })
                             );
                             break;
                         }
                         case 1: {
                             app.alerts.show(
                                 { type: 'success' },
-                                app.translator.trans('pushedx-chat.forum.chat.edit_modal.moderator.got', { chatname: <b>{chat.title()}</b> })
+                                app.translator.trans('xelson-chat.forum.chat.edit_modal.moderator.got', { chatname: <b>{chat.title()}</b> })
                             );
                             break;
                         }

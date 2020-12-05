@@ -11,11 +11,11 @@ export default class ChatViewport extends Component {
         this.model = this.attrs.model;
         this.state = ChatState.getViewportState(this.model);
 
-        this.messageCharLimit = app.forum.attribute('pushedx-chat.settings.charlimit') ?? 512;
-        if (!app.session.user) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.unauthenticated');
-        else if (!ChatState.getPermissions().post) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.chatdenied');
-        else if (this.model.removed_at()) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.removed');
-        else this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.chat.placeholder');
+        this.messageCharLimit = app.forum.attribute('xelson-chat.settings.charlimit') ?? 512;
+        if (!app.session.user) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.unauthenticated');
+        else if (!ChatState.getPermissions().post) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.chatdenied');
+        else if (this.model.removed_at()) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.removed');
+        else this.inputPlaceholder = app.translator.trans('xelson-chat.forum.chat.placeholder');
 
         ChatState.evented.on('onChatChanged', this.onChatChanged.bind(this));
         ChatState.evented.on('onClickMessage', this.onChatMessageClicked.bind(this));
@@ -27,10 +27,10 @@ export default class ChatViewport extends Component {
         this.model = this.attrs.model;
         this.state = ChatState.getViewportState(this.model);
 
-        if (!app.session.user) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.unauthenticated');
-        else if (!ChatState.getPermissions().post) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.chatdenied');
-        else if (this.model.removed_at()) this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.errors.removed');
-        else this.inputPlaceholder = app.translator.trans('pushedx-chat.forum.chat.placeholder');
+        if (!app.session.user) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.unauthenticated');
+        else if (!ChatState.getPermissions().post) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.chatdenied');
+        else if (this.model.removed_at()) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.removed');
+        else this.inputPlaceholder = app.translator.trans('xelson-chat.forum.chat.placeholder');
     }
 
     onupdate(vnode) {

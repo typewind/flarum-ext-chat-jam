@@ -44,8 +44,8 @@ class MessageFloodgate
 	 */
 	public function isFlooding(User $actor, Chat $chat): bool
 	{
-		$number = $this->settings->get('pushedx-chat.settings.floodgate.number');
-		$time = $this->settings->get('pushedx-chat.settings.floodgate.time');
+		$number = $this->settings->get('xelson-chat.settings.floodgate.number');
+		$time = $this->settings->get('xelson-chat.settings.floodgate.time');
 		if($number <= 0) return false;
 		
 		$lastMessages = Message::where('created_at', '>=', new DateTime('-' . $time))

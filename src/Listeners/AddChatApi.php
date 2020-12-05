@@ -42,18 +42,18 @@ class AddChatApi
         if($event->isSerializer(ForumSerializer::class)) 
         {
             $permissions = [
-                'pushedx-chat.permissions.chat', 
-                'pushedx-chat.permissions.create',
-                'pushedx-chat.permissions.create.channel',
-                'pushedx-chat.permissions.enabled',
-                'pushedx-chat.permissions.edit',
-                'pushedx-chat.permissions.delete'
+                'xelson-chat.permissions.chat', 
+                'xelson-chat.permissions.create',
+                'xelson-chat.permissions.create.channel',
+                'xelson-chat.permissions.enabled',
+                'xelson-chat.permissions.edit',
+                'xelson-chat.permissions.delete'
             ];
 
             $attributes = [
-                'pushedx-chat.settings.charlimit',
-                'pushedx-chat.settings.display.minimize',
-                'pushedx-chat.settings.display.censor'
+                'xelson-chat.settings.charlimit',
+                'xelson-chat.settings.display.minimize',
+                'xelson-chat.settings.display.censor'
             ];
 
             foreach($permissions as $permission)

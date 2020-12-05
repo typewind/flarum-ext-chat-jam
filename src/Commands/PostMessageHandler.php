@@ -63,7 +63,7 @@ class PostMessageHandler
 
         $this->assertCan(
             $actor,
-            'pushedx-chat.permissions.chat'
+            'xelson-chat.permissions.chat'
         );
 
         if(!$command->bypassFloodgate)

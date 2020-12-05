@@ -1,4 +1,4 @@
-pushedx-chat:
+xelson-chat:
   forum:
     toolbar:
       title: Чат
@@ -60,8 +60,8 @@ pushedx-chat:
             title.validator: Хотя бы один символ
             icon: => core.ref.icon
             icon.validator: => core.ref.icon_text
-            color: => pushedx-chat.forum.chat.edit_modal.form.color
-            color.validator: => pushedx-chat.forum.chat.edit_modal.form.color.validator
+            color: => xelson-chat.forum.chat.edit_modal.form.color
+            color.validator: => xelson-chat.forum.chat.edit_modal.form.color.validator
             users: Выбранные пользователи
           search:
             placeholder: Поиск пользователей

@@ -55,7 +55,7 @@ class CreateChatHandler
 
         $this->assertCan(
             $actor,
-            $isChannel ? 'pushedx-chat.permissions.create.channel' : 'pushedx-chat.permissions.create'
+            $isChannel ? 'xelson-chat.permissions.create.channel' : 'xelson-chat.permissions.create'
         );
 
         $invited = [];

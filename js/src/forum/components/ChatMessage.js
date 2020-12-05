@@ -83,7 +83,7 @@ export default class ChatMessage extends Component {
                     </div>
                     <div className="message">
                         {this.model.is_censored() ? (
-                            <div className="censored" title={app.translator.trans('pushedx-chat.forum.chat.message.censored')}>
+                            <div className="censored" title={app.translator.trans('xelson-chat.forum.chat.message.censored')}>
                                 {this.model.content}
                             </div>
                         ) : (
@@ -132,7 +132,7 @@ export default class ChatMessage extends Component {
                 <div class="icon">
                     <i class="fas fa-trash-alt"></i>{' '}
                     <span>
-                        {`(${app.translator.trans('pushedx-chat.forum.chat.message.deleted' + (this.model.isDeletedForever ? '_forever' : ''))}`}{' '}
+                        {`(${app.translator.trans('xelson-chat.forum.chat.message.deleted' + (this.model.isDeletedForever ? '_forever' : ''))}`}{' '}
                         {username(this.model.deleted_by())})
                     </span>
                 </div>
@@ -224,10 +224,10 @@ export default class ChatMessage extends Component {
                     icon="fas fa-ellipsis-h"
                 >
                     <Button onclick={this.modelEvent.bind(this, 'dropdownDelete')} icon="fas fa-trash-alt">
-                        {app.translator.trans('pushedx-chat.forum.chat.message.actions.hide')}
+                        {app.translator.trans('xelson-chat.forum.chat.message.actions.hide')}
                     </Button>
                     <Button onclick={this.modelEvent.bind(this, 'dropdownResend')} icon="fas fa-reply">
-                        {app.translator.trans('pushedx-chat.forum.chat.message.actions.resend')}
+                        {app.translator.trans('xelson-chat.forum.chat.message.actions.resend')}
                     </Button>
                 </Dropdown>
             </div>

@@ -55,7 +55,7 @@ class MessageSerializer extends AbstractSerializer
         $attributes = $message->getAttributes();
         $attributes['created_at'] = $this->formatDate($message->created_at);
         if($attributes['edited_at']) $attributes['edited_at'] = $this->formatDate($message->edited_at);
-        if($this->settings->get('pushedx-chat.settings.display.censor') && !$this->actor->id)
+        if($this->settings->get('xelson-chat.settings.display.censor') && !$this->actor->id)
         {
             $attributes['message'] = str_repeat("*", strlen($attributes['message']));
             $attributes['is_censored'] = true;

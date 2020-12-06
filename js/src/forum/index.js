@@ -8,6 +8,11 @@ import User from 'flarum/models/User';
 import Model from 'flarum/Model';
 import ChatState from './states/ChatState';
 
+const chat = document.createElement('div');
+chat.setAttribute('id', 'chat');
+
+document.body.append(chat);
+
 app.initializers.add('xelson-chat', (app) => {
     app.store.models.chats = Chat;
     app.store.models.chatmessages = Message;
@@ -43,6 +48,6 @@ app.initializers.add('xelson-chat', (app) => {
 
         app.chat = new ChatState();
 
-        m.mount(document.getElementById('modal'), ChatFrame);
+        m.mount(document.getElementById('chat'), ChatFrame);
     });
 });

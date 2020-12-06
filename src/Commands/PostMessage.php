@@ -29,21 +29,14 @@ class PostMessage
     public $ip_address;
 
     /**
-     * @var int
-     */
-    public $bypassFloodgate;
-
-    /**
      * @param User $actor
      * @param mixed $data
      * @param string $ip_address
-     * @param int $bypassFloodgate
      */
-    public function __construct(User $actor, $data, string $ip_address, $bypassFloodgate)
+    public function __construct(User $actor, $data, string $ip_address)
     {
         $this->actor = $actor;
         $this->data = $data;
         $this->ip_address = $ip_address;
-        $this->bypassFloodgate = $bypassFloodgate;
     }
 }

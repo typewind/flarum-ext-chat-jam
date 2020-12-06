@@ -12,7 +12,6 @@ use Carbon\Carbon;
 use Xelson\Chat\ChatRepository;
 use Xelson\Chat\Message;
 use Xelson\Chat\MessageValidator;
-use Xelson\Chat\MessageFloodgate;
 use Flarum\User\AssertPermissionTrait;
 
 class PostEventMessageHandler

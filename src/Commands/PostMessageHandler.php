@@ -12,7 +12,6 @@ use Carbon\Carbon;
 use Xelson\Chat\ChatRepository;
 use Xelson\Chat\Message;
 use Xelson\Chat\MessageValidator;
-use Xelson\Chat\MessageFloodgate;
 use Flarum\User\AssertPermissionTrait;
 
 class PostMessageHandler
@@ -25,22 +24,14 @@ class PostMessageHandler
     protected $validator;
 
     /**
-     * @var MessageFloodgate
-     */
-    protected $floodgate;
-
-    /**
      * @param MessageValidator      $validator
-     * @param MessageFloodgate      $floodgate
      * @param ChatRepository        $chats
      */
     public function __construct(
         MessageValidator $validator,
-        MessageFloodgate $floodgate,
         ChatRepository $chats
     ) {
         $this->validator = $validator;
-        $this->floodgate = $floodgate;
         $this->chats = $chats;
     }
 
@@ -65,9 +56,6 @@ class PostMessageHandler
             $actor,
             'xelson-chat.permissions.chat'
         );
-
-        if(!$command->bypassFloodgate)
-            $this->floodgate->assertNotFlooding($actor, $chat);
 
         $chatUser = $chat->getChatUser($actor);
 

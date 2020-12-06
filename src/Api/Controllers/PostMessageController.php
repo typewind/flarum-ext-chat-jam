@@ -65,7 +65,7 @@ class PostMessageController extends AbstractShowController
         $this->getEventDispatcher()->listen(EventWillSerializeData::class, [$this, 'onWillSerializeData']);
         
         return $this->bus->dispatch(
-            new PostMessage($actor, $data, $ip_address, $request->getAttribute('bypassFloodgate'))
+            new PostMessage($actor, $data, $ip_address)
         );
     }
 

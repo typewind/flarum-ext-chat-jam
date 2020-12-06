@@ -101,23 +101,23 @@ export default class ChatViewport extends Component {
     }
 
     getChat() {
-        return document.querySelector('.neonchat');
+        return document.querySelector('.NeonChatFrame');
     }
 
     getChatHeader() {
-        return document.querySelector('.neonchat #chat-header');
+        return document.querySelector('.NeonChatFrame #chat-header');
     }
 
     getChatInput() {
-        return document.querySelector('.neonchat #chat-input');
+        return document.querySelector('.NeonChatFrame #chat-input');
     }
 
     getChatsList() {
-        return document.querySelector('.neonchat #chats-list');
+        return document.querySelector('.NeonChatFrame #chats-list');
     }
 
     getChatWrapper() {
-        return document.querySelector('.neonchat .wrapper');
+        return document.querySelector('.NeonChatFrame .wrapper');
     }
 
     reachedLimit() {

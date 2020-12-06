@@ -23,31 +23,31 @@ export default class ChatFrame extends Component {
     }
 
     getChat() {
-        return document.querySelector('.neonchat');
+        return document.querySelector('.NeonChatFrame');
     }
 
     getChatFrame() {
-        return document.querySelector('.neonchat #chat');
+        return document.querySelector('.NeonChatFrame #chat');
     }
 
     getChatHeader() {
-        return document.querySelector('.neonchat #chat-header');
+        return document.querySelector('.NeonChatFrame #chat-header');
     }
 
     getChatWrapper() {
-        return document.querySelector('.neonchat .wrapper');
+        return document.querySelector('.NeonChatFrame .wrapper');
     }
 
     getChatViewport() {
-        return document.querySelector('.neonchat #chat-viewport');
+        return document.querySelector('.NeonChatFrame #chat-viewport');
     }
 
     getChatsListPanel() {
-        return document.querySelector('.neonchat #chats-list');
+        return document.querySelector('.NeonChatFrame #chats-list');
     }
 
     getChatsList() {
-        return document.querySelector('.neonchat #chats-list .list');
+        return document.querySelector('.NeonChatFrame #chats-list .list');
     }
 
     toggleChat(e) {
@@ -189,6 +189,8 @@ export default class ChatFrame extends Component {
     }
 
     chatHeaderOnMouseDown(e) {
+        if (e.button !== 0) return;
+
         var path = e.path || (e.composedPath && e.composedPath());
         if (path) {
             for (let i = 0, el; i < path.length; i++) {

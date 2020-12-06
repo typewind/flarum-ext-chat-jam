@@ -325,7 +325,7 @@ export default class ChatState {
     }
 
     renderChatMessage(model, content) {
-        let element = model instanceof Model ? document.querySelector(`.neonchat .message-wrapper[data-id="${model.id()}"] .message`) : model;
+        let element = model instanceof Model ? document.querySelector(`.NeonChatFrame .message-wrapper[data-id="${model.id()}"] .message`) : model;
 
         if (element) {
             element.innerText = content;
@@ -333,7 +333,7 @@ export default class ChatState {
 
             if (this.executeScriptsTimeout) clearTimeout(this.executeScriptsTimeout);
             this.executeScriptsTimeout = setTimeout(() => {
-                $('.neonchat script').each(function () {
+                $('.NeonChatFrame script').each(function () {
                     if (!self.executedScripts) self.executedScripts = {};
                     let scriptURL = $(this).attr('src');
                     if (!self.executedScripts[scriptURL]) {

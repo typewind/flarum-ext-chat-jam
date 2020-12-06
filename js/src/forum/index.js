@@ -1,5 +1,5 @@
 import { extend } from 'flarum/extend';
-import HeaderPrimary from 'flarum/components/HeaderPrimary';
+import Application from 'flarum/Application';
 import ChatFrame from './components/ChatFrame';
 
 import Chat from './models/Chat';
@@ -38,11 +38,11 @@ app.initializers.add('xelson-chat', (app) => {
         },
     });
 
-    extend(HeaderPrimary.prototype, 'items', function (items) {
-        if (app.forum.attribute('xelson-chat.permissions.enabled')) {
-            if (!app.chat) app.chat = new ChatState();
+    extend(Application.prototype, 'mount', function () {
+        if (!app.forum.attribute('xelson-chat.permissions.enabled')) return;
 
-            items.add('xelson-chat-frame', <ChatFrame />);
-        }
+        app.chat = new ChatState();
+
+        m.mount(document.getElementById('modal'), ChatFrame);
     });
 });

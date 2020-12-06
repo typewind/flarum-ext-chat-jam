@@ -49,10 +49,7 @@ class CreateChatHandler
 
         $isChannel = $attributes['isChannel'];
 
-        $actor->assertCan(
-            $actor,
-            $isChannel ? 'xelson-chat.permissions.create.channel' : 'xelson-chat.permissions.create'
-        );
+        $actor->assertCan($isChannel ? 'xelson-chat.permissions.create.channel' : 'xelson-chat.permissions.create');
 
         $invited = [];
 

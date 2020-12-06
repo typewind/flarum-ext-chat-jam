@@ -58,20 +58,22 @@ export default class UsersSearchResults {
 
         return [
             <li className="Dropdown-header">{app.translator.trans('core.forum.search.users_heading')}</li>,
-            resultsFind.map((user) => {
-                const name = username(user);
-                const id = user.id();
-                const children = [highlight(name.text, query)];
+            resultsFind
+                .filter((user) => !this.isUserSelected(user))
+                .map((user) => {
+                    const name = username(user);
+                    const id = user.id();
+                    const children = [highlight(name.text, query)];
 
-                return (
-                    <li className="UserSearchResult UserSearchResult" data-index={'users' + id} onclick={this.userClick.bind(this, user)}>
-                        <span class={this.isUserSelected(user) ? 'selected' : null}>
-                            {avatar(user)}
-                            {{ ...name, text: undefined, children }}
-                        </span>
-                    </li>
-                );
-            }),
+                    return (
+                        <li className="UserSearchResult UserSearchResult" data-index={'users' + id} onclick={this.userClick.bind(this, user)}>
+                            <span>
+                                {avatar(user)}
+                                {{ ...name, text: undefined, children }}
+                            </span>
+                        </li>
+                    );
+                }),
             resultsSelected.length ? (
                 <li className="Dropdown-header">{app.translator.trans('xelson-chat.forum.chat.list.add_modal.search.invited')}</li>
             ) : null,

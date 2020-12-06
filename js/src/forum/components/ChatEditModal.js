@@ -289,7 +289,7 @@ export default class ChatEditModal extends ChatModal {
 
     content() {
         return (
-            <div className="Modal-body Modal-body--neonchat">
+            <div className="Modal-body">
                 <div class="Form-group InputTitle">
                     {this.componentForm()}
                     <div className="ButtonsPadding"></div>

@@ -99,7 +99,7 @@ export default class ChatCreateModal extends ChatModal {
 
     content() {
         return (
-            <div className="Modal-body Modal-body--neonchat">
+            <div className="Modal-body">
                 <div class="Form-group InputTitle">
                     {app.chat.getPermissions().create.channel ? (
                         <div className="ChatType">

@@ -37,7 +37,7 @@ export default class ChatModal extends Modal {
     }
 
     className() {
-        return 'Modal--small';
+        return 'ChatModal Modal--small';
     }
 
     isChatExists() {

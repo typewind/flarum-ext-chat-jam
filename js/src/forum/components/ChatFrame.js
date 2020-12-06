@@ -95,7 +95,7 @@ export default class ChatFrame extends Component {
     view(vnode) {
         return (
             <div
-                className={'neonchat ' + (app.chat.getFrameState('beingShown') ? '' : 'hidden')}
+                className={'NeonChatFrame ' + (app.chat.getFrameState('beingShown') ? '' : 'hidden')}
                 style={{ right: app.chat.getFrameState('transform').x + 'px' }}
             >
                 <div tabindex="0" className="frame" id="chat">

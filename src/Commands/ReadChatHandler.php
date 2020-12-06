@@ -9,25 +9,21 @@
 namespace Xelson\Chat\Commands;
 
 use Carbon\Carbon;
-use Illuminate\Support\Arr;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
 use Xelson\Chat\ChatRepository;
-use Xelson\Chat\Exceptions\ChatEditException;
-use Flarum\User\AssertPermissionTrait;
 
 class ReadChatHandler
 {
-    use AssertPermissionTrait;
 
-	/**
-	 * @param BusDispatcher $bus
-	 */
-	public function __construct(BusDispatcher $bus, ChatRepository $chats) 
-	{
+    /**
+     * @param BusDispatcher $bus
+     */
+    public function __construct(BusDispatcher $bus, ChatRepository $chats)
+    {
         $this->bus = $bus;
         $this->chats = $chats;
-	}
-	
+    }
+
     /**
      * Handles the command execution.
      *
@@ -36,22 +32,20 @@ class ReadChatHandler
      */
     public function handle(ReadChat $command)
     {
-		$chat_id = $command->chat_id;
-		$actor = $command->actor;
+        $chat_id = $command->chat_id;
+        $actor = $command->actor;
         $readed_at = $command->readed_at;
 
         $chat = $this->chats->findOrFail($chat_id, $actor);
 
         $chatUser = $chat->getChatUser($actor);
 
-        $this->assertPermission(
-            $chatUser
-        );
+        $actor->assertPermission($chatUser);
 
         $time = new Carbon($readed_at);
-        if($chatUser->removed_at && $time > $chatUser->removed_at) $time = $chatUser->removed_at;
+        if ($chatUser->removed_at && $time > $chatUser->removed_at) $time = $chatUser->removed_at;
         $chat->users()->updateExistingPivot($actor->id, ['readed_at' => $time]);
-        
+
         return $chat;
     }
 }

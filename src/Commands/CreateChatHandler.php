@@ -9,8 +9,6 @@
 namespace Xelson\Chat\Commands;
 
 use Carbon\Carbon;
-use Flarum\User\AssertPermissionTrait;
-use Flarum\User\User;
 use Illuminate\Support\Arr;
 use Xelson\Chat\Chat;
 use Xelson\Chat\ChatUser;
@@ -23,8 +21,6 @@ use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
 
 class CreateChatHandler
 {
-	use AssertPermissionTrait;
-
 	/**
      * @param ChatValidator $validator
      * @param ChatRepository $chats
@@ -53,7 +49,7 @@ class CreateChatHandler
 
         $isChannel = $attributes['isChannel'];
 
-        $this->assertCan(
+        $actor->assertCan(
             $actor,
             $isChannel ? 'xelson-chat.permissions.create.channel' : 'xelson-chat.permissions.create'
         );

@@ -8,15 +8,11 @@
 
 namespace Xelson\Chat\Commands;
 
-use Xelson\Chat\Message;
 use Xelson\Chat\ChatRepository;
 use Xelson\Chat\MessageRepository;
-use Flarum\User\AssertPermissionTrait;
 
 class DeleteMessageHandler
 {
-    use AssertPermissionTrait;
-
     /**
      * @var MessageRepository
      */
@@ -26,7 +22,7 @@ class DeleteMessageHandler
      * @param MessageRepository $messages
      * @param ChatRepository $chats
      */
-    public function __construct(MessageRepository $messages, ChatRepository $chats) 
+    public function __construct(MessageRepository $messages, ChatRepository $chats)
     {
         $this->messages  = $messages;
         $this->chats = $chats;
@@ -45,17 +41,17 @@ class DeleteMessageHandler
 
         $message = $this->messages->findOrFail($messageId);
 
-        $this->assertPermission(
+        $actor->assertPermission(
             !$message->type
         );
 
         $chat = $this->chats->findOrFail($message->chat_id, $actor);
         $chatUser = $chat->getChatUser($actor);
 
-        $this->assertPermission(
+        $actor->assertPermission(
             $chatUser && $chatUser->role != 0
         );
-		
+
         $message->delete();
         $message->deleted_by = $actor->id;
         $message->deleted_forever = true;

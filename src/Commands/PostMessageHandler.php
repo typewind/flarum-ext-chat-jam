@@ -12,12 +12,9 @@ use Carbon\Carbon;
 use Xelson\Chat\ChatRepository;
 use Xelson\Chat\Message;
 use Xelson\Chat\MessageValidator;
-use Flarum\User\AssertPermissionTrait;
 
 class PostMessageHandler
 {
-    use AssertPermissionTrait;
-
     /**
      * @var MessageValidator
      */
@@ -52,16 +49,11 @@ class PostMessageHandler
 
         $chat = $this->chats->findOrFail($chat_id, $actor);
 
-        $this->assertCan(
-            $actor,
-            'xelson-chat.permissions.chat'
-        );
+        $actor->assertCan('xelson-chat.permissions.chat');
 
         $chatUser = $chat->getChatUser($actor);
 
-        $this->assertPermission(
-            $chatUser && !$chatUser->removed_at
-        );
+        $actor->assertPermission($chatUser && !$chatUser->removed_at);
 
         $message = Message::build(
             $content,

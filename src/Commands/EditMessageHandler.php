@@ -9,18 +9,13 @@
 namespace Xelson\Chat\Commands;
 
 use Carbon\Carbon;
-use Xelson\Chat\Message;
 use Xelson\Chat\ChatRepository;
 use Xelson\Chat\MessageRepository;
 use Xelson\Chat\MessageValidator;
-use Flarum\User\AssertPermissionTrait;
 use Illuminate\Support\Arr;
-use Tobscure\JsonApi\Resource;
 
 class EditMessageHandler
 {
-    use AssertPermissionTrait;
-
     /**
      * @var MessageRepository
      */
@@ -67,54 +62,40 @@ class EditMessageHandler
 
         $message = $this->messages->findOrFail($message_id);
 
-        $this->assertPermission(
+        $actor->assertPermission(
             !$message->type
         );
 
         $chat = $this->chats->findOrFail($message->chat_id, $actor);
         $chatUser = $chat->getChatUser($actor);
 
-        if(isset($actions['msg']))
-        {
-            $this->assertCan(
-                $actor,
-                'xelson-chat.permissions.edit'
-            );
-            $this->assertPermission($actor->id == $message->user_id);
-            $this->assertPermission($message->message != $actions['msg']);
+        if (isset($actions['msg'])) {
+            $actor->assertCan('xelson-chat.permissions.edit');
+            $actor->assertPermission($actor->id == $message->user_id);
+            $actor->assertPermission($message->message != $actions['msg']);
 
             $message->message = $actions['msg'];
             $message->edited_at = Carbon::now();
-    
-            $this->validator->assertValid($message->getDirty());
-    
-            $message->save();
-        }
-        else if(isset($actions['hide']))
-        {
-            $this->assertCan(
-                $actor,
-                'xelson-chat.permissions.delete'
-            );
 
-            if($actions['hide'])
-            {
-                if($message->user_id != $actor->id)
-                {
-                    $this->assertPermission(
+            $this->validator->assertValid($message->getDirty());
+
+            $message->save();
+        } else if (isset($actions['hide'])) {
+            $actor->assertCan('xelson-chat.permissions.delete');
+
+            if ($actions['hide']) {
+                if ($message->user_id != $actor->id) {
+                    $actor->assertPermission(
                         $chatUser && $chatUser->role != 0
                     );
-                }	
+                }
                 $message->deleted_by = $actor->id;
-            }
-            else
-            {
-                if($message->deleted_by != $actor->id)
-                {
-                    $this->assertPermission(
+            } else {
+                if ($message->deleted_by != $actor->id) {
+                    $actor->assertPermission(
                         $chatUser && $chatUser->role != 0
                     );
-                }	
+                }
                 $message->deleted_by = null;
             }
 

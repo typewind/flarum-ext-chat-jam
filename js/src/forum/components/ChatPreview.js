@@ -4,7 +4,6 @@ import classList from 'flarum/utils/classList';
 import extractText from 'flarum/utils/extractText';
 import SubtreeRetainer from 'flarum/utils/SubtreeRetainer';
 
-import ChatState from '../states/ChatState';
 import ChatAvatar from './ChatAvatar';
 
 export default class ChatPreview extends Component {
@@ -15,7 +14,7 @@ export default class ChatPreview extends Component {
 
         this.subtree = new SubtreeRetainer(
             () => this.model.freshness,
-            () => ChatState.getCurrentChat(),
+            () => app.chat.getCurrentChat(),
 
             // Reactive attrs
             () => this.model.isNeedToFlash
@@ -32,9 +31,7 @@ export default class ChatPreview extends Component {
     view(vnode) {
         return (
             <div style={{ position: 'relative' }}>
-                <div className={classList({ 'panel-preview': true, active: ChatState.getCurrentChat() == this.model })}>
-                    {this.componentPreview()}
-                </div>
+                <div className={classList({ 'panel-preview': true, active: app.chat.getCurrentChat() == this.model })}>{this.componentPreview()}</div>
                 {this.model.unreaded() ? <div className="unreaded">{this.model.unreaded()}</div> : null}
             </div>
         );
@@ -42,14 +39,14 @@ export default class ChatPreview extends Component {
 
     oncreate(vnode) {
         if (this.model.isNeedToFlash) {
-            ChatState.flashItem($(vnode.dom));
+            app.chat.flashItem($(vnode.dom));
             this.model.isNeedToFlash = false;
         }
     }
 
     onupdate(vnode) {
         if (this.model.isNeedToFlash) {
-            ChatState.flashItem($(vnode.dom));
+            app.chat.flashItem($(vnode.dom));
             this.model.isNeedToFlash = false;
         }
     }

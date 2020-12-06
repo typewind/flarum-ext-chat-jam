@@ -5,8 +5,6 @@ import ChatSearchUser from './ChatSearchUser';
 import ChatModal from './ChatModal';
 import Stream from 'flarum/utils/Stream';
 
-import ChatState from '../states/ChatState';
-
 export default class ChatCreateModal extends ChatModal {
     oninit(vnode) {
         super.oninit(vnode);
@@ -29,8 +27,8 @@ export default class ChatCreateModal extends ChatModal {
                 relationships: { users: this.getSelectedUsers() },
             })
             .then((model) => {
-                ChatState.addChat(model);
-                ChatState.onChatChanged(model);
+                app.chat.addChat(model);
+                app.chat.onChatChanged(model);
                 m.redraw();
             });
         this.hide();
@@ -103,7 +101,7 @@ export default class ChatCreateModal extends ChatModal {
         return (
             <div className="Modal-body Modal-body--neonchat">
                 <div class="Form-group InputTitle">
-                    {ChatState.getPermissions().create.channel ? (
+                    {app.chat.getPermissions().create.channel ? (
                         <div className="ChatType">
                             <div
                                 className={classList({ 'Tab Tab--left': true, 'Tab--active': !this.isChannel })}

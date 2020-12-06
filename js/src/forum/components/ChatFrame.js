@@ -4,13 +4,11 @@ import ChatWelcome from './ChatWelcome';
 import ChatCreateModal from './ChatCreateModal';
 import ChatEditModal from './ChatEditModal';
 
-import ChatState from '../states/ChatState';
-
 export default class ChatFrame extends Component {
     oninit(vnode) {
         super.oninit(vnode);
 
-        if ('Notification' in window && ChatState.getFrameState('notify')) Notification.requestPermission();
+        if ('Notification' in window && app.chat.getFrameState('notify')) Notification.requestPermission();
         setInterval(() => m.redraw(), 30000);
 
         document.addEventListener('mousedown', this.chatMoveListener.bind(this, 'mousedown'));
@@ -21,7 +19,7 @@ export default class ChatFrame extends Component {
             return;
         }
 
-        ChatState.apiFetchChats();
+        app.chat.apiFetchChats();
     }
 
     getChat() {
@@ -64,7 +62,7 @@ export default class ChatFrame extends Component {
 
         chat.className = classes;
 
-        ChatState.saveFrameState('beingShown', showing);
+        app.chat.saveFrameState('beingShown', showing);
     }
 
     toggleChatsList(e) {
@@ -76,19 +74,19 @@ export default class ChatFrame extends Component {
             showing = false;
         } else chatLists.classList.add('toggled');
 
-        ChatState.saveFrameState('beingShownChatsList', showing);
+        app.chat.saveFrameState('beingShownChatsList', showing);
     }
 
     toggleSound(e) {
-        ChatState.saveFrameState('isMuted', !ChatState.getFrameState('isMuted'));
+        app.chat.saveFrameState('isMuted', !app.chat.getFrameState('isMuted'));
 
         e.preventDefault();
         e.stopPropagation();
     }
 
     toggleNotifications(e) {
-        ChatState.saveFrameState('notify', !ChatState.getFrameState('notify'));
-        if ('Notification' in window && ChatState.getFrameState('notify')) Notification.requestPermission();
+        app.chat.saveFrameState('notify', !app.chat.getFrameState('notify'));
+        if ('Notification' in window && app.chat.getFrameState('notify')) Notification.requestPermission();
 
         e.preventDefault();
         e.stopPropagation();
@@ -97,11 +95,11 @@ export default class ChatFrame extends Component {
     view(vnode) {
         return (
             <div
-                className={'neonchat left container ' + (ChatState.getFrameState('beingShown') ? '' : 'hidden')}
-                style={{ right: ChatState.getFrameState('transform').x + 'px' }}
+                className={'neonchat left container ' + (app.chat.getFrameState('beingShown') ? '' : 'hidden')}
+                style={{ right: app.chat.getFrameState('transform').x + 'px' }}
             >
                 <div tabindex="0" className="frame" id="chat">
-                    <div id="chats-list" className={ChatState.getFrameState('beingShownChatsList') ? 'toggled' : ''}>
+                    <div id="chats-list" className={app.chat.getFrameState('beingShownChatsList') ? 'toggled' : ''}>
                         <div className="header">
                             <div className="input-wrapper input--down">
                                 <textarea id="chat-find" placeholder={app.translator.trans('xelson-chat.forum.chat.list.placeholder')} />
@@ -110,15 +108,15 @@ export default class ChatFrame extends Component {
                                 className="icon icon-toggle"
                                 onclick={this.toggleChatsList.bind(this)}
                                 data-title={app.translator.trans(
-                                    'xelson-chat.forum.chat.list.' + (ChatState.getFrameState('beingShownChatsList') ? 'unpin' : 'pin')
+                                    'xelson-chat.forum.chat.list.' + (app.chat.getFrameState('beingShownChatsList') ? 'unpin' : 'pin')
                                 )}
                             >
                                 <i className="fas fa-paperclip"></i>
                             </div>
                         </div>
-                        <div className="list" style={{ 'max-height': ChatState.getFrameState('transform').y + 'px' }}>
-                            {ChatState.componentsChats()}
-                            {app.session.user && ChatState.getPermissions().create.chat ? (
+                        <div className="list" style={{ 'max-height': app.chat.getFrameState('transform').y + 'px' }}>
+                            {app.chat.componentsChats()}
+                            {app.session.user && app.chat.getPermissions().create.chat ? (
                                 <div class="panel-add" onclick={() => app.modal.show(ChatCreateModal)}></div>
                             ) : null}
                         </div>
@@ -127,23 +125,23 @@ export default class ChatFrame extends Component {
                     <div id="chat-panel">
                         <div id="chat-header" ondragstart={() => false} onmousedown={this.chatHeaderOnMouseDown.bind(this)}>
                             <h2>
-                                {ChatState.getCurrentChat()
+                                {app.chat.getCurrentChat()
                                     ? [
-                                          ChatState.getCurrentChat().icon() ? (
+                                          app.chat.getCurrentChat().icon() ? (
                                               <i
-                                                  class={ChatState.getCurrentChat().icon()}
-                                                  style={{ color: ChatState.getCurrentChat().color(), 'margin-right': '3px' }}
+                                                  class={app.chat.getCurrentChat().icon()}
+                                                  style={{ color: app.chat.getCurrentChat().color(), 'margin-right': '3px' }}
                                               ></i>
                                           ) : null,
-                                          ChatState.getCurrentChat().title(),
+                                          app.chat.getCurrentChat().title(),
                                       ]
                                     : app.translator.trans('xelson-chat.forum.toolbar.title')}
                             </h2>
-                            {!ChatState.getCurrentChat() || !app.session.user ? null : (
+                            {!app.chat.getCurrentChat() || !app.session.user ? null : (
                                 <div
                                     className="icon"
                                     data-title={app.translator.trans('xelson-chat.forum.toolbar.chat.settings')}
-                                    onclick={() => app.modal.show(ChatEditModal, { model: ChatState.getCurrentChat() })}
+                                    onclick={() => app.modal.show(ChatEditModal, { model: app.chat.getCurrentChat() })}
                                 >
                                     <i className="fas fa-cog"></i>
                                 </div>
@@ -153,33 +151,33 @@ export default class ChatFrame extends Component {
                                     className="icon"
                                     onclick={this.toggleSound.bind(this)}
                                     data-title={app.translator.trans(
-                                        'xelson-chat.forum.toolbar.' + (ChatState.getFrameState('isMuted') ? 'enable_sounds' : 'disable_sounds')
+                                        'xelson-chat.forum.toolbar.' + (app.chat.getFrameState('isMuted') ? 'enable_sounds' : 'disable_sounds')
                                     )}
                                 >
-                                    <i className={ChatState.getFrameState('isMuted') ? 'fas fa-volume-mute' : 'fas fa-volume-up'}></i>
+                                    <i className={app.chat.getFrameState('isMuted') ? 'fas fa-volume-mute' : 'fas fa-volume-up'}></i>
                                 </div>
                                 <div
                                     className="icon"
                                     onclick={this.toggleNotifications.bind(this)}
                                     data-title={app.translator.trans(
                                         'xelson-chat.forum.toolbar.' +
-                                            (ChatState.getFrameState('notify') ? 'disable_notifications' : 'enable_notifications')
+                                            (app.chat.getFrameState('notify') ? 'disable_notifications' : 'enable_notifications')
                                     )}
                                 >
-                                    <i className={ChatState.getFrameState('notify') ? 'fas fa-bell' : 'fas fa-bell-slash'}></i>
+                                    <i className={app.chat.getFrameState('notify') ? 'fas fa-bell' : 'fas fa-bell-slash'}></i>
                                 </div>
                                 <div
                                     className="icon"
                                     onclick={this.toggleChat.bind(this)}
                                     data-title={app.translator.trans(
-                                        'xelson-chat.forum.toolbar.' + (ChatState.getFrameState('beingShown') ? 'minimize' : 'maximize')
+                                        'xelson-chat.forum.toolbar.' + (app.chat.getFrameState('beingShown') ? 'minimize' : 'maximize')
                                     )}
                                 >
-                                    <i className={ChatState.getFrameState('beingShown') ? 'fas fa-window-minimize' : 'fas fa-window-maximize'}></i>
+                                    <i className={app.chat.getFrameState('beingShown') ? 'fas fa-window-minimize' : 'fas fa-window-maximize'}></i>
                                 </div>
                             </div>
                         </div>
-                        <div id="chat-viewport">{ChatState.componentCurViewport() ?? <ChatWelcome />}</div>
+                        <div id="chat-viewport">{app.chat.componentCurViewport() ?? <ChatWelcome />}</div>
                     </div>
                 </div>
             </div>
@@ -230,7 +228,7 @@ export default class ChatFrame extends Component {
         document.removeEventListener('mousemove', this.mouseMoveEvent);
         document.body.classList.remove('moving');
 
-        ChatState.saveFrameState('transform', { x: parseInt(this.getChat().style.right), y: this.getChatWrapper().offsetHeight });
+        app.chat.saveFrameState('transform', { x: parseInt(this.getChat().style.right), y: this.getChatWrapper().offsetHeight });
     }
 
     chatMoveProcess(e) {

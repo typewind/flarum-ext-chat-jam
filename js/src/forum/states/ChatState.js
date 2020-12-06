@@ -17,8 +17,8 @@ var audio = new Audio();
 audio.src = resources.base64AudioNotification;
 audio.volume = 0.5;
 
-class ChatState {
-    init() {
+export default class ChatState {
+    constructor() {
         this.chats = [];
         this.chatmessages = [];
 
@@ -27,6 +27,7 @@ class ChatState {
         this.totalHiddenCount = 0;
 
         let neonchatState = JSON.parse(localStorage.getItem('neonchat')) ?? {};
+
         this.frameState = {
             beingShown: neonchatState.beingShown ?? app.forum.attribute('xelson-chat.settings.display.minimize'),
             beingShownChatsList: neonchatState.beingShownChatsList ?? 0,
@@ -495,5 +496,3 @@ class ChatState {
         $item.addClass('flash').one('animationend webkitAnimationEnd', () => $item.removeClass('flash'));
     }
 }
-
-export default new ChatState();

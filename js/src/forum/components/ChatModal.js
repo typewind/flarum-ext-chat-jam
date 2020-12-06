@@ -3,8 +3,6 @@ import ChatSearchUser from './ChatSearchUser';
 import Stream from 'flarum/utils/Stream';
 import classList from 'flarum/utils/classList';
 
-import ChatState from '../states/ChatState';
-
 export default class ChatModal extends Modal {
     oninit(vnode) {
         super.oninit(vnode);
@@ -43,7 +41,7 @@ export default class ChatModal extends Modal {
     }
 
     isChatExists() {
-        return this.getSelectedUsers().length == 1 && ChatState.isExistsPMChat(app.session.user, this.getSelectedUsers()[0]);
+        return this.getSelectedUsers().length == 1 && app.chat.isExistsPMChat(app.session.user, this.getSelectedUsers()[0]);
     }
 
     alertText() {

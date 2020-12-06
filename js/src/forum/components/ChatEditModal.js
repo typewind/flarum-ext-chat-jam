@@ -7,8 +7,6 @@ import Group from 'flarum/models/Group';
 import ChatModal from './ChatModal';
 import Stream from 'flarum/utils/Stream';
 
-import ChatState from '../states/ChatState';
-
 export default class ChatEditModal extends ChatModal {
     oninit(vnode) {
         super.oninit(vnode);
@@ -114,7 +112,7 @@ export default class ChatEditModal extends ChatModal {
     }
 
     userMentionContent(user) {
-        return ['@' + user.displayName(), this.isLocalModerator && !ChatState.isChatPM(this.model) ? this.componentUserMentionDropdown(user) : null];
+        return ['@' + user.displayName(), this.isLocalModerator && !app.chat.isChatPM(this.model) ? this.componentUserMentionDropdown(user) : null];
     }
 
     userMentionOnClick(user, e) {
@@ -182,7 +180,7 @@ export default class ChatEditModal extends ChatModal {
 
     componentForm() {
         if (this.model.type()) return this.componentFormChannel();
-        if (ChatState.isChatPM(this.model)) return this.componentFormPM();
+        if (app.chat.isChatPM(this.model)) return this.componentFormPM();
 
         return this.componentFormChat();
     }
@@ -190,7 +188,7 @@ export default class ChatEditModal extends ChatModal {
     copmonentFormButtons() {
         let buttons = [];
 
-        if (this.isLocalModerator && !ChatState.isChatPM(this.model))
+        if (this.isLocalModerator && !app.chat.isChatPM(this.model))
             buttons.push(
                 <Button
                     className="Button Button--primary Button--block ButtonSave"
@@ -211,7 +209,7 @@ export default class ChatEditModal extends ChatModal {
             </Button>
         );
 
-        if (!ChatState.isChatPM(this.model) && ChatState.getPermissions().create.channel) buttons.push(this.componentDeleteChat());
+        if (!app.chat.isChatPM(this.model) && app.chat.getPermissions().create.channel) buttons.push(this.componentDeleteChat());
 
         return buttons;
     }
@@ -279,7 +277,7 @@ export default class ChatEditModal extends ChatModal {
             }
             case 1: {
                 if (this.isValidTitleCopy()) {
-                    ChatState.deleteChat(this.model);
+                    app.chat.deleteChat(this.model);
                     this.model.delete();
 
                     this.hide();

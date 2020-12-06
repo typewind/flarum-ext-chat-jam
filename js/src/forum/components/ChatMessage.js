@@ -13,8 +13,6 @@ import Button from 'flarum/components/Button';
 import Separator from 'flarum/components/Separator';
 import Link from 'flarum/components/Link';
 
-import ChatState from '../states/ChatState';
-
 export default class ChatMessage extends Component {
     oninit(vnode) {
         super.oninit(vnode);
@@ -28,7 +26,7 @@ export default class ChatMessage extends Component {
         this.subtree = new SubtreeRetainer(
             () => this.model.freshness,
             () => this.model.user().freshness,
-            () => ChatState.getCurrentChat(),
+            () => app.chat.getCurrentChat(),
 
             // Reactive attrs
             () => this.model.content,
@@ -40,7 +38,7 @@ export default class ChatMessage extends Component {
     }
 
     modelEvent(name, ...args) {
-        ChatState.evented.trigger('onClickMessage', name, this.model, args);
+        app.chat.evented.trigger('onClickMessage', name, this.model, args);
     }
 
     onbeforeupdate(vnode) {
@@ -156,7 +154,7 @@ export default class ChatMessage extends Component {
     editDropDown() {
         const items = new ItemList();
 
-        if (ChatState.getPermissions().edit && this.model.user() && this.model.user() == app.session.user) {
+        if (app.chat.getPermissions().edit && this.model.user() && this.model.user() == app.session.user) {
             items.add(
                 'dropdownEditStart',
                 <Button
@@ -171,14 +169,14 @@ export default class ChatMessage extends Component {
 
         items.add('separator', <Separator />);
 
-        if (this.model.chat().role() || (ChatState.getPermissions().delete && this.model.user() == app.session.user)) {
+        if (this.model.chat().role() || (app.chat.getPermissions().delete && this.model.user() == app.session.user)) {
             if (this.model.deleted_by()) {
                 items.add(
                     'dropdownRestore',
                     <Button
                         onclick={this.modelEvent.bind(this, 'dropdownRestore')}
                         icon="fas fa-reply"
-                        disabled={!ChatState.getPermissions().moderate.delete && this.model.deleted_by() != app.session.user}
+                        disabled={!app.chat.getPermissions().moderate.delete && this.model.deleted_by() != app.session.user}
                     >
                         {app.translator.trans('core.forum.post_controls.restore_button')}
                     </Button>
@@ -193,10 +191,10 @@ export default class ChatMessage extends Component {
             }
         }
 
-        if (this.model.chat().role() && (this.model.deleted_by() || ChatState.totalHidden() >= 3)) {
+        if (this.model.chat().role() && (this.model.deleted_by() || app.chat.totalHidden() >= 3)) {
             items.add(
                 'dropdownDelete',
-                <Button onclick={this.modelEvent.bind(this, 'dropdownDelete')} icon="fas fa-trash-alt" disabled={!ChatState.getPermissions().delete}>
+                <Button onclick={this.modelEvent.bind(this, 'dropdownDelete')} icon="fas fa-trash-alt" disabled={!app.chat.getPermissions().delete}>
                     {app.translator.trans('core.forum.post_controls.delete_forever_button')}
                 </Button>
             );
@@ -251,17 +249,17 @@ export default class ChatMessage extends Component {
         let element = vnode.dom;
 
         if (this.model.isNeedToFlash) {
-            ChatState.flashItem($(this.messageWrapper));
+            app.chat.flashItem($(this.messageWrapper));
             this.model.isNeedToFlash = false;
         }
         if (this.model.content !== this.oldContent) {
             this.oldContent = this.model.content;
-            ChatState.renderChatMessage(element, this.model.content);
+            app.chat.renderChatMessage(element, this.model.content);
         }
     }
 
     isVisible() {
-        if (this.model.chat() != ChatState.getCurrentChat()) return false;
+        if (this.model.chat() != app.chat.getCurrentChat()) return false;
 
         if (this.model.isDeletedForever) return false;
 

@@ -36,16 +36,6 @@ export default class ChatViewport extends Component {
         //app.chat.colorizeOddChatMessages();
     }
 
-    oncreate(vnode) {
-        super.oncreate(vnode);
-
-        this.$element.addEventListener('scroll', (this.boundScrollListener = this.wrapperOnScroll.bind(this)), { passive: true });
-    }
-
-    onremove(vnode) {
-        this.$element.removeEventListener('scroll', this.boundScrollListener);
-    }
-
     view(vnode) {
         return (
             <div>
@@ -53,12 +43,12 @@ export default class ChatViewport extends Component {
                     className="wrapper"
                     oncreate={this.wrapperOnCreate.bind(this)}
                     onupdate={this.wrapperOnUpdate.bind(this)}
-                    onwheel={this.wrapperOnMouseWheel.bind(this)}
+                    onremove={this.wrapperOnRemove.bind(this)}
                     style={{ height: app.chat.getFrameState('transform').y + 'px' }}
                 >
-                    {this.componentLoader(this.state.scroll.loading.all)}
+                    {this.componentLoader(this.state.scroll.loading)}
                     {app.chat
-                        .componentsChatMessages()
+                        .componentsChatMessages(this.model)
                         .concat(this.state.input.writingPreview ? app.chat.componentChatMessage(this.state.input.previewModel) : [])}
                 </div>
                 <div className="input-wrapper">
@@ -167,6 +157,8 @@ export default class ChatViewport extends Component {
     wrapperOnCreate(vnode) {
         super.oncreate(vnode);
         this.wrapperOnUpdate(vnode);
+
+        vnode.dom.addEventListener('scroll', (this.boundScrollListener = this.wrapperOnScroll.bind(this)), { passive: true });
     }
 
     wrapperOnUpdate(vnode) {
@@ -179,11 +171,14 @@ export default class ChatViewport extends Component {
         this.checkUnreaded();
     }
 
+    wrapperOnRemove(vnode) {
+        vnode.dom.removeEventListener('scroll', this.boundScrollListener);
+    }
+
     wrapperOnScroll(e) {
         e.redraw = false;
-        let el = e.target;
+        let el = this.element;
 
-        this.state.scroll.autoScroll = el.scrollTop + el.offsetHeight >= el.scrollHeight - 10;
         this.state.scroll.oldScroll = el.scrollTop;
 
         if (el.scrollTop <= 0) el.scrollTop += 1;
@@ -194,6 +189,24 @@ export default class ChatViewport extends Component {
         if (this.lastFastScrollStatus != this.isFastScrollAvailable()) {
             this.lastFastScrollStatus = this.isFastScrollAvailable();
             m.redraw();
+        }
+
+        let currentHeight = el.scrollHeight;
+
+        if (this.state.scroll.autoScroll || this.state.loading) return;
+
+        if (!this.state.messageEditing && this.state.scroll.oldScroll >= 0) {
+            if (el.scrollTop <= 500) {
+                let topMessage = app.chat.getChatMessages((model) => model.chat() == this.model)[0];
+                if (topMessage && topMessage != this.model.first_message()) {
+                    app.chat.apiFetchChatMessages(this.model, topMessage.created_at().toISOString());
+                }
+            } else if (el.scrollTop + el.offsetHeight >= currentHeight - 500) {
+                let bottomMessage = app.chat.getChatMessages((model) => model.chat() == this.model).slice(-1)[0];
+                if (bottomMessage && bottomMessage != this.model.last_message()) {
+                    app.chat.apiFetchChatMessages(this.model, bottomMessage.created_at().toISOString());
+                }
+            }
         }
     }
 
@@ -221,28 +234,6 @@ export default class ChatViewport extends Component {
         }
     }
 
-    wrapperOnMouseWheel(e) {
-        e.redraw = false;
-
-        let el = this.element;
-        let currentHeight = el.scrollHeight;
-
-        if (this.state.scroll.autoScroll) this.state.scroll.needToScroll = false;
-        if (this.state.scroll.needToScroll) this.scrollToBottom();
-
-        if (!this.state.messageEditing && this.state.scroll.oldScroll >= 0) {
-            if (el.scrollTop <= 500) {
-                let topMessage = app.chat.getChatMessages((model) => model.chat() == this.model)[0];
-                if (topMessage && topMessage != this.model.first_message())
-                    app.chat.apiFetchChatMessages(this.model, topMessage.created_at().toISOString());
-            } else if (el.scrollTop + el.offsetHeight >= currentHeight - 500) {
-                let bottomMessage = app.chat.getChatMessages((model) => model.chat() == this.model).slice(-1)[0];
-                if (bottomMessage && bottomMessage != this.model.last_message())
-                    app.chat.apiFetchChatMessages(this.model, bottomMessage.created_at().toISOString());
-            }
-        }
-    }
-
     scrollToAnchor(anchor) {
         let scroll = () => {
             let element;
@@ -264,8 +255,11 @@ export default class ChatViewport extends Component {
         if (chatWrapper) {
             if (chatWrapper.scrollTop + chatWrapper.offsetHeight >= chatWrapper.scrollHeight - 1) return;
 
-            $(chatWrapper).stop().animate({ scrollTop: chatWrapper.scrollHeight }, 500);
-            if (!this.state.scroll.autoScroll) this.state.scroll.needToScroll = true;
+            $(chatWrapper)
+                .stop()
+                .animate({ scrollTop: chatWrapper.scrollHeight }, 500, 'swing', () => {
+                    this.state.scroll.autoScroll = false;
+                });
         }
     }
 
@@ -462,10 +456,7 @@ export default class ChatViewport extends Component {
                 this.state.scroll.autoScroll = false;
             }
 
-            this.state.scroll.loading.all = true;
             app.chat.apiFetchChatMessages(this.model, query).then(() => {
-                this.state.scroll.loading.all = false;
-
                 if (this.model.unreaded()) {
                     let anchor = app.chat.getChatMessages((mdl) => mdl.chat() == this.model && mdl.created_at() > this.model.readed_at())[0];
                     this.scrollToAnchor(anchor);

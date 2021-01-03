@@ -17,6 +17,26 @@ var audio = new Audio();
 audio.src = resources.base64AudioNotification;
 audio.volume = 0.5;
 
+class ViewportState {
+    loadingSend = false;
+
+    scroll = {
+        autoScroll: true,
+        oldScroll: 0,
+    };
+
+    loading = false;
+    loadingQueries = {};
+
+    input = {
+        messageLength: 0,
+        rows: 1,
+        content: '',
+    };
+
+    messagesFetched = false;
+}
+
 export default class ChatState {
     constructor() {
         this.chats = [];
@@ -52,23 +72,14 @@ export default class ChatState {
             },
         };
 
-        this.viewportState = {};
+        this.viewportStates = {};
         if (app.session.user) app.pusher.then(this.listenSocketChannels.bind(this));
 
         this.evented.on('onClickMessage', this.onChatMessageClicked.bind(this));
     }
 
-    initViewportState() {
-        return {
-            loadingSend: false,
-            scroll: { autoScroll: true, oldScroll: 0, loading: { all: false, queries: {} }, needToScroll: false },
-            input: { messageLength: 0, rows: 1, content: '' },
-            messagesFetched: false,
-        };
-    }
-
     getViewportState(model) {
-        return this.viewportState[model.id()];
+        return this.viewportStates[model.id()];
     }
 
     listenSocketChannels(socket) {
@@ -197,7 +208,7 @@ export default class ChatState {
 
     addChat(model, outside = false) {
         this.chats.push(model);
-        this.viewportState[model.id()] = this.initViewportState();
+        this.viewportStates[model.id()] = new ViewportState();
 
         if (model.id() == this.getFrameState('selectedChat')) this.onChatChanged(model);
         if (outside) model.isNeedToFlash = true;
@@ -269,9 +280,10 @@ export default class ChatState {
         let viewport = this.getViewportState(model);
         let self = this;
 
-        if (viewport.scroll.loading.queries[query]) return;
+        if (viewport.loading || viewport.loadingQueries[query]) return;
 
-        viewport.scroll.loading.queries[query] = true;
+        viewport.loading = true;
+        viewport.loadingQueries[query] = true;
 
         return app.store.find('chatmessages', { chat_id: model.id(), query }).then((r) => {
             if (r.length) {
@@ -281,7 +293,8 @@ export default class ChatState {
                 });
                 if (options.notify) this.messageNotify(r[0]);
 
-                viewport.scroll.loading.queries[query] = false;
+                viewport.loading = false;
+                viewport.loadingQueries[query] = false;
                 viewport.scroll.autoScroll = false;
 
                 m.redraw();
@@ -293,8 +306,8 @@ export default class ChatState {
         return model.type() ? <ChatEventMessage key={model.id()} model={model} /> : <ChatMessage key={model.id()} model={model} />;
     }
 
-    componentsChatMessages() {
-        return this.getChatMessages().map((model) => this.componentChatMessage(model));
+    componentsChatMessages(chat) {
+        return this.getChatMessages((message) => message.chat() === chat).map((model) => this.componentChatMessage(model));
     }
 
     isChatMessageExists(model) {

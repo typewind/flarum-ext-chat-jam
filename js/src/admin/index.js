@@ -22,7 +22,7 @@ app.initializers.add('xelson-chat', (app) => {
         })
         .registerSetting({
             setting: 'xelson-chat.settings.display.minimize',
-            label: 'xelson-chat.admin.settings.display.minimize',
+            label: app.translator.trans('xelson-chat.admin.settings.display.minimize'),
             type: 'switch',
         })
         .registerSetting({

@@ -10,6 +10,11 @@
     ],
     "type": "flarum-extension",
     "license": "MIT",
+    "support": {
+        "issues": "https://github.com/Xelson/flarum-ext-chat/issues",
+        "source": "https://github.com/Xelson/flarum-ext-chat",
+        "forum": "https://discuss.flarum.org/d/25361"
+    },
     "authors": [
         {
             "name": "Juan"
@@ -29,12 +34,13 @@
         "source": "https://github.com/Xelson/flarum-ext-chat"
     },
     "require": {
-        "flarum/core": "^0.1.0-beta.14",
+        "flarum/core": "^0.1.0-beta.15",
         "flarum/markdown": "^0.1.0"
     },
     "extra": {
         "flarum-extension": {
             "title": "Neon Chat",
+            "category": "feature",
             "icon": {
                 "image": "icon.svg",
                 "backgroundColor": "#ffaad4",

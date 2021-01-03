@@ -12,7 +12,7 @@ export default class ChatEventMessage extends ChatMessage {
             this.model
                 .message()
                 .split('')
-                .every((c) => c == '*')
+                .every((c) => c === '*')
         )
             this.parsedContent = { id: 'chatCensored' };
         else this.parsedContent = JSON.parse(this.model.message());

@@ -131,7 +131,7 @@ export default class ChatMessage extends Component {
                     <i class="fas fa-trash-alt"></i>{' '}
                     <span>
                         {`(${app.translator.trans('xelson-chat.forum.chat.message.deleted' + (this.model.isDeletedForever ? '_forever' : ''))}`}{' '}
-                        {username(this.model.deleted_by())})
+                        {username(this.model.deleted_by())}
                     </span>
                 </div>
             )

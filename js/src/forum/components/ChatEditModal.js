@@ -185,7 +185,7 @@ export default class ChatEditModal extends ChatModal {
         return this.componentFormChat();
     }
 
-    copmonentFormButtons() {
+    componentFormButtons() {
         let buttons = [];
 
         if (this.isLocalModerator && !app.chat.isChatPM(this.model))
@@ -293,7 +293,7 @@ export default class ChatEditModal extends ChatModal {
                 <div class="Form-group InputTitle">
                     {this.componentForm()}
                     <div className="ButtonsPadding"></div>
-                    {this.copmonentFormButtons()}
+                    {this.componentFormButtons()}
                 </div>
             </div>
         );

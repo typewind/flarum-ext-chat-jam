@@ -41,7 +41,7 @@ export default class ChatModal extends Modal {
     }
 
     isChatExists() {
-        return this.getSelectedUsers().length == 1 && app.chat.isExistsPMChat(app.session.user, this.getSelectedUsers()[0]);
+        return this.getSelectedUsers().length === 1 && app.chat.isExistsPMChat(app.session.user, this.getSelectedUsers()[0]);
     }
 
     alertText() {

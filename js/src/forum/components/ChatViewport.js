@@ -36,6 +36,16 @@ export default class ChatViewport extends Component {
         //app.chat.colorizeOddChatMessages();
     }
 
+    oncreate(vnode) {
+        super.oncreate(vnode);
+
+        this.$element.addEventListener('scroll', (this.boundScrollListener = this.wrapperOnScroll.bind(this)), { passive: true });
+    }
+
+    onremove(vnode) {
+        this.$element.removeEventListener('scroll', this.boundScrollListener);
+    }
+
     view(vnode) {
         return (
             <div>
@@ -43,7 +53,6 @@ export default class ChatViewport extends Component {
                     className="wrapper"
                     oncreate={this.wrapperOnCreate.bind(this)}
                     onupdate={this.wrapperOnUpdate.bind(this)}
-                    onscroll={this.wrapperOnScroll.bind(this)}
                     onwheel={this.wrapperOnMouseWheel.bind(this)}
                     style={{ height: app.chat.getFrameState('transform').y + 'px' }}
                 >

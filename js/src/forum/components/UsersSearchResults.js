@@ -40,11 +40,11 @@ export default class UsersSearchResults {
     view(query) {
         query = query.toLowerCase();
 
-        const usersList = (this.results[query] || []).concat(
-            app.store
-                .all('users')
-                .filter((user) => [user.username(), user.displayName()].some((value) => value.toLowerCase().substr(0, query.length) === query))
-        );
+        const usersList = (this.results[query] || [])
+            .concat(
+                app.store.all('users').filter((user) => [user.username(), user.displayName()].some((value) => value.toLowerCase().includes(query)))
+            )
+            .filter((user) => user !== app.session.user);
 
         const resultsFind = usersList.filter((e, i, arr) => arr.lastIndexOf(e) === i).sort((a, b) => a.displayName().localeCompare(b.displayName()));
 

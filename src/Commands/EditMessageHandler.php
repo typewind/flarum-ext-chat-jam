@@ -12,7 +12,9 @@ use Carbon\Carbon;
 use Xelson\Chat\ChatRepository;
 use Xelson\Chat\MessageRepository;
 use Xelson\Chat\MessageValidator;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
+use Xelson\Chat\Event\Message\Saved;
 
 class EditMessageHandler
 {
@@ -35,15 +37,18 @@ class EditMessageHandler
      * @param MessageRepository             $messages
      * @param MessageValidator              $validator
      * @param ChatRepository                $chats
+     * @param Dispatcher                    $events
      */
     public function __construct(
         MessageRepository $messages,
         MessageValidator $validator,
-        ChatRepository $chats
+        ChatRepository $chats,
+        Dispatcher $events
     ) {
         $this->messages  = $messages;
         $this->validator = $validator;
         $this->chats = $chats;
+        $this->events = $events;
     }
 
     /**
@@ -103,6 +108,10 @@ class EditMessageHandler
             $actions['invoker'] = $actor->id;
         }
         $message->actions = $actions;
+
+        $this->events->dispatch(
+            new Saved($message, $actor, $data, false)
+        );
 
         return $message;
     }

@@ -9,7 +9,9 @@
 namespace Xelson\Chat\Commands;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Events\Dispatcher;
 use Xelson\Chat\ChatRepository;
+use Xelson\Chat\Event\Message\Saved;
 use Xelson\Chat\Message;
 use Xelson\Chat\MessageValidator;
 
@@ -23,13 +25,16 @@ class PostMessageHandler
     /**
      * @param MessageValidator      $validator
      * @param ChatRepository        $chats
+     * @param Dispatcher            $events
      */
     public function __construct(
         MessageValidator $validator,
-        ChatRepository $chats
+        ChatRepository $chats,
+        Dispatcher $events
     ) {
         $this->validator = $validator;
         $this->chats = $chats;
+        $this->events = $events;
     }
 
     /**
@@ -68,6 +73,10 @@ class PostMessageHandler
         $message->save();
 
         $chat->users()->updateExistingPivot($actor->id, ['readed_at' => Carbon::now()]);
+
+        $this->events->dispatch(
+            new Saved($message, $actor, $command->data, true)
+        );
 
         return $message;
     }

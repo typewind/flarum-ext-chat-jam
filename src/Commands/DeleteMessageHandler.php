@@ -8,7 +8,9 @@
 
 namespace Xelson\Chat\Commands;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Xelson\Chat\ChatRepository;
+use Xelson\Chat\Event\Message\Deleting;
 use Xelson\Chat\MessageRepository;
 
 class DeleteMessageHandler
@@ -21,11 +23,13 @@ class DeleteMessageHandler
     /**
      * @param MessageRepository $messages
      * @param ChatRepository $chats
+     * @param Dispatcher $events
      */
-    public function __construct(MessageRepository $messages, ChatRepository $chats)
+    public function __construct(MessageRepository $messages, ChatRepository $chats, Dispatcher $events)
     {
         $this->messages  = $messages;
         $this->chats = $chats;
+        $this->events = $events;
     }
 
     /**
@@ -50,6 +54,10 @@ class DeleteMessageHandler
 
         $actor->assertPermission(
             $chatUser && $chatUser->role != 0
+        );
+
+        $this->events->dispatch(
+            new Deleting($message, $actor)
         );
 
         $message->delete();

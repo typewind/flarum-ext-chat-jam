@@ -10,17 +10,21 @@ namespace Xelson\Chat\Commands;
 
 use Xelson\Chat\ChatRepository;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
+use Illuminate\Contracts\Events\Dispatcher;
+use Xelson\Chat\Event\Chat\Deleting;
 
 class DeleteChatHandler
 {
     /**
      * @param ChatRepository $chats
      * @param ChatSocket $socket
+     * @param Dispatcher $events
      */
-    public function __construct(ChatRepository $chats, BusDispatcher $bus)
+    public function __construct(ChatRepository $chats, BusDispatcher $bus, Dispatcher $events)
     {
         $this->chats  = $chats;
         $this->bus = $bus;
+        $this->events = $events;
     }
 
     /**
@@ -40,6 +44,10 @@ class DeleteChatHandler
 
         $actor->assertPermission(
             $chat->creator_id == $actor->id && (count($users) > 2 || $chat->type == 1)
+        );
+
+        $this->events->dispatch(
+            new Deleting($chat, $actor)
         );
 
         $chat->users()->detach();

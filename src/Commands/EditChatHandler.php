@@ -17,6 +17,8 @@ use Xelson\Chat\EventMessageChatAddRemoveUser;
 use Xelson\Chat\Commands\PostEventMessage;
 use Xelson\Chat\Exceptions\ChatEditException;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
+use Illuminate\Contracts\Events\Dispatcher;
+use Xelson\Chat\Event\Chat\Saved;
 
 class EditChatHandler
 {
@@ -24,12 +26,14 @@ class EditChatHandler
      * @param ChatValidator $validator
      * @param ChatRepository $chats
      * @param BusDispatcher $bus
+     * @param Dispatcher $events
      */
-    public function __construct(ChatValidator $validator, ChatRepository $chats, BusDispatcher $bus)
+    public function __construct(ChatValidator $validator, ChatRepository $chats, BusDispatcher $bus, Dispatcher $events)
     {
         $this->validator = $validator;
         $this->chats  = $chats;
         $this->bus = $bus;
+        $this->events = $events;
     }
 
     /**
@@ -187,6 +191,10 @@ class EditChatHandler
         }
         $chat->eventmsg_range = $events_list;
         $chat->roles_updated_for = $roles_updated_for;
+
+        $this->events->dispatch(
+            new Saved($chat, $actor, $data, false)
+        );
 
         return $chat;
     }

@@ -15,7 +15,7 @@ class ChatSocket extends PusherWrapper
 	public function sendChatEvent($chat_id, $event_id, $options)
 	{
 		$chat = Chat::findOrFail($chat_id);
-		
+
 		$attributes = [
 			'event' => [
 				'id' => $event_id,

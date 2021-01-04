@@ -7,6 +7,7 @@
  */
 
 namespace Xelson\Chat;
+
 use Flarum\Settings\SettingsRepositoryInterface;
 use Pusher\Pusher;
 use Pusher as PusherLegacy;
@@ -17,25 +18,28 @@ class PusherWrapper
      * @var SettingsRepositoryInterface
      */
     protected $settings;
-    
+
+    /**
+     * @var Pusher
+     */
+    protected $pusher;
+
     /**
      * @param SettingsRepositoryInterface $settings
      */
-	public function __construct(SettingsRepositoryInterface $settings)
-	{
+    public function __construct(SettingsRepositoryInterface $settings)
+    {
         $this->settings = $settings;
-        $this->pusher = $this->getPusher();
     }
-    
+
     /**
      * @return bool|\Illuminate\Foundation\Application|mixed|Pusher
      * @throws \Pusher\PusherException
      */
-    private function getPusher()
+    private function buildPusher()
     {
-        if(class_exists(Pusher::class) && app()->bound(Pusher::class)) return app(Pusher::class);
-        else
-        {
+        if (class_exists(Pusher::class) && app()->bound(Pusher::class)) return app(Pusher::class);
+        else {
             $settings = app('flarum.settings');
 
             $options = [];
@@ -54,12 +58,16 @@ class PusherWrapper
     }
 
     /**
-	 * Pseudo for pusher instance
-	 * 
+     * Pseudo for pusher instance
+     * 
      * @return Pusher
      */
-	public function pusher()
-	{
-		return $this->pusher;
-	}
+    public function pusher()
+    {
+        if (is_null($this->pusher)) {
+            $this->pusher = $this->buildPusher();
+        }
+
+        return $this->pusher;
+    }
 }

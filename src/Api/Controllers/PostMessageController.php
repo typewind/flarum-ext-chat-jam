@@ -16,8 +16,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
 use Illuminate\Support\Arr;
 
-use Flarum\Api\Event\WillSerializeData as EventWillSerializeData;
-use Xelson\Chat\ChatSocket;
 
 class PostMessageController extends AbstractShowController
 {
@@ -41,12 +39,10 @@ class PostMessageController extends AbstractShowController
 
     /**
      * @param Dispatcher        $bus
-     * @param ChatSocket        $socket
      */
-    public function __construct(Dispatcher $bus, ChatSocket $socket)
+    public function __construct(Dispatcher $bus)
     {
         $this->bus = $bus;
-        $this->socket = $socket;
     }
 
     /**
@@ -62,30 +58,8 @@ class PostMessageController extends AbstractShowController
         $data = Arr::get($request->getParsedBody(), 'data', []);
         $ip_address = Arr::get($request->getServerParams(), 'REMOTE_ADDR', '127.0.0.1');
 
-        $this->getEventDispatcher()->listen(EventWillSerializeData::class, [$this, 'onWillSerializeData']);
-        
         return $this->bus->dispatch(
             new PostMessage($actor, $data, $ip_address)
         );
-    }
-
-    public function onWillSerializeData(EventWillSerializeData $event)
-    {
-        $request = $event->request;
-        $data = $event->data;
-        $document = $event->document;
-        $serializer = AbstractShowController::getContainer()->make($this->serializer);
-        $serializer->setRequest($request);
-
-        $element = $this->createElement($data, $serializer)
-            ->with($this->extractInclude($request))
-            ->fields($this->extractFields($request));
-
-        $response = $document->setData($element)->jsonSerialize();
-
-        $message = $data;
-        $this->socket->sendChatEvent($message->chat_id, 'message.post', [
-            'message' => $response
-        ]);
     }
 }

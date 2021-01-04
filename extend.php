@@ -11,6 +11,7 @@ namespace Xelson\Chat;
 use Flarum\Extend;
 
 use Flarum\Api\Serializer\ForumSerializer;
+use Illuminate\Contracts\Events\Dispatcher;
 use Xelson\Chat\Api\Controllers\PostMessageController;
 use Xelson\Chat\Api\Controllers\FetchMessageController;
 use Xelson\Chat\Api\Controllers\EditMessageController;
@@ -81,4 +82,8 @@ return [
         ->serializeToForum('xelson-chat.settings.charlimit', 'xelson-chat.settings.charlimit')
         ->serializeToForum('xelson-chat.settings.display.minimize', 'xelson-chat.settings.display.minimize')
         ->serializeToForum('xelson-chat.settings.display.censor', 'xelson-chat.settings.display.censor'),
+
+    function (Dispatcher $events) {
+        $events->subscribe(Listener\PushChatEvents::class);
+    },
 ];

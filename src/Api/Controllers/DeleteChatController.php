@@ -16,9 +16,6 @@ use Tobscure\JsonApi\Document;
 use Illuminate\Support\Arr;
 
 use Xelson\Chat\Api\Serializers\ChatSerializer;
-use Flarum\Api\Event\WillSerializeData as EventWillSerializeData;
-use Xelson\Chat\ChatSocket;
-
 class DeleteChatController extends AbstractShowController
 {
     /**
@@ -41,10 +38,9 @@ class DeleteChatController extends AbstractShowController
     /**
      * @param Dispatcher            $bus
      */
-    public function __construct(Dispatcher $bus, ChatSocket $socket)
+    public function __construct(Dispatcher $bus)
     {
         $this->bus = $bus;
-        $this->socket = $socket;
 	}
 
     /**
@@ -58,31 +54,9 @@ class DeleteChatController extends AbstractShowController
     {
         $id = Arr::get($request->getQueryParams(), 'id');
         $actor = $request->getAttribute('actor');
-		
-        //$this->getEventDispatcher()->listen(EventWillSerializeData::class, [$this, 'onWillSerializeData']);
 
         return $this->bus->dispatch(
             new DeleteChat($id, $actor)
         );
 	}
-	
-    public function onWillSerializeData(EventWillSerializeData $event)
-    {
-        $request = $event->request;
-        $data = $event->data;
-        $document = $event->document;
-        $serializer = AbstractShowController::getContainer()->make($this->serializer);
-        $serializer->setRequest($request);
-
-        $element = $this->createElement($data, $serializer)
-            ->with($this->extractInclude($request))
-            ->fields($this->extractFields($request));
-
-        $response = $document->setData($element)->jsonSerialize();
-
-        $chat = $data;
-        $this->socket->sendChatEvent($chat->id, 'chat.delete', [
-            'chat' => $response
-        ]);
-    }
 }

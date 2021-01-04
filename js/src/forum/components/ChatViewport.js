@@ -308,7 +308,10 @@ export default class ChatViewport extends Component {
 
         if (this.state.messageEditing) this.state.messageEditing.content = inputValue;
         else if (this.state.input.writingPreview) this.state.input.previewModel.content = inputValue;
-        this.timedRedraw(100, () => (this.state.scroll.autoScroll && !this.state.messageEditing ? this.scrollToBottom() : null));
+
+        console.log(this.element.scrollHeight, this.element.scrollTop, this.element.clientHeight);
+        const atBottom = Math.abs(this.element.scrollHeight - this.element.scrollTop - this.element.clientHeight) <= 5;
+        this.timedRedraw(100, () => (atBottom && !this.state.messageEditing ? this.scrollToBottom() : null));
     }
 
     inputPressEnter(e) {

@@ -24,7 +24,7 @@ export default class ChatCreateModal extends ChatModal {
                 isChannel: this.isChannel,
                 icon: this.getInput().icon(),
                 color: this.getInput().color(),
-                relationships: { users: this.getSelectedUsers() },
+                relationships: { users: [...this.getSelectedUsers(), app.session.user] },
             })
             .then((model) => {
                 app.chat.addChat(model);

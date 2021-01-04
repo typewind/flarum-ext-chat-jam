@@ -333,8 +333,10 @@ export default class ChatState {
         }
 
         let list = this.getChatMessages((mdl) => mdl.chat() == model.chat());
-        if ((notify || model.chat().removed_at()) && model.id() && list[list.length - 1] == model)
+        if ((notify || model.chat().removed_at()) && model.id() && list[list.length - 1] == model) {
             model.chat().pushData({ relationships: { last_message: model } });
+            this.getViewportState(model.chat()).newPushedPosts = true;
+        }
     }
 
     renderChatMessage(model, content) {

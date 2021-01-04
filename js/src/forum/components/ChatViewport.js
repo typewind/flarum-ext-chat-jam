@@ -127,7 +127,9 @@ export default class ChatViewport extends Component {
     isFastScrollAvailable() {
         let chatWrapper = this.getChatWrapper();
         return (
-            this.model.unreaded() >= 30 || (chatWrapper && chatWrapper.scrollHeight > 2000 && chatWrapper.scrollTop < chatWrapper.scrollHeight - 2000)
+            this.state.newPushedPosts ||
+            this.model.unreaded() >= 30 ||
+            (chatWrapper && chatWrapper.scrollHeight > 2000 && chatWrapper.scrollTop < chatWrapper.scrollHeight - 2000)
         );
     }
 
@@ -192,6 +194,10 @@ export default class ChatViewport extends Component {
         }
 
         let currentHeight = el.scrollHeight;
+
+        if (this.atBottom()) {
+            this.state.newPushedPosts = false;
+        }
 
         if (this.state.scroll.autoScroll || this.state.loading) return;
 
@@ -310,8 +316,7 @@ export default class ChatViewport extends Component {
         else if (this.state.input.writingPreview) this.state.input.previewModel.content = inputValue;
 
         console.log(this.element.scrollHeight, this.element.scrollTop, this.element.clientHeight);
-        const atBottom = Math.abs(this.element.scrollHeight - this.element.scrollTop - this.element.clientHeight) <= 5;
-        this.timedRedraw(100, () => (atBottom && !this.state.messageEditing ? this.scrollToBottom() : null));
+        this.timedRedraw(100, () => (this.atBottom() && !this.state.messageEditing ? this.scrollToBottom() : null));
     }
 
     inputPressEnter(e) {
@@ -495,5 +500,9 @@ export default class ChatViewport extends Component {
         input.focus();
 
         this.inputProcess();
+    }
+
+    atBottom() {
+        return Math.abs(this.element.scrollHeight - this.element.scrollTop - this.element.clientHeight) <= 5;
     }
 }

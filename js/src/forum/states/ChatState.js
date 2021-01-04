@@ -242,7 +242,7 @@ export default class ChatState {
     isExistsPMChat(user1, user2) {
         return this.getChats().some((model) => {
             let users = model.users();
-            return model.type === 0 && users.length === 2 && users.some((model) => model == user1) && users.some((model) => model == user2);
+            return model.type() === 0 && users.length === 2 && users.some((model) => model == user1) && users.some((model) => model == user2);
         });
     }
 

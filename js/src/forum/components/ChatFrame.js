@@ -101,7 +101,7 @@ export default class ChatFrame extends Component {
                 <div tabindex="0" className="frame" id="chat">
                     <div id="chats-list" className={app.chat.getFrameState('beingShownChatsList') ? 'toggled' : ''}>
                         <div className="header">
-                            <div className="input-wrapper input--down">
+                            <div className="input-wrapper input--down" style="opacity:0">
                                 <textarea id="chat-find" placeholder={app.translator.trans('xelson-chat.forum.chat.list.placeholder')} />
                             </div>
                             <div

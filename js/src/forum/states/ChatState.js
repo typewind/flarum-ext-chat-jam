@@ -263,8 +263,6 @@ export default class ChatState {
 
         this.setCurrentChat(model);
         m.redraw.sync();
-
-        this.evented.trigger('onChatChanged', model);
     }
 
     comporatorAscButZerosDesc(a, b) {

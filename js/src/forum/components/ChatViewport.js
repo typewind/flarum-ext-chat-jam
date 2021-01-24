@@ -293,10 +293,6 @@ export default class ChatViewport extends Component {
         }
     }
 
-    inputClear() {
-        input.value = '';
-    }
-
     inputProcess(e) {
         if (e) e.redraw = false;
 

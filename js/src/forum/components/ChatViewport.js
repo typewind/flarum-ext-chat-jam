@@ -42,6 +42,7 @@ export default class ChatViewport extends Component {
                 <div
                     className="wrapper"
                     oncreate={this.wrapperOnCreate.bind(this)}
+                    onbeforeupdate={this.wrapperOnBeforeUpdate.bind(this)}
                     onupdate={this.wrapperOnUpdate.bind(this)}
                     onremove={this.wrapperOnRemove.bind(this)}
                     style={{ height: app.chat.getFrameState('transform').y + 'px' }}
@@ -163,6 +164,12 @@ export default class ChatViewport extends Component {
         vnode.dom.addEventListener('scroll', (this.boundScrollListener = this.wrapperOnScroll.bind(this)), { passive: true });
     }
 
+    wrapperOnBeforeUpdate(vnode, vnodeNew) {
+        if (!this.state.autoScroll && this.atBottom() && this.state.newPushedPosts) {
+            this.scrollAfterUpdate = true;
+        }
+    }
+
     wrapperOnUpdate(vnode) {
         let el = vnode.dom;
         if (this.model && this.state.scroll.autoScroll) {
@@ -171,6 +178,11 @@ export default class ChatViewport extends Component {
         }
         if (el.scrollTop <= 0) el.scrollTop = 1;
         this.checkUnreaded();
+
+        if (this.scrollAfterUpdate) {
+            this.scrollAfterUpdate = false;
+            this.scrollToBottom();
+        }
     }
 
     wrapperOnRemove(vnode) {

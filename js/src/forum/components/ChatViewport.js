@@ -11,7 +11,6 @@ export default class ChatViewport extends Component {
         this.model = app.chat.getCurrentChat();
 
         this.messageCharLimit = app.forum.attribute('xelson-chat.settings.charlimit') ?? 512;
-        app.chat.evented.on('onClickMessage', this.onChatMessageClicked.bind(this));
     }
 
     onupdate(vnode) {
@@ -75,7 +74,7 @@ export default class ChatViewport extends Component {
                             rows={this.state.input.rows}
                         />
                         {this.state.messageEditing ? (
-                            <div className="icon edit" onclick={this.messageEditEnd.bind(this)}>
+                            <div className="icon edit" onclick={this.state.messageEditEnd.bind(this)}>
                                 <i class="fas fa-times"></i>
                             </div>
                         ) : null}
@@ -334,24 +333,14 @@ export default class ChatViewport extends Component {
     inputPressEnter(e) {
         e.redraw = false;
         if (e.keyCode == 13 && !e.shiftKey) {
-            this.messageSend(this.getChatInput().value);
+            this.state.messageSend(this.getChatInput().value);
             return false;
         }
         return true;
     }
 
     inputPressButton() {
-        this.messageSend(this.getChatInput().value);
-    }
-
-    inputClear() {
-        this.state.input.messageLength = 0;
-        this.state.input.rows = 1;
-        this.state.input.content = '';
-
-        let input = this.getChatInput();
-        input.value = '';
-        input.rows = 1;
+        this.state.messageSend(this.getChatInput().value);
     }
 
     inputPreviewStart(content) {
@@ -374,94 +363,6 @@ export default class ChatViewport extends Component {
         this.state.input.writingPreview = false;
 
         m.redraw();
-    }
-
-    onChatMessageClicked(eventName, model) {
-        switch (eventName) {
-            case 'dropdownEditStart': {
-                this.messageEdit(model, true);
-                break;
-            }
-            case 'dropdownResend': {
-                this.messageResend(model);
-                break;
-            }
-            case 'insertMention': {
-                this.insertMention(model);
-                break;
-            }
-        }
-    }
-
-    messageSend(text) {
-        if (text.trim().length > 0 && !this.state.loadingSend) {
-            if (this.state.input.writingPreview) {
-                this.state.input.writingPreview = false;
-
-                this.messagePost(this.state.input.previewModel);
-                app.chat.insertChatMessage(Object.assign(this.state.input.previewModel, {}));
-
-                this.inputClear();
-            } else if (this.state.messageEditing) {
-                let model = this.state.messageEditing;
-                if (model.content.trim() !== model.oldContent.trim()) {
-                    model.oldContent = model.content;
-                    app.chat.editChatMessage(model, true, model.content);
-                }
-                this.messageEditEnd();
-                this.inputClear();
-            }
-        }
-    }
-
-    messageEdit(model) {
-        let chatInput = this.getChatInput();
-        if (this.state.input.writingPreview) this.inputPreviewEnd();
-
-        model.isEditing = true;
-        model.oldContent = model.message();
-
-        this.state.messageEditing = model;
-        chatInput.value = model.oldContent;
-        chatInput.focus();
-        this.inputProcess();
-
-        m.redraw();
-    }
-
-    messageEditEnd() {
-        let message = this.state.messageEditing;
-        if (message) {
-            message.isEditing = false;
-            message.content = message.oldContent;
-            this.inputClear();
-            m.redraw();
-
-            this.state.messageEditing = null;
-        }
-    }
-
-    messageResend(model) {
-        this.messagePost(model);
-    }
-
-    messagePost(model) {
-        let self = this;
-        self.state.loadingSend = true;
-        m.redraw();
-
-        return app.chat.postChatMessage(model).then(
-            (r) => {
-                self.state.loadingSend = false;
-
-                m.redraw();
-            },
-            (r) => {
-                self.state.loadingSend = false;
-
-                m.redraw();
-            }
-        );
     }
 
     reloadMessages() {

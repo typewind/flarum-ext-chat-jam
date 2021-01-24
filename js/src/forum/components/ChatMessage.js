@@ -37,8 +37,10 @@ export default class ChatMessage extends Component {
         );
     }
 
-    modelEvent(name, ...args) {
-        app.chat.evented.trigger('onClickMessage', name, this.model, args);
+    modelEvent(name) {
+        const viewportState = app.chat.getViewportState(this.model);
+        viewportState.onChatMessageClicked(name, this.model);
+        app.chat.onChatMessageClicked(name, this.model);
     }
 
     onbeforeupdate(vnode) {

@@ -68,6 +68,7 @@ export default class ChatViewport extends Component {
                             maxlength={this.messageCharLimit}
                             disabled={!app.chat.getPermissions().post || this.model.removed_at()}
                             placeholder={this.inputPlaceholder}
+                            value={this.state.input.content()}
                             onkeypress={this.inputPressEnter.bind(this)}
                             oninput={this.inputProcess.bind(this)}
                             onpaste={this.inputProcess.bind(this)}
@@ -298,7 +299,7 @@ export default class ChatViewport extends Component {
         let input = this.getChatInput();
         let inputValue = input.value.trim();
         this.state.input.messageLength = inputValue.length;
-        this.state.input.content = inputValue;
+        this.state.input.content(inputValue);
 
         /*
         if(!input.baseScrollHeight)
@@ -326,7 +327,6 @@ export default class ChatViewport extends Component {
         if (this.state.messageEditing) this.state.messageEditing.content = inputValue;
         else if (this.state.input.writingPreview) this.state.input.previewModel.content = inputValue;
 
-        console.log(this.element.scrollHeight, this.element.scrollTop, this.element.clientHeight);
         this.timedRedraw(100, () => (this.atBottom() && !this.state.messageEditing ? this.scrollToBottom() : null));
     }
 

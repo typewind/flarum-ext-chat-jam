@@ -1,3 +1,5 @@
+import Stream from 'flarum/utils/Stream';
+
 export default class ViewportState {
     loadingSend = false;
 
@@ -12,7 +14,7 @@ export default class ViewportState {
     input = {
         messageLength: 0,
         rows: 1,
-        content: '',
+        content: Stream(''),
     };
 
     messagesFetched = false;
@@ -107,10 +109,6 @@ export default class ViewportState {
     inputClear() {
         this.input.messageLength = 0;
         this.input.rows = 1;
-        this.input.content = '';
-
-        // let input = this.getChatInput();
-        // input.value = '';
-        // input.rows = 1;
+        this.input.content('');
     }
 }

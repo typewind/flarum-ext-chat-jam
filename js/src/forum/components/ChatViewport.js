@@ -179,9 +179,6 @@ export default class ChatViewport extends Component {
 
         this.state.scroll.oldScroll = el.scrollHeight - el.clientHeight - el.scrollTop;
 
-        if (el.scrollTop <= 0) el.scrollTop += 1;
-        else if (el.scrollTop + el.offsetHeight >= el.scrollHeight) el.scrollTop -= 1;
-
         this.checkUnreaded();
 
         if (this.lastFastScrollStatus != this.isFastScrollAvailable()) {

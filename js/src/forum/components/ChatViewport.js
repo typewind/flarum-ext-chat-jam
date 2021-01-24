@@ -25,6 +25,8 @@ export default class ChatViewport extends Component {
             if (this.model) {
                 this.state = app.chat.getViewportState(this.model);
 
+                const oldScroll = this.state.scroll.oldScroll;
+
                 if (!app.session.user) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.unauthenticated');
                 else if (!app.chat.getPermissions().post) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.chatdenied');
                 else if (this.model.removed_at()) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.removed');
@@ -32,6 +34,12 @@ export default class ChatViewport extends Component {
 
                 this.reloadMessages();
                 m.redraw();
+
+                setTimeout(() => {
+                    const element = this.element;
+
+                    this.getChatWrapper().scrollTop = element.scrollHeight - element.clientHeight - oldScroll;
+                }, 200);
             }
         }
     }
@@ -197,7 +205,7 @@ export default class ChatViewport extends Component {
         e.redraw = false;
         let el = this.element;
 
-        this.state.scroll.oldScroll = el.scrollTop;
+        this.state.scroll.oldScroll = el.scrollHeight - el.clientHeight - el.scrollTop;
 
         if (el.scrollTop <= 0) el.scrollTop += 1;
         else if (el.scrollTop + el.offsetHeight >= el.scrollHeight) el.scrollTop -= 1;
@@ -217,7 +225,7 @@ export default class ChatViewport extends Component {
 
         if (this.state.scroll.autoScroll || this.state.loading) return;
 
-        if (!this.state.messageEditing && this.state.scroll.oldScroll >= 0) {
+        if (!this.state.messageEditing && el.scrollTop >= 0) {
             if (el.scrollTop <= 500) {
                 let topMessage = app.chat.getChatMessages((model) => model.chat() == this.model)[0];
                 if (topMessage && topMessage != this.model.first_message()) {
@@ -479,8 +487,6 @@ export default class ChatViewport extends Component {
 
             this.state.messagesFetched = true;
         }
-
-        this.getChatWrapper().scrollTop = this.state.scroll.oldScroll;
     }
 
     timedRedraw(timeout, callback) {

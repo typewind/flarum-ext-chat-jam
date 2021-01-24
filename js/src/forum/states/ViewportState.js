@@ -14,7 +14,7 @@ export default class ViewportState {
     input = {
         messageLength: 0,
         rows: 1,
-        content: Stream(''),
+        content: Stream(),
     };
 
     messagesFetched = false;
@@ -36,7 +36,13 @@ export default class ViewportState {
         }
     }
 
-    messageSend(text) {
+    getChatInput() {
+        return document.querySelector('.NeonChatFrame #chat-input');
+    }
+
+    messageSend() {
+        const text = this.input.content();
+
         if (text.trim().length > 0 && !this.loadingSend) {
             if (this.input.writingPreview) {
                 this.input.writingPreview = false;
@@ -58,16 +64,15 @@ export default class ViewportState {
     }
 
     messageEdit(model) {
-        let chatInput = this.getChatInput();
         if (this.input.writingPreview) this.inputPreviewEnd();
 
         model.isEditing = true;
         model.oldContent = model.message();
 
         this.messageEditing = model;
-        chatInput.value = model.oldContent;
-        chatInput.focus();
-        this.inputProcess();
+
+        this.input.content(model.oldContent);
+        this.getChatInput().focus();
 
         m.redraw();
     }
@@ -109,6 +114,16 @@ export default class ViewportState {
     inputClear() {
         this.input.messageLength = 0;
         this.input.rows = 1;
-        this.input.content('');
+        this.input.content(null);
+    }
+
+    insertMention(model) {
+        let user = model.user();
+        if (!app.session.user) return;
+
+        this.input.content(this.input.content() + ` @${user.username()} `);
+
+        var input = this.getChatInput();
+        input.focus();
     }
 }

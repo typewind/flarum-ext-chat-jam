@@ -1,16 +1,16 @@
 import Component from 'flarum/Component';
-import ChatWelcome from './ChatWelcome';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
 
+import ChatInput from './ChatInput';
+import ChatWelcome from './ChatWelcome';
 import Message from '../models/Message';
+import timedRedraw from '../utils/timedRedraw';
 
 export default class ChatViewport extends Component {
     oninit(vnode) {
         super.oninit(vnode);
 
         this.model = app.chat.getCurrentChat();
-
-        this.messageCharLimit = app.forum.attribute('xelson-chat.settings.charlimit') ?? 512;
     }
 
     onupdate(vnode) {
@@ -62,34 +62,15 @@ export default class ChatViewport extends Component {
                             .componentsChatMessages(this.model)
                             .concat(this.state.input.writingPreview ? app.chat.componentChatMessage(this.state.input.previewModel) : [])}
                     </div>
-                    <div className="input-wrapper">
-                        <textarea
-                            id="chat-input"
-                            maxlength={this.messageCharLimit}
-                            disabled={!app.chat.getPermissions().post || this.model.removed_at()}
-                            placeholder={this.inputPlaceholder}
-                            value={this.state.input.content()}
-                            onkeypress={this.inputPressEnter.bind(this)}
-                            oninput={this.inputProcess.bind(this)}
-                            onpaste={this.inputProcess.bind(this)}
-                            rows={this.state.input.rows}
-                        />
-                        {this.state.messageEditing ? (
-                            <div className="icon edit" onclick={this.state.messageEditEnd.bind(this)}>
-                                <i class="fas fa-times"></i>
-                            </div>
-                        ) : null}
-                        <div className="icon send" onclick={this.inputPressButton.bind(this)}>
-                            <i class="fas fa-angle-double-right"></i>
-                        </div>
-                        <div
-                            id="chat-limitter"
-                            className={this.reachedLimit() ? 'reaching-limit' : ''}
-                            style={{ display: !app.chat.getPermissions().post ? 'none' : '' }}
-                        >
-                            {this.messageCharLimit - (this.state.input.messageLength || 0) + '/' + this.messageCharLimit}
-                        </div>
-                    </div>
+                    <ChatInput
+                        state={this.state}
+                        model={this.model}
+                        oninput={() => {
+                            if (this.atBottom() && !this.state.messageEditing) {
+                                this.scrollToBottom();
+                            }
+                        }}
+                    ></ChatInput>
                     {this.isFastScrollAvailable() ? this.componentScroller() : null}
                 </div>
             );
@@ -120,21 +101,12 @@ export default class ChatViewport extends Component {
         return document.querySelector('.NeonChatFrame');
     }
 
-    getChatInput() {
-        return document.querySelector('.NeonChatFrame #chat-input');
-    }
-
     getChatsList() {
         return document.querySelector('.NeonChatFrame #chats-list');
     }
 
     getChatWrapper() {
         return document.querySelector('.NeonChatFrame .wrapper');
-    }
-
-    reachedLimit() {
-        this.oldReached = this.messageCharLimit - (this.state.input.messageLength || 0) < 100;
-        return this.oldReached;
     }
 
     isFastScrollAvailable() {
@@ -161,7 +133,7 @@ export default class ChatViewport extends Component {
 
         app.chat.apiFetchChatMessages(this.model).then((r) => {
             this.scrollToBottom();
-            this.timedRedraw(300);
+            timedRedraw(300);
 
             this.model.pushAttributes({ unreaded: 0 });
             let message = app.chat.getChatMessages((mdl) => mdl.chat() == this.model).slice(-1)[0];
@@ -293,78 +265,6 @@ export default class ChatViewport extends Component {
         }
     }
 
-    inputProcess(e) {
-        if (e) e.redraw = false;
-
-        let input = this.getChatInput();
-        let inputValue = input.value.trim();
-        this.state.input.messageLength = inputValue.length;
-        this.state.input.content(inputValue);
-
-        /*
-        if(!input.baseScrollHeight)
-        {
-            input.baseScrollHeight = input.scrollHeight;
-            input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
-        }
-
-        input.rows = 1;
-        let rows = Math.ceil((input.scrollHeight - input.baseScrollHeight) / input.lineHeight) + 1;
-        this.state.input.rows = rows;
-        input.rows = rows;
-        */
-
-        if (!input.lineHeight) input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
-        input.rows = 1;
-        input.rows = input.scrollHeight / input.lineHeight;
-
-        if (this.state.input.messageLength) {
-            if (!this.state.input.writingPreview && !this.state.messageEditing) this.inputPreviewStart(inputValue);
-        } else {
-            if (this.state.input.writingPreview && !inputValue.length) this.inputPreviewEnd();
-        }
-
-        if (this.state.messageEditing) this.state.messageEditing.content = inputValue;
-        else if (this.state.input.writingPreview) this.state.input.previewModel.content = inputValue;
-
-        this.timedRedraw(100, () => (this.atBottom() && !this.state.messageEditing ? this.scrollToBottom() : null));
-    }
-
-    inputPressEnter(e) {
-        e.redraw = false;
-        if (e.keyCode == 13 && !e.shiftKey) {
-            this.state.messageSend(this.getChatInput().value);
-            return false;
-        }
-        return true;
-    }
-
-    inputPressButton() {
-        this.state.messageSend(this.getChatInput().value);
-    }
-
-    inputPreviewStart(content) {
-        if (!this.state.input.writingPreview) {
-            this.state.input.writingPreview = true;
-
-            this.state.input.previewModel = app.store.createRecord('chatmessages');
-            this.state.input.previewModel.pushData({
-                id: 0,
-                attributes: { message: ' ', created_at: 0 },
-                relationships: { user: app.session.user, chat: this.model },
-            });
-            Object.assign(this.state.input.previewModel, { isEditing: true, isNeedToFlash: true, content });
-        } else this.state.input.previewModel.isNeedToFlash = true;
-
-        m.redraw();
-    }
-
-    inputPreviewEnd() {
-        this.state.input.writingPreview = false;
-
-        m.redraw();
-    }
-
     reloadMessages() {
         if (!this.state.messagesFetched) {
             let query;
@@ -384,27 +284,6 @@ export default class ChatViewport extends Component {
 
             this.state.messagesFetched = true;
         }
-    }
-
-    timedRedraw(timeout, callback) {
-        if (!this.redrawTimeout) {
-            this.redrawTimeout = setTimeout(() => {
-                m.redraw();
-                if (callback) callback();
-                this.redrawTimeout = null;
-            }, timeout);
-        }
-    }
-
-    insertMention(model) {
-        let user = model.user();
-        if (!app.session.user) return;
-
-        var input = this.getChatInput();
-        input.value += ` @${user.username()} `;
-        input.focus();
-
-        this.inputProcess();
     }
 
     atBottom() {

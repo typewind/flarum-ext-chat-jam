@@ -38,7 +38,7 @@ export default class ChatMessage extends Component {
     }
 
     modelEvent(name) {
-        const viewportState = app.chat.getViewportState(this.model);
+        const viewportState = app.chat.getViewportState(this.model.chat());
         viewportState.onChatMessageClicked(name, this.model);
         app.chat.onChatMessageClicked(name, this.model);
     }

@@ -459,11 +459,6 @@ export default class ChatState {
         });
     }
 
-    componentCurViewport() {
-        let model = this.getCurrentChat();
-        return model ? <ChatViewport model={model} /> : null;
-    }
-
     messageNotify(model) {
         if (!app.session.user || model.user().id() != app.session.user.id()) this.notifyTry(model);
     }

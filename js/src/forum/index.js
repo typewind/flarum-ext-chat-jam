@@ -1,6 +1,7 @@
 import { extend } from 'flarum/extend';
 import Application from 'flarum/Application';
 import ChatFrame from './components/ChatFrame';
+import ChatPage from './components/ChatPage';
 
 import Chat from './models/Chat';
 import Message from './models/Message';
@@ -14,6 +15,8 @@ chat.setAttribute('id', 'chat');
 document.body.append(chat);
 
 app.initializers.add('xelson-chat', (app) => {
+    app.routes.chat = { path: '/chat', component: ChatPage };
+
     app.store.models.chats = Chat;
     app.store.models.chatmessages = Message;
 
@@ -49,5 +52,14 @@ app.initializers.add('xelson-chat', (app) => {
         app.chat = new ChatState();
 
         m.mount(document.getElementById('chat'), ChatFrame);
+
+        if ('Notification' in window && app.chat.getFrameState('notify')) Notification.requestPermission();
+
+        if (!app.pusher) {
+            alert('Please enable Pusher/WebSocket to use Neon Chat!');
+            return;
+        }
+
+        app.chat.apiFetchChats();
     });
 });

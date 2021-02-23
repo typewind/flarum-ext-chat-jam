@@ -61,22 +61,8 @@ export default class ChatInput extends Component {
         this.state.input.messageLength = inputValue.length;
         this.state.input.content(inputValue);
 
-        /*
-        if(!input.baseScrollHeight)
-        {
-            input.baseScrollHeight = input.scrollHeight;
-            input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
-        }
-
-        input.rows = 1;
-        let rows = Math.ceil((input.scrollHeight - input.baseScrollHeight) / input.lineHeight) + 1;
-        this.state.input.rows = rows;
-        input.rows = rows;
-        */
-
         if (!input.lineHeight) input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
-        input.rows = 1;
-        input.rows = input.scrollHeight / input.lineHeight;
+        input.rows = Math.max(Math.min(input.scrollHeight / input.lineHeight, 5), 1);
 
         if (this.state.input.messageLength) {
             if (!this.state.input.writingPreview && !this.state.messageEditing) this.inputPreviewStart(inputValue);

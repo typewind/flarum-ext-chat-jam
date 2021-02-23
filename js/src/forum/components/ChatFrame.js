@@ -86,7 +86,9 @@ export default class ChatFrame extends Component {
         document.removeEventListener('mousemove', this.mouseMoveEvent);
         document.body.classList.remove('moving');
 
-        app.chat.saveFrameState('transform', { x: parseInt(this.getChat().style.right), y: this.getChatWrapper().offsetHeight });
+        if (!app.current.matches(ChatPage)) {
+            app.chat.saveFrameState('transform', { x: parseInt(this.getChat().style.right), y: this.getChatWrapper().offsetHeight });
+        }
     }
 
     chatMoveProcess(e) {

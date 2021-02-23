@@ -51,7 +51,7 @@ export default class ChatViewport extends Component {
         let contents;
 
         const style = {};
-        if (!app.current.matches(ChatPage)) style['height'] = app.chat.getFrameState('transform').y + 'px';
+        if (!app.current.matches(ChatPage) && app.screen() !== 'phone') style['height'] = app.chat.getFrameState('transform').y + 'px';
         if (this.model) {
             contents = (
                 <div className="ChatViewport">
@@ -119,9 +119,10 @@ export default class ChatViewport extends Component {
     isFastScrollAvailable() {
         let chatWrapper = this.getChatWrapper();
         return (
-            this.state.newPushedPosts ||
-            this.model.unreaded() >= 30 ||
-            (chatWrapper && chatWrapper.scrollHeight > 2000 && chatWrapper.scrollTop < chatWrapper.scrollHeight - 2000)
+            (this.state.newPushedPosts ||
+                this.model.unreaded() >= 30 ||
+                (chatWrapper && chatWrapper.scrollHeight > 2000 && chatWrapper.scrollTop < chatWrapper.scrollHeight - 2000)) &&
+            !this.nearBottom()
         );
     }
 

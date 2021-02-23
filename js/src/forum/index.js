@@ -1,13 +1,13 @@
 import { extend } from 'flarum/extend';
 import Application from 'flarum/Application';
 import ChatFrame from './components/ChatFrame';
-import ChatPage from './components/ChatPage';
 
 import Chat from './models/Chat';
 import Message from './models/Message';
 import User from 'flarum/models/User';
 import Model from 'flarum/Model';
 import ChatState from './states/ChatState';
+import addChatPage from './addChatPage';
 
 const chat = document.createElement('div');
 chat.setAttribute('id', 'chat');
@@ -15,8 +15,6 @@ chat.setAttribute('id', 'chat');
 document.body.append(chat);
 
 app.initializers.add('xelson-chat', (app) => {
-    app.routes.chat = { path: '/chat', component: ChatPage };
-
     app.store.models.chats = Chat;
     app.store.models.chatmessages = Message;
 
@@ -62,4 +60,6 @@ app.initializers.add('xelson-chat', (app) => {
 
         app.chat.apiFetchChats();
     });
+
+    addChatPage();
 });

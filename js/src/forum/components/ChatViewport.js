@@ -50,14 +50,13 @@ export default class ChatViewport extends Component {
 
         if (this.model) {
             contents = (
-                <div>
+                <div className="ChatViewport">
                     <div
                         className="wrapper"
                         oncreate={this.wrapperOnCreate.bind(this)}
                         onbeforeupdate={this.wrapperOnBeforeUpdate.bind(this)}
                         onupdate={this.wrapperOnUpdate.bind(this)}
                         onremove={this.wrapperOnRemove.bind(this)}
-                        style={{ height: app.chat.getFrameState('transform').y + 'px' }}
                     >
                         {this.componentLoader(this.state.scroll.loading)}
                         {this.componentsChatMessages(this.model).concat(

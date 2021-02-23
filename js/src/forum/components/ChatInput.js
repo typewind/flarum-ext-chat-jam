@@ -23,7 +23,7 @@ export default class ChatInput extends Component {
 
     view() {
         return (
-            <div className="input-wrapper">
+            <div className="ChatInput input-wrapper">
                 <textarea
                     id="chat-input"
                     maxlength={this.messageCharLimit}

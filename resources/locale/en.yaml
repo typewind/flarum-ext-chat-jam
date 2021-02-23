@@ -1,5 +1,7 @@
 xelson-chat:
   forum:
+    index:
+      chat_link: Chat
     toolbar:
       title: Chat
       enable_sounds: Enable sounds

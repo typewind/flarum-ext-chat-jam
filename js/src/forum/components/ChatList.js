@@ -4,8 +4,10 @@ import ChatPreview from './ChatPreview';
 
 export default class ChatFrame extends Component {
     view(vnode) {
+        const classes = ['ChatList'];
+        if (app.chat.getFrameState('beingShownChatsList')) classes.push('toggled');
         return (
-            <div id="chats-list" className={app.chat.getFrameState('beingShownChatsList') ? 'toggled' : ''}>
+            <div id="chats-list" className={classes.join(' ')}>
                 <div className="header">
                     <div className="input-wrapper input--down">
                         <input id="chat-find" bidi={app.chat.q} placeholder={app.translator.trans('xelson-chat.forum.chat.list.placeholder')} />

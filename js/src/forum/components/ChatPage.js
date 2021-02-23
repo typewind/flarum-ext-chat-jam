@@ -52,6 +52,6 @@ export default class ChatPage extends Page {
     onremove(vnode) {
         super.onremove(vnode);
 
-        $(window).off(this.clickHandler);
+        $(window).off('click', this.clickHandler);
     }
 }

@@ -149,7 +149,11 @@ export default class ChatViewport extends Component {
         super.oncreate(vnode);
         this.wrapperOnUpdate(vnode);
 
-        vnode.dom.addEventListener('scroll', (this.boundScrollListener = this.wrapperOnScroll.bind(this)), { passive: true });
+        (app.current.matches(ChatPage) ? window : vnode.dom).addEventListener(
+            'scroll',
+            (this.boundScrollListener = this.wrapperOnScroll.bind(this)),
+            { passive: true }
+        );
 
         if (!app.current.matches(ChatPage) && app.screen() !== 'phone') vnode.dom.style.height = app.chat.getFrameState('transform').y + 'px';
     }
@@ -180,8 +184,7 @@ export default class ChatViewport extends Component {
     }
 
     wrapperOnScroll(e) {
-        e.redraw = false;
-        let el = this.element;
+        const el = app.current.matches(ChatPage) ? document.documentElement : this.element;
 
         this.state.scroll.oldScroll = el.scrollHeight - el.clientHeight - el.scrollTop;
 

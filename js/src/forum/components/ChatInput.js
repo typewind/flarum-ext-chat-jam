@@ -8,6 +8,14 @@ export default class ChatInput extends Component {
         this.state = this.attrs.state;
 
         this.messageCharLimit = app.forum.attribute('xelson-chat.settings.charlimit') ?? 512;
+
+        if (!app.session.user) {
+            this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.unauthenticated');
+        } else if (!app.chat.getPermissions().post) {
+            this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.chatdenied');
+        } else {
+            this.inputPlaceholder = app.translator.trans('xelson-chat.forum.chat.placeholder');
+        }
     }
 
     oncreate(vnode) {

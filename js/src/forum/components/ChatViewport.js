@@ -284,7 +284,7 @@ export default class ChatViewport extends Component {
     }
 
     nearBottom() {
-        return Math.abs(this.element.scrollHeight - this.element.scrollTop - this.element.clientHeight) <= 300;
+        return Math.abs(this.element.scrollHeight - this.element.scrollTop - this.element.clientHeight) <= 500;
     }
 
     atBottom() {

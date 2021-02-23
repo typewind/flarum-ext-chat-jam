@@ -62,7 +62,8 @@ export default class ChatInput extends Component {
         this.state.input.content(inputValue);
 
         if (!input.lineHeight) input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
-        input.rows = Math.max(Math.min(input.scrollHeight / input.lineHeight, 5), 1);
+        this.state.input.rows = Math.min(input.scrollHeight / input.lineHeight, 5);
+        input.rows = this.state.input.rows;
 
         if (this.state.input.messageLength) {
             if (!this.state.input.writingPreview && !this.state.messageEditing) this.inputPreviewStart(inputValue);

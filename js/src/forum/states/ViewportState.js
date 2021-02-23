@@ -115,6 +115,7 @@ export default class ViewportState {
         this.input.messageLength = 0;
         this.input.rows = 1;
         this.input.content(null);
+        m.redraw();
     }
 
     insertMention(model) {

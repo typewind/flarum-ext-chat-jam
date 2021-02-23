@@ -1,6 +1,3 @@
-import ChatPreview from '../components/ChatPreview';
-import ChatMessage from '../components/ChatMessage';
-import ChatEventMessage from '../components/ChatEventMessage';
 import Message from '../models/Message';
 
 import Model from 'flarum/Model';
@@ -176,14 +173,6 @@ export default class ChatState {
         });
     }
 
-    componentsChats() {
-        return this.getChatsSortedByLastUpdate().map((model) => (
-            <div onclick={this.onChatChanged.bind(this, model)}>
-                <ChatPreview key={model.id()} model={model} />
-            </div>
-        ));
-    }
-
     addChat(model, outside = false) {
         this.chats.push(model);
         this.viewportStates[model.id()] = new ViewportState();
@@ -276,14 +265,6 @@ export default class ChatState {
                 m.redraw();
             }
         });
-    }
-
-    componentChatMessage(model) {
-        return model.type() ? <ChatEventMessage key={model.id()} model={model} /> : <ChatMessage key={model.id()} model={model} />;
-    }
-
-    componentsChatMessages(chat) {
-        return this.getChatMessages((message) => message.chat() === chat).map((model) => this.componentChatMessage(model));
     }
 
     isChatMessageExists(model) {

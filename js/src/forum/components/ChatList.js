@@ -1,5 +1,6 @@
 import Component from 'flarum/Component';
 import ChatCreateModal from './ChatCreateModal';
+import ChatPreview from './ChatPreview';
 
 export default class ChatFrame extends Component {
     view(vnode) {
@@ -20,13 +21,25 @@ export default class ChatFrame extends Component {
                     </div>
                 </div>
                 <div className="list">
-                    {app.chat.componentsChats()}
+                    {app.chat.getChatsSortedByLastUpdate().map((model) => (
+                        <div onclick={app.chat.onChatChanged.bind(app.chat, model)}>
+                            <ChatPreview key={model.id()} model={model} />
+                        </div>
+                    ))}
                     {app.session.user && app.chat.getPermissions().create.chat ? (
                         <div class="panel-add" onclick={() => app.modal.show(ChatCreateModal)}></div>
                     ) : null}
                 </div>
             </div>
         );
+    }
+
+    content() {
+        return app.chat.getChatsSortedByLastUpdate().map((model) => (
+            <div onclick={this.onChatChanged.bind(this, model)}>
+                <ChatPreview key={model.id()} model={model} />
+            </div>
+        ));
     }
 
     getChatsListPanel() {

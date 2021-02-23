@@ -2,6 +2,8 @@ import Component from 'flarum/Component';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
 
 import ChatInput from './ChatInput';
+import ChatMessage from './ChatMessage';
+import ChatEventMessage from './ChatEventMessage';
 import ChatWelcome from './ChatWelcome';
 import Message from '../models/Message';
 import timedRedraw from '../utils/timedRedraw';
@@ -58,9 +60,9 @@ export default class ChatViewport extends Component {
                         style={{ height: app.chat.getFrameState('transform').y + 'px' }}
                     >
                         {this.componentLoader(this.state.scroll.loading)}
-                        {app.chat
-                            .componentsChatMessages(this.model)
-                            .concat(this.state.input.writingPreview ? app.chat.componentChatMessage(this.state.input.previewModel) : [])}
+                        {this.componentsChatMessages(this.model).concat(
+                            this.state.input.writingPreview ? this.componentChatMessage(this.state.input.previewModel) : []
+                        )}
                     </div>
                     <ChatInput
                         state={this.state}
@@ -79,6 +81,14 @@ export default class ChatViewport extends Component {
         }
 
         return <div id="chat-viewport">{contents}</div>;
+    }
+
+    componentChatMessage(model) {
+        return model.type() ? <ChatEventMessage key={model.id()} model={model} /> : <ChatMessage key={model.id()} model={model} />;
+    }
+
+    componentsChatMessages(chat) {
+        return app.chat.getChatMessages((message) => message.chat() === chat).map((model) => this.componentChatMessage(model));
     }
 
     componentScroller() {

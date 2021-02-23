@@ -43,7 +43,7 @@ xelson-chat:
       list:
         pin: Pin panel
         unpin: Unpin panel
-        placeholder: Search
+        placeholder: Filter Chats
         preview:
           empty: No messages
         add_modal: 
@@ -91,7 +91,7 @@ xelson-chat:
           users.invited: "{editorname} invited {usernames}"
           users.kicked: "{editorname} kicked {usernames}"
           users.invited_kicked: "{editorname} invited {invitednames} and kicked {kickednames}"
-          self.leaved: "{username} leaved the chat"
+          self.leaved: "{username} left the chat"
           self.entered: "{username} entered the chat"
     errors:
       unauthenticated: Only registered users can use the chat

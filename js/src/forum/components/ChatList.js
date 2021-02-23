@@ -7,8 +7,8 @@ export default class ChatFrame extends Component {
         return (
             <div id="chats-list" className={app.chat.getFrameState('beingShownChatsList') ? 'toggled' : ''}>
                 <div className="header">
-                    <div className="input-wrapper input--down" style="opacity:0">
-                        <textarea id="chat-find" placeholder={app.translator.trans('xelson-chat.forum.chat.list.placeholder')} />
+                    <div className="input-wrapper input--down">
+                        <input id="chat-find" bidi={app.chat.q} placeholder={app.translator.trans('xelson-chat.forum.chat.list.placeholder')} />
                     </div>
                     <div
                         className="icon icon-toggle"

@@ -2,6 +2,7 @@ import Message from '../models/Message';
 
 import Model from 'flarum/Model';
 import evented from 'flarum/utils/evented';
+import Stream from 'flarum/utils/Stream';
 
 import * as resources from '../resources';
 import ViewportState from './ViewportState';
@@ -16,6 +17,7 @@ audio.volume = 0.5;
 
 export default class ChatState {
     constructor() {
+        this.q = Stream('');
         this.chats = [];
         this.chatmessages = [];
 
@@ -161,7 +163,7 @@ export default class ChatState {
     }
 
     getChats() {
-        return this.chats;
+        return this.chats.filter((chat) => (this.q() && chat.matches(this.q().toLowerCase())) || (!this.q() && !chat.removed_at()));
     }
 
     getChatsSortedByLastUpdate() {

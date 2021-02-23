@@ -87,7 +87,11 @@ export default class ChatMessage extends Component {
                                 {this.model.content}
                             </div>
                         ) : (
-                            <div className="actualMessage" oncreate={this.onContentWrapperCreated.bind(this)} onupdate={this.onContentWrapperUpdated.bind(this)}></div>
+                            <div
+                                className="actualMessage"
+                                oncreate={this.onContentWrapperCreated.bind(this)}
+                                onupdate={this.onContentWrapperUpdated.bind(this)}
+                            ></div>
                         )}
                     </div>
                 </div>

@@ -47,14 +47,13 @@ export default class ChatInput extends Component {
                     id="chat-limiter"
                     className={this.reachedLimit() ? 'reaching-limit' : ''}
                     style={{ display: !app.chat.getPermissions().post ? 'none' : '' }}
-                >
-                </div>
+                ></div>
             </div>
         );
     }
 
     updateLimit() {
-        this.$('#chat-limiter')[0].innerText = (this.messageCharLimit - (this.state.input.messageLength || 0) + '/' + this.messageCharLimit);
+        this.$('#chat-limiter')[0].innerText = this.messageCharLimit - (this.state.input.messageLength || 0) + '/' + this.messageCharLimit;
     }
 
     reachedLimit() {

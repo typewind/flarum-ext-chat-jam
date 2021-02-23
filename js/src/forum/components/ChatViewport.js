@@ -202,7 +202,7 @@ export default class ChatViewport extends Component {
             this.state.newPushedPosts = false;
         }
 
-        if (this.state.scroll.autoScroll || this.state.loading) return;
+        if (this.state.scroll.autoScroll || this.state.loading || this.scrolling) return;
 
         if (!this.state.messageEditing && el.scrollTop >= 0) {
             if (el.scrollTop <= 500) {
@@ -260,6 +260,7 @@ export default class ChatViewport extends Component {
     }
 
     scrollToBottom() {
+        this.scrolling = true;
         let chatWrapper = this.getChatWrapper();
         if (chatWrapper) {
             if (chatWrapper.scrollTop + chatWrapper.offsetHeight >= chatWrapper.scrollHeight - 1) return;
@@ -268,6 +269,7 @@ export default class ChatViewport extends Component {
                 .stop()
                 .animate({ scrollTop: chatWrapper.scrollHeight }, 250, 'swing', () => {
                     this.state.scroll.autoScroll = false;
+                    this.scrolling = false;
                 });
         }
     }

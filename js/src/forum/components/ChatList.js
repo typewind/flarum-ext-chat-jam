@@ -12,7 +12,9 @@ export default class ChatFrame extends Component {
                     <div className="input-wrapper input--down">
                         <input id="chat-find" bidi={app.chat.q} placeholder={app.translator.trans('xelson-chat.forum.chat.list.placeholder')} />
                     </div>
-                    {this.attrs.inPage ? '' :
+                    {this.attrs.inPage ? (
+                        ''
+                    ) : (
                         <div
                             className="icon icon-toggle"
                             onclick={this.toggleChatsList.bind(this)}
@@ -22,7 +24,7 @@ export default class ChatFrame extends Component {
                         >
                             <i className="fas fa-paperclip"></i>
                         </div>
-                    }
+                    )}
                 </div>
                 <div className="list">
                     {app.chat.getChatsSortedByLastUpdate().map((model) => (

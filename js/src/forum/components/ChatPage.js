@@ -23,12 +23,35 @@ export default class ChatPage extends Page {
                 </nav>
                 <ChatHeader showChatListStream={this.listOpen}></ChatHeader>
                 {app.chat.chatsLoading ? <LoadingIndicator></LoadingIndicator> : <ChatViewport chatModel={app.chat.getCurrentChat()}></ChatViewport>}
-                {this.listOpen() ? 
+                {this.listOpen() ? (
                     <div class="ChatPage--list">
                         <ChatList inPage={true}></ChatList>
-                    </div> : ''
-                }
+                    </div>
+                ) : (
+                    ''
+                )}
             </div>
         );
+    }
+
+    oncreate(vnode) {
+        super.oncreate(vnode);
+
+        this.clickHandler = (e) => {
+            const chatList = this.$('.ChatList')[0];
+
+            if (this.listOpen() && !(chatList && chatList.contains(e.target))) {
+                this.listOpen(false);
+                m.redraw();
+            }
+        };
+
+        $(window).on('click', this.clickHandler);
+    }
+
+    onremove(vnode) {
+        super.onremove(vnode);
+
+        $(window).off(this.clickHandler);
     }
 }

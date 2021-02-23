@@ -258,7 +258,7 @@ export default class ChatViewport extends Component {
         this.scrolling = true;
         let chatWrapper = this.getChatWrapper();
         if (chatWrapper) {
-            if (!force && chatWrapper.scrollTop + chatWrapper.offsetHeight >= chatWrapper.scrollHeight - 1) return;
+            if (!force && this.atBottom()) return;
 
             $(chatWrapper)
                 .stop()
@@ -291,6 +291,7 @@ export default class ChatViewport extends Component {
     }
 
     nearBottom() {
+        console.log(this.pixelsFromBottom());
         return this.pixelsFromBottom() <= 500;
     }
 
@@ -299,7 +300,7 @@ export default class ChatViewport extends Component {
     }
 
     pixelsFromBottom() {
-        const element = app.current.matches(ChatPage) ? this.element : document.documentElement;
+        const element = app.current.matches(ChatPage) ? document.documentElement : this.element;
         return Math.abs(element.scrollHeight - element.scrollTop - element.clientHeight);
     }
 }

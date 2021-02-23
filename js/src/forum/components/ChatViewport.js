@@ -256,7 +256,7 @@ export default class ChatViewport extends Component {
 
             $(chatWrapper)
                 .stop()
-                .animate({ scrollTop: chatWrapper.scrollHeight }, 500, 'swing', () => {
+                .animate({ scrollTop: chatWrapper.scrollHeight }, 250, 'swing', () => {
                     this.state.scroll.autoScroll = false;
                 });
         }

@@ -10,6 +10,12 @@ export default class ChatInput extends Component {
         this.messageCharLimit = app.forum.attribute('xelson-chat.settings.charlimit') ?? 512;
     }
 
+    oncreate(vnode) {
+        super.oncreate(vnode);
+
+        this.updateLimit();
+    }
+
     onupdate(vnode) {
         this.model = this.attrs.model;
         this.state = this.attrs.state;
@@ -38,14 +44,17 @@ export default class ChatInput extends Component {
                     <i class="fas fa-angle-double-right"></i>
                 </div>
                 <div
-                    id="chat-limitter"
+                    id="chat-limiter"
                     className={this.reachedLimit() ? 'reaching-limit' : ''}
                     style={{ display: !app.chat.getPermissions().post ? 'none' : '' }}
                 >
-                    {this.messageCharLimit - (this.state.input.messageLength || 0) + '/' + this.messageCharLimit}
                 </div>
             </div>
         );
+    }
+
+    updateLimit() {
+        this.$('#chat-limiter')[0].innerText = (this.messageCharLimit - (this.state.input.messageLength || 0) + '/' + this.messageCharLimit);
     }
 
     reachedLimit() {
@@ -59,6 +68,7 @@ export default class ChatInput extends Component {
         let input = e.target;
         let inputValue = input.value.trim();
         this.state.input.messageLength = inputValue.length;
+        this.updateLimit();
         this.state.input.content(inputValue);
 
         if (!input.lineHeight) input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));

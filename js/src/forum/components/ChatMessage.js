@@ -83,11 +83,11 @@ export default class ChatMessage extends Component {
                     </div>
                     <div className="message">
                         {this.model.is_censored() ? (
-                            <div className="censored" title={app.translator.trans('xelson-chat.forum.chat.message.censored')}>
+                            <div className="censored actualMessage" title={app.translator.trans('xelson-chat.forum.chat.message.censored')}>
                                 {this.model.content}
                             </div>
                         ) : (
-                            <div oncreate={this.onContentWrapperCreated.bind(this)} onupdate={this.onContentWrapperUpdated.bind(this)}></div>
+                            <div className="actualMessage" oncreate={this.onContentWrapperCreated.bind(this)} onupdate={this.onContentWrapperUpdated.bind(this)}></div>
                         )}
                     </div>
                 </div>
@@ -237,19 +237,27 @@ export default class ChatMessage extends Component {
     oncreate(vnode) {
         super.oncreate(vnode);
         this.messageWrapper = vnode.dom;
+
+        if (!this.attrs.model.exists) {
+            this.pollInterval = setInterval(() => {
+                this.renderMessage(this.$('.actualMessage')[0]);
+            }, 100);
+        }
+    }
+
+    onremove(vnode) {
+        clearInterval(this.pollInterval);
     }
 
     onContentWrapperUpdated(vnode) {
-        this.renderMessage(vnode);
+        this.renderMessage(vnode.dom);
     }
 
     onContentWrapperCreated(vnode) {
-        this.renderMessage(vnode);
+        this.renderMessage(vnode.dom);
     }
 
-    renderMessage(vnode) {
-        let element = vnode.dom;
-
+    renderMessage(element) {
         if (this.model.isNeedToFlash) {
             app.chat.flashItem($(this.messageWrapper));
             this.model.isNeedToFlash = false;

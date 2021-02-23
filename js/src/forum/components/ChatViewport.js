@@ -66,7 +66,7 @@ export default class ChatViewport extends Component {
                         state={this.state}
                         model={this.model}
                         oninput={() => {
-                            if (this.atBottom() && !this.state.messageEditing) {
+                            if (this.nearBottom() && !this.state.messageEditing) {
                                 this.scrollToBottom();
                             }
                         }}
@@ -149,7 +149,7 @@ export default class ChatViewport extends Component {
     }
 
     wrapperOnBeforeUpdate(vnode, vnodeNew) {
-        if (!this.state.autoScroll && this.atBottom() && this.state.newPushedPosts) {
+        if (!this.state.autoScroll && this.nearBottom() && this.state.newPushedPosts) {
             this.scrollAfterUpdate = true;
         }
     }
@@ -281,6 +281,10 @@ export default class ChatViewport extends Component {
 
             this.state.messagesFetched = true;
         }
+    }
+
+    nearBottom() {
+        return Math.abs(this.element.scrollHeight - this.element.scrollTop - this.element.clientHeight) <= 300;
     }
 
     atBottom() {

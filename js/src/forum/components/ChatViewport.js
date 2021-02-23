@@ -7,6 +7,7 @@ import ChatEventMessage from './ChatEventMessage';
 import ChatWelcome from './ChatWelcome';
 import Message from '../models/Message';
 import timedRedraw from '../utils/timedRedraw';
+import ChatPage from './ChatPage';
 
 export default class ChatViewport extends Component {
     oninit(vnode) {
@@ -39,6 +40,7 @@ export default class ChatViewport extends Component {
                 setTimeout(() => {
                     const element = this.element;
 
+                    // ! SCROLL
                     this.getChatWrapper().scrollTop = element.scrollHeight - element.clientHeight - oldScroll;
                 }, 200);
             }
@@ -48,6 +50,8 @@ export default class ChatViewport extends Component {
     view(vnode) {
         let contents;
 
+        const style = {};
+        if (!app.current.matches(ChatPage)) style['height'] = app.chat.getFrameState('transform').y + 'px';
         if (this.model) {
             contents = (
                 <div className="ChatViewport">
@@ -57,6 +61,7 @@ export default class ChatViewport extends Component {
                         onbeforeupdate={this.wrapperOnBeforeUpdate.bind(this)}
                         onupdate={this.wrapperOnUpdate.bind(this)}
                         onremove={this.wrapperOnRemove.bind(this)}
+                        style={style}
                     >
                         {this.componentLoader(this.state.scroll.loading)}
                         {this.componentsChatMessages(this.model).concat(
@@ -105,17 +110,10 @@ export default class ChatViewport extends Component {
             </msgloader>
         ) : null;
     }
-
-    getChat() {
-        return document.querySelector('.NeonChatFrame');
-    }
-
-    getChatsList() {
-        return document.querySelector('.NeonChatFrame #chats-list');
-    }
-
     getChatWrapper() {
-        return document.querySelector('.NeonChatFrame .wrapper');
+        return app.screen() === 'phone' && app.current.matches(ChatPage)
+            ? document.documentElement
+            : document.querySelector('.ChatViewport .wrapper');
     }
 
     isFastScrollAvailable() {
@@ -167,7 +165,7 @@ export default class ChatViewport extends Component {
         let el = vnode.dom;
         if (this.model && this.state.scroll.autoScroll) {
             if (this.autoScrollTimeout) clearTimeout(this.autoScrollTimeout);
-            this.autoScrollTimeout = setTimeout(this.scrollToBottom.bind(this), 100);
+            this.autoScrollTimeout = setTimeout(this.scrollToBottom.bind(this, true), 100);
         }
         if (el.scrollTop <= 0) el.scrollTop = 1;
         this.checkUnreaded();
@@ -243,26 +241,23 @@ export default class ChatViewport extends Component {
     }
 
     scrollToAnchor(anchor) {
-        let scroll = () => {
-            let element;
-            if (anchor instanceof Message) element = $(`.message-wrapper[data-id="${anchor.id()}"`)[0];
-            else element = anchor;
+        let element;
+        if (anchor instanceof Message) element = $(`.message-wrapper[data-id="${anchor.id()}"`)[0];
+        else element = anchor;
 
-            let chatWrapper = this.getChatWrapper();
-            if (chatWrapper && element)
-                $(chatWrapper)
-                    .stop()
-                    .animate({ scrollTop: element.offsetTop - element.offsetHeight }, 500);
-            else setTimeout(scroll, 100);
-        };
-        scroll();
+        let chatWrapper = this.getChatWrapper();
+        if (chatWrapper && element)
+            $(chatWrapper)
+                .stop()
+                .animate({ scrollTop: element.offsetTop - element.offsetHeight }, 500);
+        else setTimeout(scroll, 100);
     }
 
-    scrollToBottom() {
+    scrollToBottom(force = false) {
         this.scrolling = true;
         let chatWrapper = this.getChatWrapper();
         if (chatWrapper) {
-            if (chatWrapper.scrollTop + chatWrapper.offsetHeight >= chatWrapper.scrollHeight - 1) return;
+            if (!force && chatWrapper.scrollTop + chatWrapper.offsetHeight >= chatWrapper.scrollHeight - 1) return;
 
             $(chatWrapper)
                 .stop()
@@ -295,10 +290,15 @@ export default class ChatViewport extends Component {
     }
 
     nearBottom() {
-        return Math.abs(this.element.scrollHeight - this.element.scrollTop - this.element.clientHeight) <= 500;
+        return this.pixelsFromBottom() <= 500;
     }
 
     atBottom() {
-        return Math.abs(this.element.scrollHeight - this.element.scrollTop - this.element.clientHeight) <= 5;
+        return this.pixelsFromBottom() <= 5;
+    }
+
+    pixelsFromBottom() {
+        const element = app.current.matches(ChatPage) ? this.element : document.documentElement;
+        return Math.abs(element.scrollHeight - element.scrollTop - element.clientHeight);
     }
 }

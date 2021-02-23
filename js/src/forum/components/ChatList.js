@@ -5,22 +5,24 @@ import ChatPreview from './ChatPreview';
 export default class ChatFrame extends Component {
     view(vnode) {
         const classes = ['ChatList'];
-        if (app.chat.getFrameState('beingShownChatsList')) classes.push('toggled');
+        if (app.chat.getFrameState('beingShownChatsList') || this.attrs.inPage) classes.push('toggled');
         return (
-            <div id="chats-list" className={classes.join(' ')}>
+            <div className={classes.join(' ')}>
                 <div className="header">
                     <div className="input-wrapper input--down">
                         <input id="chat-find" bidi={app.chat.q} placeholder={app.translator.trans('xelson-chat.forum.chat.list.placeholder')} />
                     </div>
-                    <div
-                        className="icon icon-toggle"
-                        onclick={this.toggleChatsList.bind(this)}
-                        data-title={app.translator.trans(
-                            'xelson-chat.forum.chat.list.' + (app.chat.getFrameState('beingShownChatsList') ? 'unpin' : 'pin')
-                        )}
-                    >
-                        <i className="fas fa-paperclip"></i>
-                    </div>
+                    {this.attrs.inPage ? '' :
+                        <div
+                            className="icon icon-toggle"
+                            onclick={this.toggleChatsList.bind(this)}
+                            data-title={app.translator.trans(
+                                'xelson-chat.forum.chat.list.' + (app.chat.getFrameState('beingShownChatsList') ? 'unpin' : 'pin')
+                            )}
+                        >
+                            <i className="fas fa-paperclip"></i>
+                        </div>
+                    }
                 </div>
                 <div className="list">
                     {app.chat.getChatsSortedByLastUpdate().map((model) => (
@@ -45,11 +47,11 @@ export default class ChatFrame extends Component {
     }
 
     getChatsListPanel() {
-        return document.querySelector('.NeonChatFrame #chats-list');
+        return document.querySelector('.ChatList');
     }
 
     getChatsList() {
-        return document.querySelector('.NeonChatFrame #chats-list .list');
+        return document.querySelector('.ChatList .list');
     }
 
     toggleChatsList(e) {

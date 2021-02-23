@@ -13,6 +13,14 @@ export default class ChatHeader extends Component {
 
         return (
             <div className="ChatHeader" {...attrs}>
+                {this.attrs.showChatListStream ?
+                    <div
+                        className="icon"
+                        onclick={() => { this.attrs.showChatListStream(!this.attrs.showChatListStream())}}
+                    >
+                        <i className='fas fa-list'></i>
+                    </div>
+                : ''}
                 <h2>
                     {app.chat.getCurrentChat()
                         ? [

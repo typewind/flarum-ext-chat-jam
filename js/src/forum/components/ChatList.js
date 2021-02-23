@@ -19,7 +19,7 @@ export default class ChatFrame extends Component {
                         <i className="fas fa-paperclip"></i>
                     </div>
                 </div>
-                <div className="list" style={{ 'max-height': app.chat.getFrameState('transform').y + 'px' }}>
+                <div className="list">
                     {app.chat.componentsChats()}
                     {app.session.user && app.chat.getPermissions().create.chat ? (
                         <div class="panel-add" onclick={() => app.modal.show(ChatCreateModal)}></div>

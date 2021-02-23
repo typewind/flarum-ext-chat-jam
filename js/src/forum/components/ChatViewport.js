@@ -49,10 +49,8 @@ export default class ChatViewport extends Component {
     }
 
     view(vnode) {
-        let contents;
-
         if (this.model) {
-            contents = (
+            return (
                 <div className="ChatViewport">
                     <div
                         className="wrapper"
@@ -78,11 +76,9 @@ export default class ChatViewport extends Component {
                     {this.isFastScrollAvailable() ? this.componentScroller() : null}
                 </div>
             );
-        } else {
-            contents = <ChatWelcome />;
         }
 
-        return <div id="chat-viewport">{contents}</div>;
+        return <ChatWelcome />;
     }
 
     componentChatMessage(model) {

@@ -55,89 +55,31 @@
             }
         }
 
-        #chat-header {
-            width: 100%;
-            height: 35px;
-            background-color: @color-hr;
-            position: relative;
-            .user-select(none);
-
-            .window-buttons {
-                position: absolute;
-                right: 0;
-                top: 0;
-            }
-
-            .icon {
-                display: inline-block;
-                width: 28px;
-                line-height: 35px;
-                color: #adb0b5;
-                vertical-align: middle;
-                text-align: center;
-                font-size: 12pt;
-                cursor: pointer;
-                position: relative;
-
-                &:hover {
-                    color: #fff;
-                }
-            }
-
-            h2 {
-                display: inline-block;
-                color: #fff;
-                font-size: 18px;
-                font-weight: 100;
-                line-height: 35px;
-                vertical-align: middle;
-                margin: 0 0px 0px 15px;
-                max-width: 150px;
-                text-overflow: ellipsis;
-            }
-
-            p {
-                display: inline-block;
-                position: relative;
-                float: right;
-                margin: 0;
-                padding: 0;
-
-                img {
-                    height: 20px;
-                }
-            }
+        *[data-title]:after {
+            content: '';
+            opacity: 0;
         }
 
-        #chat-viewport {
-            overflow: hidden;
+        *[data-title]:hover:after {
+            content: attr(data-title);
+            .transition(opacity .3s);
+
+            padding: 4px 8px;
+            color: #FFF;
+            position: absolute;
+            right: 0;
+            top: -30px;
+            white-space: nowrap;
+            z-index: 20;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            background-color: #000;
+            opacity: 1.0;
+            font-size: 9pt;
+            line-height: 18px;
         }
-
-    *[data-title]:after {
-        content: '';
-        opacity: 0;
     }
-
-    *[data-title]:hover:after {
-        content: attr(data-title);
-        .transition(opacity .3s);
-
-        padding: 4px 8px;
-        color: #FFF;
-        position: absolute;
-        right: 0;
-        top: -30px;
-        white-space: nowrap;
-        z-index: 20;
-        -moz-border-radius: 5px;
-        -webkit-border-radius: 5px;
-        border-radius: 5px;
-        background-color: #000;
-        opacity: 1.0;
-        font-size: 9pt;
-        line-height: 18px;
-    }
-}
 }
 
 .moving {
@@ -150,9 +92,7 @@
 
 .hidden {
     .frame {
-
-        #chat-viewport,
-        #chats-list {
+        .ChatViewport, .ChatList {
             display: none;
         }
     }

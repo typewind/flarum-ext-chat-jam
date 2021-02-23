@@ -40,7 +40,6 @@ export default class ChatViewport extends Component {
                 setTimeout(() => {
                     const element = this.element;
 
-                    // ! SCROLL
                     this.getChatWrapper().scrollTop = element.scrollHeight - element.clientHeight - oldScroll;
                 }, 200);
             }
@@ -50,8 +49,6 @@ export default class ChatViewport extends Component {
     view(vnode) {
         let contents;
 
-        const style = {};
-        if (!app.current.matches(ChatPage) && app.screen() !== 'phone') style['height'] = app.chat.getFrameState('transform').y + 'px';
         if (this.model) {
             contents = (
                 <div className="ChatViewport">
@@ -61,7 +58,6 @@ export default class ChatViewport extends Component {
                         onbeforeupdate={this.wrapperOnBeforeUpdate.bind(this)}
                         onupdate={this.wrapperOnUpdate.bind(this)}
                         onremove={this.wrapperOnRemove.bind(this)}
-                        style={style}
                     >
                         {this.componentLoader(this.state.scroll.loading)}
                         {this.componentsChatMessages(this.model).concat(
@@ -154,6 +150,8 @@ export default class ChatViewport extends Component {
         this.wrapperOnUpdate(vnode);
 
         vnode.dom.addEventListener('scroll', (this.boundScrollListener = this.wrapperOnScroll.bind(this)), { passive: true });
+
+        if (!app.current.matches(ChatPage) && app.screen() !== 'phone') vnode.dom.style.height = app.chat.getFrameState('transform').y + 'px';
     }
 
     wrapperOnBeforeUpdate(vnode, vnodeNew) {
@@ -291,7 +289,6 @@ export default class ChatViewport extends Component {
     }
 
     nearBottom() {
-        console.log(this.pixelsFromBottom());
         return this.pixelsFromBottom() <= 500;
     }
 

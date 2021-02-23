@@ -20,6 +20,7 @@ export default class ChatState {
         this.chats = [];
         this.chatmessages = [];
 
+        this.chatsLoading = true;
         this.curChat = null;
         this.totalHiddenCount = 0;
 
@@ -179,8 +180,6 @@ export default class ChatState {
 
         if (model.id() == this.getFrameState('selectedChat')) this.onChatChanged(model);
         if (outside) model.isNeedToFlash = true;
-
-        app.test = () => model.delete();
     }
 
     editChat(model, outside = false) {
@@ -408,10 +407,9 @@ export default class ChatState {
     }
 
     apiFetchChats() {
-        let self = this;
-
         return app.store.find('chats').then((chats) => {
-            chats.map((model) => self.addChat(model));
+            chats.map((model) => this.addChat(model));
+            this.chatsLoading = false;
             m.redraw();
         });
     }

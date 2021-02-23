@@ -16,7 +16,7 @@ export default class ChatPage extends Page {
                 <nav className="IndexPage-nav sideNav">
                     <ul>{listItems(IndexPage.prototype.sidebarItems().toArray())}</ul>
                 </nav>
-                <ChatViewport></ChatViewport>
+                {app.chat.chatsLoading ? <LoadingIndicator></LoadingIndicator> : <ChatViewport chatModel={app.chat.getCurrentChat()}></ChatViewport>}
             </div>
         );
     }

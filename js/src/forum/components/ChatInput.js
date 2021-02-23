@@ -9,13 +9,7 @@ export default class ChatInput extends Component {
 
         this.messageCharLimit = app.forum.attribute('xelson-chat.settings.charlimit') ?? 512;
 
-        if (!app.session.user) {
-            this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.unauthenticated');
-        } else if (!app.chat.getPermissions().post) {
-            this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.chatdenied');
-        } else {
-            this.inputPlaceholder = app.translator.trans('xelson-chat.forum.chat.placeholder');
-        }
+        this.updatePlaceholder();
     }
 
     oncreate(vnode) {
@@ -25,8 +19,18 @@ export default class ChatInput extends Component {
     }
 
     onupdate(vnode) {
-        this.model = this.attrs.model;
-        this.state = this.attrs.state;
+        if (this.model !== this.attrs.model) {
+            this.model = this.attrs.model;
+            this.state = this.attrs.state;
+            this.updatePlaceholder();
+        }
+    }
+
+    updatePlaceholder() {
+        if (!app.session.user) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.unauthenticated');
+        else if (!app.chat.getPermissions().post) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.chatdenied');
+        else if (this.model.removed_at()) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.removed');
+        else this.inputPlaceholder = app.translator.trans('xelson-chat.forum.chat.placeholder');
     }
 
     view() {

@@ -13,37 +13,39 @@ export default class ChatViewport extends Component {
     oninit(vnode) {
         super.oninit(vnode);
 
-        this.model = app.chat.getCurrentChat();
+        this.model = this.attrs.chatModel;
+        this.state = app.chat.getViewportState(this.model);
+    }
+
+    oncreate(vnode) {
+        super.oncreate(vnode);
+        this.loadChat();
     }
 
     onupdate(vnode) {
         //app.chat.colorizeOddChatMessages();
 
-        const model = app.chat.getCurrentChat();
+        const model = this.attrs.chatModel;
 
         if (model !== this.model) {
             this.model = model;
+            this.state = app.chat.getViewportState(this.model);
 
-            if (this.model) {
-                this.state = app.chat.getViewportState(this.model);
-
-                const oldScroll = this.state.scroll.oldScroll;
-
-                if (!app.session.user) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.unauthenticated');
-                else if (!app.chat.getPermissions().post) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.chatdenied');
-                else if (this.model.removed_at()) this.inputPlaceholder = app.translator.trans('xelson-chat.forum.errors.removed');
-                else this.inputPlaceholder = app.translator.trans('xelson-chat.forum.chat.placeholder');
-
-                this.reloadMessages();
-                m.redraw();
-
-                setTimeout(() => {
-                    const element = this.element;
-
-                    this.getChatWrapper().scrollTop = element.scrollHeight - element.clientHeight - oldScroll;
-                }, 200);
-            }
+            this.loadChat();
         }
+    }
+
+    loadChat() {
+        const oldScroll = this.state.scroll.oldScroll;
+
+        this.reloadMessages();
+        m.redraw();
+
+        setTimeout(() => {
+            const element = this.element;
+
+            this.getChatWrapper().scrollTop = element.scrollHeight - element.clientHeight - oldScroll;
+        }, 200);
     }
 
     view(vnode) {

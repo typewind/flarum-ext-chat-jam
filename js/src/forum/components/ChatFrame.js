@@ -1,4 +1,5 @@
 import Component from 'flarum/Component';
+import LoadingIndicator from 'flarum/components/LoadingIndicator';
 import ChatHeader from './ChatHeader';
 import ChatList from './ChatList';
 import ChatPage from './ChatPage';
@@ -25,7 +26,11 @@ export default class ChatFrame extends Component {
 
                     <div id="chat-panel">
                         <ChatHeader ondragstart={() => false} onmousedown={this.chatHeaderOnMouseDown.bind(this)} inFrame={true}></ChatHeader>
-                        <ChatViewport></ChatViewport>
+                        {app.chat.chatsLoading ? (
+                            <LoadingIndicator></LoadingIndicator>
+                        ) : (
+                            <ChatViewport chatModel={app.chat.getCurrentChat()}></ChatViewport>
+                        )}
                     </div>
                 </div>
             </div>

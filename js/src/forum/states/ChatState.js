@@ -1,7 +1,6 @@
 import Message from '../models/Message';
 
 import Model from 'flarum/Model';
-import evented from 'flarum/utils/evented';
 import Stream from 'flarum/utils/Stream';
 
 import * as resources from '../resources';
@@ -22,7 +21,6 @@ export default class ChatState {
         this.chatmessages = [];
 
         this.curChat = null;
-        this.evented = evented;
         this.totalHiddenCount = 0;
 
         let neonchatState = JSON.parse(localStorage.getItem('neonchat')) ?? {};

@@ -1,6 +1,7 @@
 import Component from 'flarum/Component';
 import ChatHeader from './ChatHeader';
 import ChatList from './ChatList';
+import ChatPage from './ChatPage';
 import ChatViewport from './ChatViewport';
 
 export default class ChatFrame extends Component {
@@ -12,6 +13,8 @@ export default class ChatFrame extends Component {
     }
 
     view(vnode) {
+        if (app.current.matches(ChatPage)) return;
+
         return (
             <div
                 className={'NeonChatFrame ' + (app.chat.getFrameState('beingShown') ? '' : 'hidden')}

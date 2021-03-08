@@ -54,8 +54,7 @@ app.initializers.add('xelson-chat', (app) => {
         if ('Notification' in window && app.chat.getFrameState('notify')) Notification.requestPermission();
 
         if (!app.pusher) {
-            alert('Please enable Pusher/WebSocket to use Neon Chat!');
-            return;
+            app.alerts.show({ type: 'error' }, app.translator.trans('xelson-chat.forum.pusher_not_found'));
         }
 
         app.chat.apiFetchChats();

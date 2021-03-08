@@ -51,7 +51,8 @@ export default class ChatState {
         };
 
         this.viewportStates = {};
-        if (app.session.user) app.pusher.then(this.listenSocketChannels.bind(this));
+
+        if (app.session.user && app.pusher) app.pusher.then(this.listenSocketChannels.bind(this));
     }
 
     getViewportState(model) {
@@ -64,8 +65,6 @@ export default class ChatState {
     }
 
     handleSocketEvent(r) {
-        console.log(r);
-
         let message = r.response.message;
         if (message) message = app.store.pushPayload(message);
 

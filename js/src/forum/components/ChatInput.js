@@ -83,6 +83,7 @@ export default class ChatInput extends Component {
         this.state.input.content(inputValue);
 
         if (!input.lineHeight) input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
+        input.rows = 1;
         this.state.input.rows = Math.min(input.scrollHeight / input.lineHeight, app.screen() === 'phone' ? 3 : 5);
         input.rows = this.state.input.rows;
 

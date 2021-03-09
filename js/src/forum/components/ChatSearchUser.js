@@ -64,7 +64,9 @@ export default class ChatSearchUser extends Search {
                     )}
                 </div>
                 {this.state.getValue() && this.hasFocus ? (
-                    <ul className="Dropdown-menu Dropdown--Users Search-results">{this.sources.map((source) => source.view(this.state.getValue()))}</ul>
+                    <ul className="Dropdown-menu Dropdown--Users Search-results">
+                        {this.sources.map((source) => source.view(this.state.getValue()))}
+                    </ul>
                 ) : null}
             </div>
         );

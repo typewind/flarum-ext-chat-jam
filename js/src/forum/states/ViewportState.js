@@ -122,7 +122,7 @@ export default class ViewportState {
         let user = model.user();
         if (!app.session.user) return;
 
-        this.input.content(this.input.content() + ` @${user.username()} `);
+        this.input.content((this.input.content() || '') + ` @${user.username()} `);
 
         var input = this.getChatInput();
         input.focus();

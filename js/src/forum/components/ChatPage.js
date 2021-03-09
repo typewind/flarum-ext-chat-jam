@@ -49,6 +49,19 @@ export default class ChatPage extends Page {
         $(window).on('click', this.clickHandler);
     }
 
+    onupdate(vnode) {
+        if (this.listOpen()) {
+            this.element.querySelector('.ChatPage--list').style.height =
+                document.documentElement.clientHeight - this.element.querySelector('.ChatPage--list').getBoundingClientRect().top + 'px';
+
+            console.log(
+                this.element.querySelector('.ChatPage--list'),
+                this.element.querySelector('.ChatPage--list').style.height,
+                document.documentElement.clientHeight - this.element.querySelector('.ChatPage--list').getBoundingClientRect().top
+            );
+        }
+    }
+
     onremove(vnode) {
         super.onremove(vnode);
 

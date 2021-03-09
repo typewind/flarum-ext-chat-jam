@@ -13,6 +13,19 @@
         }
     }
 
+    .list {
+        max-height: 94%;
+    }
+
+    #chat-panel, .ChatViewport {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ChatViewport {
+        max-height: 95%;
+    }
+
     .frame {
         display: flex;
         position: relative;
@@ -22,10 +35,6 @@
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
         outline: none;
         height: 100%;
-
-        @media @phone {
-            max-height: 500px;
-        }
 
         .censored {
             box-shadow: inset 0px 0px 0px 1000px #dedede;

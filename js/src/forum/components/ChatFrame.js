@@ -13,6 +13,16 @@ export default class ChatFrame extends Component {
         document.addEventListener('mouseup', this.chatMoveListener.bind(this, 'mouseup'));
     }
 
+    oncreate(vnode) {
+        super.oncreate(vnode);
+
+        if (app.screen() !== 'phone') {
+            vnode.dom.style.height = app.chat.getFrameState('transform').y + 'px';
+        } else {
+            vnode.dom.style.height = '70vh';
+        }
+    }
+
     view(vnode) {
         if (app.current.matches(ChatPage)) return;
 
@@ -35,18 +45,6 @@ export default class ChatFrame extends Component {
                 </div>
             </div>
         );
-    }
-
-    getChat() {
-        return document.querySelector('.NeonChatFrame');
-    }
-
-    getChatFrame() {
-        return document.querySelector('.NeonChatFrame #chat');
-    }
-
-    getChatWrapper() {
-        return document.querySelector('.NeonChatFrame .wrapper');
     }
 
     chatHeaderOnMouseDown(e) {
@@ -92,25 +90,20 @@ export default class ChatFrame extends Component {
         document.body.classList.remove('moving');
 
         if (!app.current.matches(ChatPage)) {
-            app.chat.saveFrameState('transform', { x: parseInt(this.getChat().style.right), y: this.getChatWrapper().offsetHeight });
+            app.chat.saveFrameState('transform', { x: parseInt(this.element.style.right), y: this.element.offsetHeight });
         }
     }
 
     chatMoveProcess(e) {
-        let chat = this.getChat();
-        let chatWrapper = this.getChatWrapper();
-
         let move = { x: e.clientX - this.moveLast.x, y: e.clientY - this.moveLast.y };
-        let right = parseInt(chat.style.right) || 0;
-        let wrapperHeight = chatWrapper.offsetHeight;
-        let nextPos = { x: right - move.x, y: wrapperHeight - move.y };
+        let right = parseInt(this.element.style.right) || 0;
+        let nextPos = { x: right - move.x, y: this.element.offsetHeight - move.y };
 
-        if ((nextPos.x < window.innerWidth - this.getChatFrame().offsetWidth && move.x < 0) || (nextPos.x > 0 && move.x > 0))
-            chat.style.right = nextPos.x + 'px';
+        if ((nextPos.x < window.innerWidth - this.element.querySelector('#chat').offsetWidth && move.x < 0) || (nextPos.x > 0 && move.x > 0))
+            this.element.style.right = nextPos.x + 'px';
 
-        if (0 < nextPos.y && nextPos.y < window.innerHeight - 100) {
-            chatWrapper.style.height = nextPos.y + 'px';
-            chatWrapper.scrollTop += move.y;
+        if (this.element.querySelector('.ChatHeader').clientHeight < nextPos.y && nextPos.y < window.innerHeight - 100) {
+            this.element.style.height = nextPos.y + 'px';
         }
 
         this.moveLast = { x: e.clientX, y: e.clientY };

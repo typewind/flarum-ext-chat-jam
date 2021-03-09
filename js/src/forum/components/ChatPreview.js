@@ -62,7 +62,7 @@ export default class ChatPreview extends Component {
     componentPreview() {
         return [
             <ChatAvatar model={this.model} />,
-            <div style="display: flex; flex-direction: column">
+            <div class="previewBody">
                 <div className="title" title={this.model.title()}>
                     {this.model.icon() ? <i class={this.model.icon()} style={{ color: this.model.color() }}></i> : null}
                     {this.model.title()}

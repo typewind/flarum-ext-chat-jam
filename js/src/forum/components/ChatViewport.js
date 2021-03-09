@@ -152,8 +152,6 @@ export default class ChatViewport extends Component {
             (this.boundScrollListener = this.wrapperOnScroll.bind(this)),
             { passive: true }
         );
-
-        if (!app.current.matches(ChatPage) && app.screen() !== 'phone') vnode.dom.style.height = app.chat.getFrameState('transform').y + 'px';
     }
 
     wrapperOnBeforeUpdate(vnode, vnodeNew) {

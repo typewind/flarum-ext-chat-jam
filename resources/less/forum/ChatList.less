@@ -8,8 +8,12 @@
         }
     }
 
-    width: 70px;
+    width: 85px;
     background-color: @color-chatlist-bg;
+
+    .previewBody {
+        display: none;
+    }
 
     .header {
         display: flex;
@@ -40,7 +44,7 @@
     }
 
     .list {
-        overflow: hidden;
+        overflow: auto;
     }
 
     .unreaded {
@@ -55,7 +59,7 @@
         background-color: #3ab6ff;
         z-index: 99;
         top: 0px;
-        right: 5px;
+        right: 20px;
         text-align: center;
         color: #FFF;
         line-height: 18px;
@@ -63,10 +67,15 @@
         box-shadow: 0 0 4px 0px #000;
     }
 
+    .panel-add {
+        width: 55px;
+    }
+
     .panel-preview {
         display: flex;
         overflow: hidden;
         height: 55px;
+        width: 55px;
         background-color: #ffffff00;
         margin: 10px 8px;
         border-radius: 100px;
@@ -156,6 +165,11 @@
         &:hover {
             width: 255px;
 
+            .previewBody {
+                display: flex;
+                flex-direction: column;
+            }
+
             .unreaded {
                 top: 25px;
                 right: 15px;
@@ -171,6 +185,7 @@
             }
 
             .panel-add {
+                width: auto;
                 border-radius: 15px;
                 padding: 5px;
                 background-color: #ffffff;
@@ -190,6 +205,7 @@
             .panel-preview {
                 border-radius: 15px;
                 padding: 5px;
+                width: auto;
                 background-color: #fff;
 
                 .timestamp {
@@ -213,6 +229,11 @@
 
     &.toggled {
         width: 255px;
+
+        .previewBody {
+            display: flex;
+            flex-direction: column;
+        }
 
         .unreaded {
             top: 25px;
@@ -248,6 +269,7 @@
         .panel-preview {
             border-radius: 15px;
             padding: 5px;
+            width: auto;
             background-color: #fff;
 
             .timestamp {

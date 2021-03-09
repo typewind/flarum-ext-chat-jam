@@ -56,22 +56,22 @@ export default class ChatInput extends Component {
                         <i class="fas fa-times"></i>
                     </div>
                 ) : null}
-                {
-                    this.model.removed_at() && this.model.removed_by() === parseInt(app.session.user.id()) ?
-                        <Button className="Button Button--primary" onclick={() => app.modal.show(ChatEditModal, { model: this.model })}>
-                            {app.translator.trans('xelson-chat.forum.chat.rejoin')}
-                        </Button>
-                        : [
-                            <div className="icon send" onclick={this.inputPressButton.bind(this)}>
-                                <i class="fas fa-angle-double-right"></i>
-                            </div>,
-                            <div
-                                id="chat-limiter"
-                                className={this.reachedLimit() ? 'reaching-limit' : ''}
-                                style={{ display: !app.chat.getPermissions().post ? 'none' : '' }}
-                            ></div>
-                        ]
-                }
+                {this.model.removed_at() && this.model.removed_by() === parseInt(app.session.user.id()) ? (
+                    <Button className="Button Button--primary" onclick={() => app.modal.show(ChatEditModal, { model: this.model })}>
+                        {app.translator.trans('xelson-chat.forum.chat.rejoin')}
+                    </Button>
+                ) : (
+                    [
+                        <div className="icon send" onclick={this.inputPressButton.bind(this)}>
+                            <i class="fas fa-angle-double-right"></i>
+                        </div>,
+                        <div
+                            id="chat-limiter"
+                            className={this.reachedLimit() ? 'reaching-limit' : ''}
+                            style={{ display: !app.chat.getPermissions().post ? 'none' : '' }}
+                        ></div>,
+                    ]
+                )}
             </div>
         );
     }

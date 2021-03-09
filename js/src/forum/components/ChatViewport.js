@@ -14,7 +14,9 @@ export default class ChatViewport extends Component {
         super.oninit(vnode);
 
         this.model = this.attrs.chatModel;
-        this.state = app.chat.getViewportState(this.model);
+        if (this.model) {
+            this.state = app.chat.getViewportState(this.model);
+        }
     }
 
     oncreate(vnode) {
@@ -29,7 +31,9 @@ export default class ChatViewport extends Component {
 
         if (model !== this.model) {
             this.model = model;
-            this.state = app.chat.getViewportState(this.model);
+            if (this.model) {
+                this.state = app.chat.getViewportState(this.model);
+            }
 
             this.loadChat();
         }

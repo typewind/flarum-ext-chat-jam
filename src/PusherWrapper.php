@@ -39,7 +39,7 @@ class PusherWrapper
     private function buildPusher()
     {
         if (class_exists(Pusher::class) && app()->bound(Pusher::class)) return app(Pusher::class);
-        else {
+        else if (class_exists(PusherLegacy::class)) {
             $settings = app('flarum.settings');
 
             $options = [];
@@ -54,6 +54,8 @@ class PusherWrapper
                 $settings->get('flarum-pusher.app_id'),
                 $options
             );
+        } else {
+            return false;
         }
     }
 

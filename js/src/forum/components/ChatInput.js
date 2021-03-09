@@ -1,4 +1,6 @@
 import Component from 'flarum/Component';
+import Button from 'flarum/components/Button';
+import ChatEditModal from './ChatEditModal';
 
 export default class ChatInput extends Component {
     oninit(vnode) {
@@ -54,20 +56,30 @@ export default class ChatInput extends Component {
                         <i class="fas fa-times"></i>
                     </div>
                 ) : null}
-                <div className="icon send" onclick={this.inputPressButton.bind(this)}>
-                    <i class="fas fa-angle-double-right"></i>
-                </div>
-                <div
-                    id="chat-limiter"
-                    className={this.reachedLimit() ? 'reaching-limit' : ''}
-                    style={{ display: !app.chat.getPermissions().post ? 'none' : '' }}
-                ></div>
+                {
+                    this.model.removed_at() && this.model.removed_by() === parseInt(app.session.user.id()) ?
+                        <Button className="Button Button--primary" onclick={() => app.modal.show(ChatEditModal, { model: this.model })}>
+                            {app.translator.trans('xelson-chat.forum.chat.rejoin')}
+                        </Button>
+                        : [
+                            <div className="icon send" onclick={this.inputPressButton.bind(this)}>
+                                <i class="fas fa-angle-double-right"></i>
+                            </div>,
+                            <div
+                                id="chat-limiter"
+                                className={this.reachedLimit() ? 'reaching-limit' : ''}
+                                style={{ display: !app.chat.getPermissions().post ? 'none' : '' }}
+                            ></div>
+                        ]
+                }
             </div>
         );
     }
 
     updateLimit() {
-        this.$('#chat-limiter')[0].innerText = this.messageCharLimit - (this.state.input.messageLength || 0) + '/' + this.messageCharLimit;
+        const limiter = this.element.querySelector('#chat-limiter');
+        if (!limiter) return;
+        limiter.innerText = this.messageCharLimit - (this.state.input.messageLength || 0) + '/' + this.messageCharLimit;
     }
 
     reachedLimit() {

@@ -20,6 +20,7 @@ xelson-chat:
       moder: Moderator
       kick: Kick
       leave: Leave
+      rejoin: Rejoin
       edit_modal:
         title: Chat settings
         moderator:

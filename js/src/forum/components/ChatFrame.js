@@ -19,7 +19,7 @@ export default class ChatFrame extends Component {
 
     calcHeight() {
         if (!app.chat.getFrameState('beingShown')) {
-            return this.element ? this.element.querySelector('.ChatHeader').clientHeight + 'px' : '30px';
+            return '30px';
         } else if (app.screen() !== 'phone') {
             return app.chat.getFrameState('transform').y + 'px';
         } else {

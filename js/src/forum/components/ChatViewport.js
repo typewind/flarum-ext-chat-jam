@@ -261,9 +261,11 @@ export default class ChatViewport extends Component {
                 document.querySelector('.ChatViewport .wrapper').scrollHeight + 200 < document.documentElement.clientHeight;
             if (notAtBottom || fewMessages) return;
 
+            const time = this.pixelsFromBottom() < 80 ? 0 : 250;
+
             $(chatWrapper)
                 .stop()
-                .animate({ scrollTop: chatWrapper.scrollHeight }, 250, 'swing', () => {
+                .animate({ scrollTop: chatWrapper.scrollHeight }, time, 'swing', () => {
                     this.state.scroll.autoScroll = false;
                     this.scrolling = false;
                 });

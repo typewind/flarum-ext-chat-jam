@@ -18,12 +18,14 @@ export default class ChatInput extends Component {
         this.updateLimit();
     }
 
-    onupdate(vnode) {
+    onbeforeupdate(vnode, old) {
+        super.onbeforeupdate(vnode, old);
+
         if (this.model !== this.attrs.model) {
             this.model = this.attrs.model;
             this.state = this.attrs.state;
-            this.updatePlaceholder();
         }
+        this.updatePlaceholder();
     }
 
     updatePlaceholder() {

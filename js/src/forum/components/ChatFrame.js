@@ -15,22 +15,25 @@ export default class ChatFrame extends Component {
 
     oncreate(vnode) {
         super.oncreate(vnode);
+    }
 
-        if (app.screen() !== 'phone') {
-            vnode.dom.style.height = app.chat.getFrameState('transform').y + 'px';
+    calcHeight() {
+        if (!app.chat.getFrameState('beingShown')) {
+            return this.element ? this.element.querySelector('.ChatHeader').clientHeight + 'px' : '30px';
+        } else if (app.screen() !== 'phone') {
+            return app.chat.getFrameState('transform').y + 'px';
         } else {
-            vnode.dom.style.height = '70vh';
+            return '70vh';
         }
     }
 
     view(vnode) {
         if (app.current.matches(ChatPage)) return;
 
+        const style = { right: app.chat.getFrameState('transform').x + 'px', height: this.calcHeight() };
+
         return (
-            <div
-                className={'NeonChatFrame ' + (app.chat.getFrameState('beingShown') ? '' : 'hidden')}
-                style={{ right: app.chat.getFrameState('transform').x + 'px' }}
-            >
+            <div className={'NeonChatFrame ' + (app.chat.getFrameState('beingShown') ? '' : 'hidden')} style={style}>
                 <div tabindex="0" className="frame" id="chat">
                     <ChatList></ChatList>
 
@@ -74,6 +77,7 @@ export default class ChatFrame extends Component {
     }
 
     chatMoveStart(e) {
+        if (!app.chat.getFrameState('beingShown')) return;
         this.chatMoving = true;
         this.mouseMoveEvent = this.chatMoveProcess.bind(this);
         this.moveLast = { x: e.clientX, y: e.clientY };

@@ -43,7 +43,7 @@ class DeleteChatHandler
         $users = $chat->users()->get();
 
         $actor->assertPermission(
-            $chat->creator_id == $actor->id && (count($users) > 2 || $chat->type == 1)
+            ($actor->isAdmin() || $chat->creator_id == $actor->id) && (count($users) > 2 || $chat->type == 1)
         );
 
         $this->events->dispatch(

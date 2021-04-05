@@ -57,7 +57,7 @@ return [
         }),
 
     (new Extend\ApiSerializer(ForumSerializer::class))
-        ->mutate(function ($serializer, $model, $attributes) {
+        ->attributes(function ($serializer, $model, $attributes) {
             $actor = $serializer->getActor();
 
             $permissions = [
@@ -84,7 +84,5 @@ return [
         ->serializeToForum('xelson-chat.settings.display.minimize', 'xelson-chat.settings.display.minimize')
         ->serializeToForum('xelson-chat.settings.display.censor', 'xelson-chat.settings.display.censor'),
 
-    function (Dispatcher $events) {
-        $events->subscribe(Listener\PushChatEvents::class);
-    },
+    (new Extend\Event)->subscribe(Listener\PushChatEvents::class)
 ];

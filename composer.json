@@ -29,12 +29,8 @@
             "homepage": "https://neonsky.ru"
         }
     ],
-    "support": {
-        "issues": "https://github.com/Xelson/flarum-ext-chat/issues",
-        "source": "https://github.com/Xelson/flarum-ext-chat"
-    },
     "require": {
-        "flarum/core": "^0.1.0-beta.15",
+        "flarum/core": "^0.1.0-beta.16",
         "flarum/markdown": "^0.1.0"
     },
     "extra": {

@@ -16,10 +16,14 @@ export default class ChatPage extends Page {
     }
 
     view() {
+        const navItems = IndexPage.prototype.sidebarItems();
+
+        if (navItems.has('forumStatisticsWidget')) navItems.remove('forumStatisticsWidget');
+
         return (
             <div className="ChatPage">
                 <nav className="IndexPage-nav sideNav">
-                    <ul>{listItems(IndexPage.prototype.sidebarItems().toArray())}</ul>
+                    <ul>{listItems(navItems.toArray())}</ul>
                 </nav>
                 <ChatHeader showChatListStream={this.listOpen}></ChatHeader>
                 {app.chat.chatsLoading ? <LoadingIndicator></LoadingIndicator> : <ChatViewport chatModel={app.chat.getCurrentChat()}></ChatViewport>}

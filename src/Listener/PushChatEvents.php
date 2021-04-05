@@ -47,14 +47,14 @@ class PushChatEvents
 
     protected function buildResponse($data, $actor, $serializerClass, $include = [])
     {
-        $document = app(Document::class);
+        $document = resolve(Document::class);
 
 
         $request = ServerRequestFactory::fromGlobals();
 
         $request = $request->withAttribute('actor', $actor);
 
-        $serializer = app($serializerClass);
+        $serializer = resolve($serializerClass);
         $serializer->setRequest($request);
 
         $element = (new Resource($data, $serializer))

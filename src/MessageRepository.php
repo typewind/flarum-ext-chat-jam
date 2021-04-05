@@ -53,7 +53,7 @@ class MessageRepository
      */
     public function queryVisible(Chat $chat, User $actor)
     {
-        $settings = app(SettingsRepositoryInterface::class);
+        $settings = resolve(SettingsRepositoryInterface::class);
 
         $query = $this->query();
         $chatUser = $chat->getChatUser($actor);

@@ -17,7 +17,7 @@ export default class ChatSearchUser extends Search {
 
         return items;
     }
-    
+
     updateMaxHeight() {}
 
     view(vnode) {

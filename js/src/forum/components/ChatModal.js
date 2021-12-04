@@ -133,8 +133,7 @@ export default class ChatModal extends Modal {
         ];
     }
 
-    formInputOnUpdate(vnode)
-    {
+    formInputOnUpdate(vnode) {
         $('.Chat-FullColor').css({ color: this.input.color(), backgroundColor: this.input.color() });
     }
 

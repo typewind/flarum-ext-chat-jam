@@ -92,7 +92,7 @@ export default class ChatViewport extends Component {
     }
 
     componentsChatMessages(chat) {
-        return app.chat.getChatMessages((message) => message.chat() === chat).map((model) => this.componentChatMessage(model));
+        return app.chat.getChatMessages().map(model => this.componentChatMessage(model));
     }
 
     componentScroller() {

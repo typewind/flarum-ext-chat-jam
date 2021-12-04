@@ -2657,9 +2657,7 @@ function (_Component) {
   _proto.componentsChatMessages = function componentsChatMessages(chat) {
     var _this3 = this;
 
-    return app.chat.getChatMessages(function (message) {
-      return message.chat() === chat;
-    }).map(function (model) {
+    return app.chat.getChatMessages().map(function (model) {
       return _this3.componentChatMessage(model);
     });
   };

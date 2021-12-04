@@ -25,9 +25,11 @@ export default class ChatViewport extends Component {
     }
 
     onupdate(vnode) {
+        super.onupdate(vnode);
         //app.chat.colorizeOddChatMessages();
 
-        const model = this.attrs.chatModel;
+        // this.attrs is broken in onupdate hook
+        const model = vnode.attrs.chatModel;
 
         if (model !== this.model) {
             this.model = model;
@@ -159,12 +161,14 @@ export default class ChatViewport extends Component {
     }
 
     wrapperOnBeforeUpdate(vnode, vnodeNew) {
+        super.onbeforeupdate(vnode, vnodeNew);
         if (!this.state.autoScroll && this.nearBottom() && this.state.newPushedPosts) {
             this.scrollAfterUpdate = true;
         }
     }
 
     wrapperOnUpdate(vnode) {
+        super.onupdate(vnode);
         let el = vnode.dom;
         if (this.model && this.state.scroll.autoScroll) {
             if (this.autoScrollTimeout) clearTimeout(this.autoScrollTimeout);
@@ -180,6 +184,7 @@ export default class ChatViewport extends Component {
     }
 
     wrapperOnRemove(vnode) {
+        super.onremove(vnode);
         vnode.dom.removeEventListener('scroll', this.boundScrollListener);
     }
 

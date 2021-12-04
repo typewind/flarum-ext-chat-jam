@@ -20,6 +20,7 @@ export default class ChatModal extends Modal {
     }
 
     onremove(vnode) {
+        super.onremove(vnode);
         app.search.neonchat = null;
     }
 
@@ -103,7 +104,7 @@ export default class ChatModal extends Modal {
                         type="text"
                         bidi={options.stream}
                         placeholder={options.placeholder}
-                        onupdate={(vnode) => $('.Chat-FullColor').css({ color: this.input.color(), backgroundColor: this.input.color() })}
+                        onupdate={this.formInputOnUpdate.bind(this)}
                     />
                     <icon className="Chat-FullColor">
                         <i className={this.input.icon()?.length ? this.input.icon() : 'fas fa-bolt'} />
@@ -124,12 +125,17 @@ export default class ChatModal extends Modal {
                         type="text"
                         bidi={options.stream}
                         placeholder={options.placeholder}
-                        onupdate={(vnode) => $('.Chat-FullColor').css({ color: this.input.color(), backgroundColor: this.input.color() })}
+                        onupdate={this.formInputOnUpdate.bind(this)}
                     />
                     <color className="Chat-FullColor" />
                 </div>
             </div>,
         ];
+    }
+
+    formInputOnUpdate(vnode)
+    {
+        $('.Chat-FullColor').css({ color: this.input.color(), backgroundColor: this.input.color() });
     }
 
     componentFormInput(options) {

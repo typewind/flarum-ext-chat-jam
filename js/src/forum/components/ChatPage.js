@@ -54,6 +54,7 @@ export default class ChatPage extends Page {
     }
 
     onupdate(vnode) {
+        super.onupdate(vnode);
         if (this.listOpen()) {
             this.element.querySelector('.ChatPage--list').style.height =
                 document.documentElement.clientHeight - this.element.querySelector('.ChatPage--list').getBoundingClientRect().top + 'px';

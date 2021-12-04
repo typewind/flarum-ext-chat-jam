@@ -60,8 +60,9 @@ export default class ChatState {
     }
 
     listenSocketChannels(socket) {
-        socket.main.bind('neonchat.events', this.handleSocketEvent.bind(this));
-        if (socket.user) socket.user.bind('neonchat.events', this.handleSocketEvent.bind(this));
+        let channels = socket.channels;
+        channels.main.bind('neonchat.events', this.handleSocketEvent.bind(this));
+        if (channels.user) channels.user.bind('neonchat.events', this.handleSocketEvent.bind(this));
     }
 
     handleSocketEvent(r) {

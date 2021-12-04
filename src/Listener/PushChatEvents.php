@@ -9,6 +9,7 @@
 
 namespace Xelson\Chat\Listener;
 
+use Flarum\Http\RequestUtil;
 use Illuminate\Contracts\Events\Dispatcher;
 use Laminas\Diactoros\ServerRequestFactory;
 use Tobscure\JsonApi\Document;
@@ -51,8 +52,7 @@ class PushChatEvents
 
 
         $request = ServerRequestFactory::fromGlobals();
-
-        $request = $request->withAttribute('actor', $actor);
+        $request = RequestUtil::withActor($request, $actor);
 
         $serializer = resolve($serializerClass);
         $serializer->setRequest($request);

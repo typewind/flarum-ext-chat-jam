@@ -250,14 +250,17 @@ export default class ChatMessage extends Component {
     }
 
     onremove(vnode) {
+        super.onremove(vnode);
         clearInterval(this.pollInterval);
     }
 
     onContentWrapperUpdated(vnode) {
+        super.onupdate(vnode);
         this.renderMessage(vnode.dom);
     }
 
     onContentWrapperCreated(vnode) {
+        super.oncreate(vnode);
         this.renderMessage(vnode.dom);
     }
 

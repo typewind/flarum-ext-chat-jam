@@ -38,6 +38,7 @@ export default class ChatPreview extends Component {
     }
 
     oncreate(vnode) {
+        super.oncreate(vnode);
         if (this.model.isNeedToFlash) {
             app.chat.flashItem($(vnode.dom));
             this.model.isNeedToFlash = false;
@@ -45,6 +46,7 @@ export default class ChatPreview extends Component {
     }
 
     onupdate(vnode) {
+        super.onupdate(vnode);
         if (this.model.isNeedToFlash) {
             app.chat.flashItem($(vnode.dom));
             this.model.isNeedToFlash = false;

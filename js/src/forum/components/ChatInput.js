@@ -52,7 +52,7 @@ export default class ChatInput extends Component {
                     rows={this.state.input.rows}
                 />
                 {this.state.messageEditing ? (
-                    <div className="icon edit" onclick={this.state.messageEditEnd.bind(this)}>
+                    <div className="icon edit" onclick={this.state.messageEditEnd.bind(this.state)}>
                         <i class="fas fa-times"></i>
                     </div>
                 ) : null}

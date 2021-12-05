@@ -46,19 +46,18 @@ export default class UsersSearchResults {
             )
             .filter((user) => user !== app.session.user);
 
-        let resultsFind = 
-            usersList.filter((e, i, arr) => arr.lastIndexOf(e) === i)
-            .sort((a, b) => a.displayName()
-            .localeCompare(b.displayName()))
+        let resultsFind = usersList
+            .filter((e, i, arr) => arr.lastIndexOf(e) === i)
+            .sort((a, b) => a.displayName().localeCompare(b.displayName()))
             .filter((user) => !this.isUserSelected(user));
 
         let moreText;
-        if(resultsFind.length > 5)
-        {
-            moreText = 
+        if (resultsFind.length > 5) {
+            moreText = (
                 <div class="MoreResultsText">
-                    {app.translator.trans('xelson-chat.forum.chat.list.add_modal.search.more_results', {more_results: resultsFind.length - 5})}
+                    {app.translator.trans('xelson-chat.forum.chat.list.add_modal.search.more_results', { more_results: resultsFind.length - 5 })}
                 </div>
+            );
 
             resultsFind = resultsFind.slice(-5);
         }
@@ -73,22 +72,21 @@ export default class UsersSearchResults {
 
         return [
             <li className="Dropdown-header">{app.translator.trans('core.forum.search.users_heading')}</li>,
-            resultsFind
-                .map((user) => {
-                    const name = username(user);
-                    const id = user.id();
-                    const children = [highlight(name.text, query)];
+            resultsFind.map((user) => {
+                const name = username(user);
+                const id = user.id();
+                const children = [highlight(name.text, query)];
 
-                    return (
-                        <li className="UserSearchResult UserSearchResult" data-index={'users' + id} onclick={this.userClick.bind(this, user)}>
-                            <span>
-                                {avatar(user)}
-                                {{ ...name, text: undefined, children }}
-                            </span>
-                        </li>
-                    );
-                }),
-                moreText,
+                return (
+                    <li className="UserSearchResult UserSearchResult" data-index={'users' + id} onclick={this.userClick.bind(this, user)}>
+                        <span>
+                            {avatar(user)}
+                            {{ ...name, text: undefined, children }}
+                        </span>
+                    </li>
+                );
+            }),
+            moreText,
             resultsSelected.length ? (
                 <li className="Dropdown-header">{app.translator.trans('xelson-chat.forum.chat.list.add_modal.search.invited')}</li>
             ) : null,

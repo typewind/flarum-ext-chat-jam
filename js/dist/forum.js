@@ -1380,7 +1380,7 @@ function (_Component) {
       rows: this.state.input.rows
     }), this.state.messageEditing ? m("div", {
       className: "icon edit",
-      onclick: this.state.messageEditEnd.bind(this)
+      onclick: this.state.messageEditEnd.bind(this.state)
     }, m("i", {
       "class": "fas fa-times"
     })) : null, this.model.removed_at() && this.model.removed_by() === parseInt(app.session.user.id()) ? m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a, {

@@ -244,7 +244,7 @@ export default class ChatMessage extends Component {
     oncreate(vnode) {
         super.oncreate(vnode);
         this.messageWrapper = vnode.dom;
-        
+
         this.pollInterval = setInterval(() => {
             this.renderMessage();
         }, 100);

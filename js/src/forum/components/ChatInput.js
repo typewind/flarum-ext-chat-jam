@@ -110,7 +110,7 @@ export default class ChatInput extends Component {
         if (this.state.messageEditing) this.state.messageEditing.content = inputValue;
         else if (this.state.input.writingPreview) this.state.input.previewModel.content = inputValue;
 
-        if (this.attrs.oninput) this.attrs.oninput();
+        if (this.attrs.oninput) this.attrs.oninput(e);
     }
 
     inputPressEnter(e) {

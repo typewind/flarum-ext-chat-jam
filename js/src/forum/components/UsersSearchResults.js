@@ -46,9 +46,22 @@ export default class UsersSearchResults {
             )
             .filter((user) => user !== app.session.user);
 
-        const resultsFind = usersList.filter((e, i, arr) => arr.lastIndexOf(e) === i).sort((a, b) => a.displayName().localeCompare(b.displayName()));
+        let resultsFind = 
+            usersList.filter((e, i, arr) => arr.lastIndexOf(e) === i)
+            .sort((a, b) => a.displayName()
+            .localeCompare(b.displayName()))
+            .filter((user) => !this.isUserSelected(user));
 
-        const resultsSelected = Object.values(this.usersSelected).slice(-5);
+        let moreText;
+        if(resultsFind.length > 5)
+        {
+            moreText = 
+                <div class="MoreResultsText">
+                    {app.translator.trans('xelson-chat.forum.chat.list.add_modal.search.more_results', {more_results: resultsFind.length - 5})}
+                </div>
+
+            resultsFind = resultsFind.slice(-5);
+        }
 
         if (!resultsFind.length) {
             if (!this.searching)
@@ -56,10 +69,11 @@ export default class UsersSearchResults {
             else LoadingIndicator.component({ size: 'tiny', className: 'Button Button--icon Button--link' });
         }
 
+        const resultsSelected = Object.values(this.usersSelected).slice(-5);
+
         return [
             <li className="Dropdown-header">{app.translator.trans('core.forum.search.users_heading')}</li>,
             resultsFind
-                .filter((user) => !this.isUserSelected(user))
                 .map((user) => {
                     const name = username(user);
                     const id = user.id();
@@ -74,6 +88,7 @@ export default class UsersSearchResults {
                         </li>
                     );
                 }),
+                moreText,
             resultsSelected.length ? (
                 <li className="Dropdown-header">{app.translator.trans('xelson-chat.forum.chat.list.add_modal.search.invited')}</li>
             ) : null,

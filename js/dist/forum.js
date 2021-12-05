@@ -1434,7 +1434,7 @@ function (_Component) {
     }
 
     if (this.state.messageEditing) this.state.messageEditing.content = inputValue;else if (this.state.input.writingPreview) this.state.input.previewModel.content = inputValue;
-    if (this.attrs.oninput) this.attrs.oninput();
+    if (this.attrs.oninput) this.attrs.oninput(e);
   };
 
   _proto.inputPressEnter = function inputPressEnter(e) {
@@ -1737,7 +1737,7 @@ function (_Component) {
       className: "actualMessage",
       oncreate: this.onContentWrapperCreated.bind(this),
       onupdate: this.onContentWrapperUpdated.bind(this)
-    }))));
+    }, this.model.content))));
   };
 
   _proto.view = function view(vnode) {
@@ -1775,7 +1775,7 @@ function (_Component) {
         "class": "icon"
       }, m("i", {
         "class": "fas fa-trash-alt"
-      }), ' ', m("span", null, "(" + app.translator.trans('xelson-chat.forum.chat.message.deleted' + (_this2.model.isDeletedForever ? '_forever' : '')), ' ', flarum_helpers_username__WEBPACK_IMPORTED_MODULE_3___default()(_this2.model.deleted_by())));
+      }), ' ', m("span", null, "(" + app.translator.trans('xelson-chat.forum.chat.message.deleted' + (_this2.model.isDeletedForever ? '_forever' : '')), ' ', flarum_helpers_username__WEBPACK_IMPORTED_MODULE_3___default()(_this2.model.deleted_by()), ')'));
     });
     this.labelBind(function () {
       return _this2.model.isTimedOut;
@@ -1864,12 +1864,9 @@ function (_Component) {
     _Component.prototype.oncreate.call(this, vnode);
 
     this.messageWrapper = vnode.dom;
-
-    if (!this.attrs.model.exists) {
-      this.pollInterval = setInterval(function () {
-        _this3.renderMessage(_this3.$('.actualMessage')[0]);
-      }, 100);
-    }
+    this.pollInterval = setInterval(function () {
+      _this3.renderMessage();
+    }, 100);
   };
 
   _proto.onremove = function onremove(vnode) {
@@ -1890,7 +1887,7 @@ function (_Component) {
     this.renderMessage(vnode.dom);
   };
 
-  _proto.renderMessage = function renderMessage(element) {
+  _proto.renderMessage = function renderMessage() {
     if (this.model.isNeedToFlash) {
       app.chat.flashItem($(this.messageWrapper));
       this.model.isNeedToFlash = false;
@@ -1898,7 +1895,7 @@ function (_Component) {
 
     if (this.model.content !== this.oldContent) {
       this.oldContent = this.model.content;
-      app.chat.renderChatMessage(element, this.model.content);
+      app.chat.renderChatMessage(this.model, this.model.content);
     }
   };
 
@@ -2641,7 +2638,9 @@ function (_Component) {
       }), this.isFastScrollAvailable() ? this.componentScroller() : null);
     }
 
-    return m(_ChatWelcome__WEBPACK_IMPORTED_MODULE_6__["default"], null);
+    return m("div", {
+      className: "ChatViewport"
+    }, m(_ChatWelcome__WEBPACK_IMPORTED_MODULE_6__["default"], null), ";");
   };
 
   _proto.componentChatMessage = function componentChatMessage(model) {
@@ -3052,8 +3051,19 @@ function () {
       return arr.lastIndexOf(e) === i;
     }).sort(function (a, b) {
       return a.displayName().localeCompare(b.displayName());
+    }).filter(function (user) {
+      return !_this2.isUserSelected(user);
     });
-    var resultsSelected = Object.values(this.usersSelected).slice(-5);
+    var moreText;
+
+    if (resultsFind.length > 5) {
+      moreText = m("div", {
+        "class": "MoreResultsText"
+      }, app.translator.trans('xelson-chat.forum.chat.list.add_modal.search.more_results', {
+        more_results: resultsFind.length - 5
+      }));
+      resultsFind = resultsFind.slice(-5);
+    }
 
     if (!resultsFind.length) {
       if (!this.searching) return m("li", {
@@ -3064,11 +3074,10 @@ function () {
       });
     }
 
+    var resultsSelected = Object.values(this.usersSelected).slice(-5);
     return [m("li", {
       className: "Dropdown-header"
-    }, app.translator.trans('core.forum.search.users_heading')), resultsFind.filter(function (user) {
-      return !_this2.isUserSelected(user);
-    }).map(function (user) {
+    }, app.translator.trans('core.forum.search.users_heading')), resultsFind.map(function (user) {
       var name = flarum_helpers_username__WEBPACK_IMPORTED_MODULE_2___default()(user);
       var id = user.id();
       var children = [flarum_helpers_highlight__WEBPACK_IMPORTED_MODULE_3___default()(name.text, query)];
@@ -3080,7 +3089,7 @@ function () {
         text: undefined,
         children: children
       })));
-    }), resultsSelected.length ? m("li", {
+    }), moreText, resultsSelected.length ? m("li", {
       className: "Dropdown-header"
     }, app.translator.trans('xelson-chat.forum.chat.list.add_modal.search.invited')) : null, resultsSelected.map(function (user) {
       var name = flarum_helpers_username__WEBPACK_IMPORTED_MODULE_2___default()(user);

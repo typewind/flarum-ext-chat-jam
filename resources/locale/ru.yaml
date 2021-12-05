@@ -78,6 +78,7 @@ xelson-chat:
             placeholder: Поиск пользователей
             failed: Ничего не найдено по запросу
             invited: Приглашены
+            more_results: И еще {more_results}...
       placeholder: Напишите сообщение...
       message:
         actions:

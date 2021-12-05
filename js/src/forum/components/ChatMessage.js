@@ -91,7 +91,9 @@ export default class ChatMessage extends Component {
                                 className="actualMessage"
                                 oncreate={this.onContentWrapperCreated.bind(this)}
                                 onupdate={this.onContentWrapperUpdated.bind(this)}
-                            ></div>
+                            >
+                                {this.model.content}
+                            </div>
                         )}
                     </div>
                 </div>
@@ -138,6 +140,7 @@ export default class ChatMessage extends Component {
                     <span>
                         {`(${app.translator.trans('xelson-chat.forum.chat.message.deleted' + (this.model.isDeletedForever ? '_forever' : ''))}`}{' '}
                         {username(this.model.deleted_by())}
+                        {')'}
                     </span>
                 </div>
             )
@@ -241,12 +244,10 @@ export default class ChatMessage extends Component {
     oncreate(vnode) {
         super.oncreate(vnode);
         this.messageWrapper = vnode.dom;
-
-        if (!this.attrs.model.exists) {
-            this.pollInterval = setInterval(() => {
-                this.renderMessage(this.$('.actualMessage')[0]);
-            }, 100);
-        }
+        
+        this.pollInterval = setInterval(() => {
+            this.renderMessage();
+        }, 100);
     }
 
     onremove(vnode) {
@@ -264,14 +265,15 @@ export default class ChatMessage extends Component {
         this.renderMessage(vnode.dom);
     }
 
-    renderMessage(element) {
+    renderMessage() {
         if (this.model.isNeedToFlash) {
             app.chat.flashItem($(this.messageWrapper));
             this.model.isNeedToFlash = false;
         }
+
         if (this.model.content !== this.oldContent) {
             this.oldContent = this.model.content;
-            app.chat.renderChatMessage(element, this.model.content);
+            app.chat.renderChatMessage(this.model, this.model.content);
         }
     }
 

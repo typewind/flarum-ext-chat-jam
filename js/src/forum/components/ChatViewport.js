@@ -84,7 +84,11 @@ export default class ChatViewport extends Component {
             );
         }
 
-        return <ChatWelcome />;
+        return (
+            <div className="ChatViewport">
+                <ChatWelcome />;
+            </div>
+        );
     }
 
     componentChatMessage(model) {

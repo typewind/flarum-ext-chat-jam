@@ -175,7 +175,7 @@ class EditChatHandler
                 if ($id == $actor->id)
                     throw new ChatEditException('Сannot set a role for yourself');
 
-                if (!in_array($role, [1, 2]))
+                if (!in_array($role, [0, 1, 2]))
                     throw new ChatEditException('Unacceptable role');
 
                 $syncUsers[$id] = ['role' => $role];

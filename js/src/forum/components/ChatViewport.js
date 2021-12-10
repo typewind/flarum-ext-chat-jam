@@ -35,9 +35,8 @@ export default class ChatViewport extends Component {
             this.model = model;
             if (this.model) {
                 this.state = app.chat.getViewportState(this.model);
+                this.loadChat();
             }
-
-            this.loadChat();
         }
     }
 

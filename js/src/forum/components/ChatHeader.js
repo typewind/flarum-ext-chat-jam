@@ -95,6 +95,7 @@ export default class ChatHeader extends Component {
             );
         }
 
+        /*
         if (this.attrs.inFrame && app.screen() === 'phone') {
             items.add(
                 'fullscreen',
@@ -107,6 +108,7 @@ export default class ChatHeader extends Component {
                 </Link>
             );
         }
+        */
 
         return items;
     }

@@ -16,7 +16,7 @@ export default class ChatFrame extends Component {
                         ''
                     ) : (
                         <div
-                            className="icon icon-toggle"
+                            className="ToggleButton icon icon-toggle"
                             onclick={this.toggleChatsList.bind(this)}
                             data-title={app.translator.trans(
                                 'xelson-chat.forum.chat.list.' + (app.chat.getFrameState('beingShownChatsList') ? 'unpin' : 'pin')

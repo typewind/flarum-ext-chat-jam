@@ -60,5 +60,5 @@ app.initializers.add('xelson-chat', (app) => {
         app.chat.apiFetchChats();
     });
 
-    addChatPage();
+    //addChatPage();
 });

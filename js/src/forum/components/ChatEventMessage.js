@@ -48,6 +48,16 @@ export default class ChatEventMessage extends ChatMessage {
                         chatname: <b className="chat-title">{this.model.chat().title()}</b>,
                     });
                 } else {
+                    if(this.model.chat().type() == 0 && this.model.chat().users().length <= 2)
+                    {
+                        return app.translator.trans(`xelson-chat.forum.chat.message.events.pm.created`, {
+                            creatorname: this.componentUserMention(this.model.chat().creator()),
+                            username: this.parsedContent.users.length
+                                ? this.componentUserMention(app.store.getById('users', this.parsedContent.users[0]))
+                                : null,
+                        });
+                    }
+
                     return app.translator.trans(`xelson-chat.forum.chat.message.events.chat.created`, {
                         creatorname: this.componentUserMention(this.model.user()),
                         chatname: <b className="chat-title">{this.model.chat().title()}</b>,

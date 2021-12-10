@@ -94,7 +94,7 @@ export default class ChatFrame extends Component {
         document.body.classList.remove('moving');
 
         if (!app.current.matches(ChatPage)) {
-            app.chat.saveFrameState('transform', { x: parseInt(this.element.style.right), y: this.element.offsetHeight });
+            app.chat.saveFrameState('transform', { x: parseInt(this.element.style.right), y: this.element.offsetHeight || 400 });
         }
     }
 

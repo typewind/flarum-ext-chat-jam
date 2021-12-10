@@ -228,73 +228,85 @@
         }
     }
 
-    &.toggled {
-        width: 255px;
-
-        .previewBody {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .unreaded {
-            top: 25px;
-            right: 15px;
-            box-shadow: none;
-        }
-
-        .list {
-            overflow-y: auto;
-        }
-
-        .header {
-            justify-content: space-between;
-        }
-
-        .panel-add {
-            width: auto;
-            border-radius: 15px;
-            padding: 5px;
-            background-color: #ffffff;
-            .user-select(none);
-
-            &:before {
-                content: "+";
-                font-size: 48pt;
-                color: #31394652;
-                line-height: 0.5;
-                display: block;
-                text-align: center;
-                height: 45px;
-            }
-        }
-
-        .panel-preview {
-            border-radius: 15px;
-            padding: 5px;
-            width: auto;
-            background-color: #fff;
-
-            .timestamp {
-                opacity: 1;
-            }
-
-            .avatar {
-                margin-left: 2px;
-                min-width: 45px;
-                width: 45px;
-                line-height: 45px;
-                font-size: 24px;
-            }
-        }
-
-        .input-wrapper {
-            display: block;
-        }
-
-        .icon-toggle {
-            color: #FFF;
+    @media @phone
+    {
+        .ToggleButton
+        {
+            display: none;
         }
     }
+
+    @media not @phone
+    {
+        &.toggled {
+            width: 255px;
+    
+            .previewBody {
+                display: flex;
+                flex-direction: column;
+            }
+    
+            .unreaded {
+                top: 25px;
+                right: 15px;
+                box-shadow: none;
+            }
+    
+            .list {
+                overflow-y: auto;
+            }
+    
+            .header {
+                justify-content: space-between;
+            }
+    
+            .panel-add {
+                width: auto;
+                border-radius: 15px;
+                padding: 5px;
+                background-color: #ffffff;
+                .user-select(none);
+    
+                &:before {
+                    content: "+";
+                    font-size: 48pt;
+                    color: #31394652;
+                    line-height: 0.5;
+                    display: block;
+                    text-align: center;
+                    height: 45px;
+                }
+            }
+    
+            .panel-preview {
+                border-radius: 15px;
+                padding: 5px;
+                width: auto;
+                background-color: #fff;
+    
+                .timestamp {
+                    opacity: 1;
+                }
+    
+                .avatar {
+                    margin-left: 2px;
+                    min-width: 45px;
+                    width: 45px;
+                    line-height: 45px;
+                    font-size: 24px;
+                }
+            }
+    
+            .input-wrapper {
+                display: block;
+            }
+    
+            .icon-toggle {
+                color: #FFF;
+            }
+        }
+    }
+
 
     .input-wrapper {
         display: none;

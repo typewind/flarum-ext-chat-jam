@@ -43,7 +43,7 @@ export default class ViewportState {
     messageSend() {
         const text = this.input.content();
 
-        if (text.trim().length > 0 && !this.loadingSend) {
+        if (text && text.trim().length > 0 && !this.loadingSend) {
             if (this.input.writingPreview) {
                 this.input.writingPreview = false;
 

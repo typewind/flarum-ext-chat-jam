@@ -124,7 +124,7 @@ export default class ChatCreateModal extends ChatModal {
                         disabled={this.isChannel ? !this.isCanCreateChannel() : !this.isCanCreateChat()}
                         onclick={this.onsubmit.bind(this)}
                     >
-                        {app.translator.trans('xelson-chat.forum.chat.list.add_modal.create.chat')}
+                        {app.translator.trans('xelson-chat.forum.chat.list.add_modal.create.' + (this.isChannel ? 'channel' : 'chat'))}
                     </Button>
                 </div>
             </div>

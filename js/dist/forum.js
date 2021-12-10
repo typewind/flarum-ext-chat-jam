@@ -448,7 +448,7 @@ function (_ChatModal) {
       className: "Button Button--primary Button--block",
       disabled: this.isChannel ? !this.isCanCreateChannel() : !this.isCanCreateChat(),
       onclick: this.onsubmit.bind(this)
-    }, app.translator.trans('xelson-chat.forum.chat.list.add_modal.create.chat'))));
+    }, app.translator.trans('xelson-chat.forum.chat.list.add_modal.create.' + (this.isChannel ? 'channel' : 'chat')))));
   };
 
   return ChatCreateModal;
@@ -880,6 +880,13 @@ function (_ChatMessage) {
               }, this.model.chat().title())
             });
           } else {
+            if (this.model.chat().type() == 0 && this.model.chat().users().length <= 2) {
+              return app.translator.trans("xelson-chat.forum.chat.message.events.pm.created", {
+                creatorname: this.componentUserMention(this.model.chat().creator()),
+                username: this.parsedContent.users.length ? this.componentUserMention(app.store.getById('users', this.parsedContent.users[0])) : null
+              });
+            }
+
             return app.translator.trans("xelson-chat.forum.chat.message.events.chat.created", {
               creatorname: this.componentUserMention(this.model.user()),
               chatname: m("b", {
@@ -1121,7 +1128,7 @@ function (_Component) {
     if (!app.current.matches(_ChatPage__WEBPACK_IMPORTED_MODULE_5__["default"])) {
       app.chat.saveFrameState('transform', {
         x: parseInt(this.element.style.right),
-        y: this.element.offsetHeight
+        y: this.element.offsetHeight || 400
       });
     }
   };
@@ -1256,16 +1263,21 @@ function (_Component) {
         className: app.chat.getFrameState('beingShown') ? 'fas fa-window-minimize' : 'fas fa-window-maximize'
       })));
     }
-
+    /*
     if (this.attrs.inFrame && app.screen() === 'phone') {
-      items.add('fullscreen', m(flarum_components_Link__WEBPACK_IMPORTED_MODULE_3___default.a, {
-        className: "icon",
-        href: app.route('chat'),
-        "data-title": app.translator.trans('xelson-chat.forum.toolbar.' + (app.chat.getFrameState('beingShown') ? 'minimize' : 'maximize'))
-      }, m("i", {
-        className: "fas fa-expand"
-      })));
+        items.add(
+            'fullscreen',
+            <Link
+                className="icon"
+                href={app.route('chat')}
+                data-title={app.translator.trans('xelson-chat.forum.toolbar.' + (app.chat.getFrameState('beingShown') ? 'minimize' : 'maximize'))}
+            >
+                <i className="fas fa-expand"></i>
+            </Link>
+        );
     }
+    */
+
 
     return items;
   };
@@ -1535,7 +1547,7 @@ function (_Component) {
       bidi: app.chat.q,
       placeholder: app.translator.trans('xelson-chat.forum.chat.list.placeholder')
     })), this.attrs.inPage ? '' : m("div", {
-      className: "icon icon-toggle",
+      className: "ToggleButton icon icon-toggle",
       onclick: this.toggleChatsList.bind(this),
       "data-title": app.translator.trans('xelson-chat.forum.chat.list.' + (app.chat.getFrameState('beingShownChatsList') ? 'unpin' : 'pin'))
     }, m("i", {
@@ -2597,9 +2609,8 @@ function (_Component) {
 
       if (this.model) {
         this.state = app.chat.getViewportState(this.model);
+        this.loadChat();
       }
-
-      this.loadChat();
     }
   };
 
@@ -3191,8 +3202,7 @@ app.initializers.add('xelson-chat', function (app) {
     }
 
     app.chat.apiFetchChats();
-  });
-  Object(_addChatPage__WEBPACK_IMPORTED_MODULE_9__["default"])();
+  }); //addChatPage();
 });
 
 /***/ }),
@@ -4076,7 +4086,7 @@ function () {
   _proto.messageSend = function messageSend() {
     var text = this.input.content();
 
-    if (text.trim().length > 0 && !this.loadingSend) {
+    if (text && text.trim().length > 0 && !this.loadingSend) {
       if (this.input.writingPreview) {
         this.input.writingPreview = false;
         this.messagePost(this.input.previewModel);

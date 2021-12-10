@@ -4,10 +4,10 @@
     z-index: @zindex-composer - 10;
     max-width: 100%;
     color: #000;
-    min-height: 400px;
 
     @media @phone {
         right: 0 !important;
+        width: 100%;
 
         .ChatViewport .wrapper {
             height: 400px;
@@ -52,22 +52,6 @@
 
         #chat-panel {
             width: 650px;
-
-            @media @phone {
-                max-width: 500px;
-            }
-
-            @media (max-width: 600px) {
-                max-width: 350px;
-            }
-
-            @media (max-width: 500px) {
-                max-width: 300px;
-            }
-
-            @media (max-width: 400px) {
-                max-width: 250px;
-            }
         }
 
         *[data-title]:after {

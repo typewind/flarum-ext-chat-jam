@@ -20,8 +20,8 @@ export default class ChatModal extends Modal {
             icon: Stream(''),
             iconState: {
                 matches: [],
-                lastInput: null
-            }
+                lastInput: null,
+            },
         };
     }
 
@@ -147,8 +147,7 @@ export default class ChatModal extends Modal {
         let inputIcon = this.input.icon();
         let matches = this.input.iconState.matches;
 
-        if(inputIcon != this.input.iconState.lastInput)
-        {
+        if (inputIcon != this.input.iconState.lastInput) {
             matches = fa5IconsList.filter((icon) => icon.includes(inputIcon));
             if (matches.length > 5) matches = matches.sort((a, b) => 0.5 - Math.random());
         }

@@ -57,7 +57,7 @@ export default class ChatInput extends Component {
                     </div>
                 ) : null}
                 {this.model.removed_at() && this.model.removed_by() === parseInt(app.session.user.id()) ? (
-                    <Button className="Button Button--primary" onclick={() => app.modal.show(ChatEditModal, { model: this.model })}>
+                    <Button className="Button Button--primary ButtonRejoin" onclick={() => app.modal.show(ChatEditModal, { model: this.model })}>
                         {app.translator.trans('xelson-chat.forum.chat.rejoin')}
                     </Button>
                 ) : (

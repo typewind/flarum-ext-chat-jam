@@ -35,7 +35,11 @@ class ChatSocket extends PusherWrapper
 
 	public function sendPrivate($chat_id, $attributes)
 	{
-		$chatUsers = ChatUser::where('chat_id', $chat_id)->pluck('user_id')->all();
+		$chatUsers = ChatUser::where('chat_id', $chat_id)
+			->whereNull('removed_at')
+			->pluck('user_id')
+			->all();
+			
 		foreach($chatUsers as $user_id)
 			$this->pusher()->trigger('private-user' . $user_id, $this->channel, $attributes);
 	}

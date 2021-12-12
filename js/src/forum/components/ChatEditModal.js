@@ -216,17 +216,21 @@ export default class ChatEditModal extends ChatModal {
 
     onleave() {
         if (!this.isLocalLeaved) {
-            this.model.save({
-                users: { removed: [Model.getIdentifier(app.session.user)] },
-                relationships: { users: this.getSelectedUsers() },
-            });
+            this.model
+                .save({
+                    users: { removed: [Model.getIdentifier(app.session.user)] },
+                    relationships: { users: this.getSelectedUsers() },
+                })
+                .then((e) => m.redraw());
         } else {
             this.getSelectedUsers().push(app.session.user);
 
-            this.model.save({
-                users: { added: [Model.getIdentifier(app.session.user)] },
-                relationships: { users: this.getSelectedUsers() },
-            });
+            this.model
+                .save({
+                    users: { added: [Model.getIdentifier(app.session.user)] },
+                    relationships: { users: this.getSelectedUsers() },
+                })
+                .then((e) => m.redraw());
         }
 
         this.hide();

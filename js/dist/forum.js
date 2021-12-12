@@ -714,6 +714,8 @@ function (_ChatModal) {
         relationships: {
           users: this.getSelectedUsers()
         }
+      }).then(function (e) {
+        return m.redraw();
       });
     } else {
       this.getSelectedUsers().push(app.session.user);
@@ -724,6 +726,8 @@ function (_ChatModal) {
         relationships: {
           users: this.getSelectedUsers()
         }
+      }).then(function (e) {
+        return m.redraw();
       });
     }
 
@@ -1396,7 +1400,7 @@ function (_Component) {
     }, m("i", {
       "class": "fas fa-times"
     })) : null, this.model.removed_at() && this.model.removed_by() === parseInt(app.session.user.id()) ? m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a, {
-      className: "Button Button--primary",
+      className: "Button Button--primary ButtonRejoin",
       onclick: function onclick() {
         return app.modal.show(_ChatEditModal__WEBPACK_IMPORTED_MODULE_4__["default"], {
           model: _this.model
@@ -3533,7 +3537,7 @@ function () {
     var chat = r.response.chat;
     if (chat) chat = app.store.pushPayload(chat); // Workaround for blocking events from a chat we leaved
 
-    if (chat && chat.removed_at()) return;
+    if (message && message.chat().type() == 1 && message.chat().removed_at()) return;
 
     switch (r.event.id) {
       case 'message.post':
@@ -3778,8 +3782,8 @@ function () {
         });
         if (options.notify) _this3.messageNotify(r[0]);
         viewport.loading = false;
-        viewport.loadingQueries[query] = false;
-        viewport.scroll.autoScroll = false;
+        viewport.loadingQueries[query] = false; //viewport.scroll.autoScroll = false;
+
         m.redraw();
       }
     });

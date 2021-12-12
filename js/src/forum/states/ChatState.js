@@ -73,7 +73,7 @@ export default class ChatState {
         if (chat) chat = app.store.pushPayload(chat);
 
         // Workaround for blocking events from a chat we leaved
-        if (chat && chat.removed_at()) return;
+        if (message && message.chat().type() == 1 && message.chat().removed_at()) return;
 
         switch (r.event.id) {
             case 'message.post': {
@@ -260,7 +260,7 @@ export default class ChatState {
 
                 viewport.loading = false;
                 viewport.loadingQueries[query] = false;
-                viewport.scroll.autoScroll = false;
+                //viewport.scroll.autoScroll = false;
 
                 m.redraw();
             }

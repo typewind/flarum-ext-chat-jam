@@ -48,8 +48,7 @@ export default class ChatEventMessage extends ChatMessage {
                         chatname: <b className="chat-title">{this.model.chat().title()}</b>,
                     });
                 } else {
-                    if(this.model.chat().type() == 0 && this.model.chat().users().length <= 2)
-                    {
+                    if (this.model.chat().type() == 0 && this.model.chat().users().length <= 2) {
                         return app.translator.trans(`xelson-chat.forum.chat.message.events.pm.created`, {
                             creatorname: this.componentUserMention(this.model.chat().creator()),
                             username: this.parsedContent.users.length

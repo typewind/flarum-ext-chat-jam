@@ -2,6 +2,8 @@ import Modal from 'flarum/components/Modal';
 import ChatSearchUser from './ChatSearchUser';
 import Stream from 'flarum/utils/Stream';
 import classList from 'flarum/utils/classList';
+import {fa5IconsList} from '../resources';
+import highlight from 'flarum/helpers/highlight';
 
 export default class ChatModal extends Modal {
     oninit(vnode) {
@@ -96,19 +98,23 @@ export default class ChatModal extends Modal {
     componentFormIcon(options) {
         return [
             options.title ? <label>{options.title}</label> : null,
-            <div>
+            <div className="IconSearch">
                 {options.desc ? <label>{options.desc}</label> : null}
-                <div className="Icon-Input">
+                <div className="Icon-Input IconSearchResult">
                     <input
                         class="FormControl"
                         type="text"
                         bidi={options.stream}
                         placeholder={options.placeholder}
                         onupdate={this.formInputOnUpdate.bind(this)}
+                        onfocus={() => (this.inputIconHasFocus = true)}
+                        onclick={() => (this.inputIconHasFocus = true)}
+                        onkeypress={e => this.inputIconHasFocus = !(e.keyCode == 13)}
                     />
                     <icon className="Chat-FullColor">
                         <i className={this.input.icon()?.length ? this.input.icon() : 'fas fa-bolt'} />
                     </icon>
+                    {this.inputIconHasFocus ? this.dropdownIconMatches(this.input.icon()) : null}
                 </div>
             </div>,
         ];
@@ -131,6 +137,32 @@ export default class ChatModal extends Modal {
                 </div>
             </div>,
         ];
+    }
+
+    dropdownIconMatches(search)
+    {
+        let inputIcon = this.input.icon();
+        let matches = fa5IconsList.filter(icon => icon.includes(inputIcon));
+        if(matches.length > 5) matches = matches.sort((a, b) => 0.5 - Math.random())
+
+        return inputIcon.length && (matches.length > 0 && !(matches.length == 1 && matches[0] === inputIcon)) ? (
+            <ul className="Dropdown-menu Dropdown--Icons Search-results">
+                <li className="Dropdown-header">Font Awesome 5</li>
+                {matches.slice(-5).map(icon => 
+                    <li 
+                        className="IconSearchResult"
+                        onclick={e => this.input.icon(icon)}
+                    >
+                        <icon className="Chat-FullColor">
+                            <i className={icon}></i>
+                        </icon>
+                        <span>
+                            {highlight(icon, inputIcon)}
+                        </span>
+                    </li>
+                )}
+            </ul>
+        ) : null;
     }
 
     formInputOnUpdate(vnode) {

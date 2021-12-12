@@ -192,6 +192,43 @@
         .user-select(none);
     }
 
+    .IconSearch
+    {
+        .IconSearchResult
+        {
+            position: relative;
+
+            icon {
+                display: inline-block;
+                max-width: 110px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            span {
+                .user-select(none);
+
+                &:hover {
+                    background-color: #eaecf0;
+                }
+
+                &.selected:before {
+                    .fa();
+                    content: @fa-var-check;
+
+                    line-height: inherit;
+                    margin-left: 175px;
+                    position: fixed;
+                }
+            } 
+
+            .Dropdown--Icons {
+                display: block;
+                width: 225px;
+            }
+        }
+    }
+
     .UsersSearch {
         .SearchFailed {
             padding: 10px 15px;
@@ -237,7 +274,7 @@
                     position: fixed;
                 }
             }
-        }
+        }  
 
         .Dropdown--Users {
             width: 225px;

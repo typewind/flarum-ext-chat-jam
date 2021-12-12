@@ -2,7 +2,7 @@ import Modal from 'flarum/components/Modal';
 import ChatSearchUser from './ChatSearchUser';
 import Stream from 'flarum/utils/Stream';
 import classList from 'flarum/utils/classList';
-import {fa5IconsList} from '../resources';
+import { fa5IconsList } from '../resources';
 import highlight from 'flarum/helpers/highlight';
 
 export default class ChatModal extends Modal {
@@ -18,6 +18,10 @@ export default class ChatModal extends Modal {
             title: Stream(''),
             color: Stream(''),
             icon: Stream(''),
+            iconState: {
+                matches: [],
+                lastInput: null
+            }
         };
     }
 
@@ -109,7 +113,7 @@ export default class ChatModal extends Modal {
                         onupdate={this.formInputOnUpdate.bind(this)}
                         onfocus={() => (this.inputIconHasFocus = true)}
                         onclick={() => (this.inputIconHasFocus = true)}
-                        onkeypress={e => this.inputIconHasFocus = !(e.keyCode == 13)}
+                        onkeypress={(e) => (this.inputIconHasFocus = !(e.keyCode == 13))}
                     />
                     <icon className="Chat-FullColor">
                         <i className={this.input.icon()?.length ? this.input.icon() : 'fas fa-bolt'} />
@@ -139,28 +143,27 @@ export default class ChatModal extends Modal {
         ];
     }
 
-    dropdownIconMatches(search)
-    {
+    dropdownIconMatches(search) {
         let inputIcon = this.input.icon();
-        let matches = fa5IconsList.filter(icon => icon.includes(inputIcon));
-        if(matches.length > 5) matches = matches.sort((a, b) => 0.5 - Math.random())
+        let matches = this.input.iconState.matches;
 
-        return inputIcon.length && (matches.length > 0 && !(matches.length == 1 && matches[0] === inputIcon)) ? (
+        if(inputIcon != this.input.iconState.lastInput)
+        {
+            matches = fa5IconsList.filter((icon) => icon.includes(inputIcon));
+            if (matches.length > 5) matches = matches.sort((a, b) => 0.5 - Math.random());
+        }
+
+        return inputIcon.length && matches.length > 0 && !(matches.length == 1 && matches[0] === inputIcon) ? (
             <ul className="Dropdown-menu Dropdown--Icons Search-results">
                 <li className="Dropdown-header">Font Awesome 5</li>
-                {matches.slice(-5).map(icon => 
-                    <li 
-                        className="IconSearchResult"
-                        onclick={e => this.input.icon(icon)}
-                    >
+                {matches.slice(-5).map((icon) => (
+                    <li className="IconSearchResult" onclick={(e) => this.input.icon(icon)}>
                         <icon className="Chat-FullColor">
                             <i className={icon}></i>
                         </icon>
-                        <span>
-                            {highlight(icon, inputIcon)}
-                        </span>
+                        <span>{highlight(icon, inputIcon)}</span>
                     </li>
-                )}
+                ))}
             </ul>
         ) : null;
     }

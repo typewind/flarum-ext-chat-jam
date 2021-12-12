@@ -112,8 +112,8 @@ class CreateChatHandler
         if (!$isChannel) {
             foreach ($users as $user) if ($user['id'] != $actor->id) $user_ids[] = $user['id'];
 
-            $pairs = array_merge($user_ids, [$actor->id]);
-            foreach ($pairs as $k => $v) {
+            $pairs = [];
+            foreach (array_merge($user_ids, [$actor->id]) as $v) {
                 $pairs[$v] = ['joined_at' => $now];
                 if ($v == $actor->id) $pairs[$v]['role'] = 2;
             }

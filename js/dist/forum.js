@@ -1976,7 +1976,11 @@ function (_Modal) {
     this.input = {
       title: flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default()(''),
       color: flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default()(''),
-      icon: flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default()('')
+      icon: flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_3___default()(''),
+      iconState: {
+        matches: [],
+        lastInput: null
+      }
     };
   };
 
@@ -2107,12 +2111,17 @@ function (_Modal) {
     var _this3 = this;
 
     var inputIcon = this.input.icon();
-    var matches = _resources__WEBPACK_IMPORTED_MODULE_5__["fa5IconsList"].filter(function (icon) {
-      return icon.includes(inputIcon);
-    });
-    if (matches.length > 5) matches = matches.sort(function (a, b) {
-      return 0.5 - Math.random();
-    });
+    var matches = this.input.iconState.matches;
+
+    if (inputIcon != this.input.iconState.lastInput) {
+      matches = _resources__WEBPACK_IMPORTED_MODULE_5__["fa5IconsList"].filter(function (icon) {
+        return icon.includes(inputIcon);
+      });
+      if (matches.length > 5) matches = matches.sort(function (a, b) {
+        return 0.5 - Math.random();
+      });
+    }
+
     return inputIcon.length && matches.length > 0 && !(matches.length == 1 && matches[0] === inputIcon) ? m("ul", {
       className: "Dropdown-menu Dropdown--Icons Search-results"
     }, m("li", {

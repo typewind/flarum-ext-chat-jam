@@ -145,17 +145,19 @@ export default class ChatModal extends Modal {
 
     dropdownIconMatches(search) {
         let inputIcon = this.input.icon();
-        let matches = this.input.iconState.matches;
+        let iconState = this.input.iconState;
 
-        if (inputIcon != this.input.iconState.lastInput) {
-            matches = fa5IconsList.filter((icon) => icon.includes(inputIcon));
-            if (matches.length > 5) matches = matches.sort((a, b) => 0.5 - Math.random());
+        if (inputIcon !== iconState.lastInput) {
+            iconState.matches = fa5IconsList.filter((icon) => icon.includes(inputIcon));
+            if (iconState.matches.length > 5) iconState.matches = iconState.matches.sort((a, b) => 0.5 - Math.random());
+
+            iconState.lastInput = inputIcon;
         }
 
-        return inputIcon.length && matches.length > 0 && !(matches.length == 1 && matches[0] === inputIcon) ? (
+        return inputIcon.length && iconState.matches.length > 0 && !(iconState.matches.length == 1 && iconState.matches[0] === inputIcon) ? (
             <ul className="Dropdown-menu Dropdown--Icons Search-results">
                 <li className="Dropdown-header">Font Awesome 5</li>
-                {matches.slice(-5).map((icon) => (
+                {iconState.matches.slice(-5).map((icon) => (
                     <li className="IconSearchResult" onclick={(e) => this.input.icon(icon)}>
                         <icon className="Chat-FullColor">
                             <i className={icon}></i>

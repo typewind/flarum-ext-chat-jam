@@ -2111,22 +2111,23 @@ function (_Modal) {
     var _this3 = this;
 
     var inputIcon = this.input.icon();
-    var matches = this.input.iconState.matches;
+    var iconState = this.input.iconState;
 
-    if (inputIcon != this.input.iconState.lastInput) {
-      matches = _resources__WEBPACK_IMPORTED_MODULE_5__["fa5IconsList"].filter(function (icon) {
+    if (inputIcon !== iconState.lastInput) {
+      iconState.matches = _resources__WEBPACK_IMPORTED_MODULE_5__["fa5IconsList"].filter(function (icon) {
         return icon.includes(inputIcon);
       });
-      if (matches.length > 5) matches = matches.sort(function (a, b) {
+      if (iconState.matches.length > 5) iconState.matches = iconState.matches.sort(function (a, b) {
         return 0.5 - Math.random();
       });
+      iconState.lastInput = inputIcon;
     }
 
-    return inputIcon.length && matches.length > 0 && !(matches.length == 1 && matches[0] === inputIcon) ? m("ul", {
+    return inputIcon.length && iconState.matches.length > 0 && !(iconState.matches.length == 1 && iconState.matches[0] === inputIcon) ? m("ul", {
       className: "Dropdown-menu Dropdown--Icons Search-results"
     }, m("li", {
       className: "Dropdown-header"
-    }, "Font Awesome 5"), matches.slice(-5).map(function (icon) {
+    }, "Font Awesome 5"), iconState.matches.slice(-5).map(function (icon) {
       return m("li", {
         className: "IconSearchResult",
         onclick: function onclick(e) {

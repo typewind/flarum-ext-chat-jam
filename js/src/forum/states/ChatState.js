@@ -72,12 +72,12 @@ export default class ChatState {
         let chat = r.response.chat;
         if (chat) chat = app.store.pushPayload(chat);
 
-        // Workaround for blocking events from a socket if we need it
-        if ((message && (message.chat().removed_at() || message.user() == app.session.user)) || (chat && chat.removed_at())) return;
+        // Workaround for blocking events from a chat we leaved
+        if (chat && chat.removed_at()) return;
 
         switch (r.event.id) {
             case 'message.post': {
-                if (!app.session.user || message.user().id() != app.session.user.id()) {
+                if (!app.session.user || message.user() != app.session.user) {
                     this.insertChatMessage(message, true);
                     m.redraw();
                 }
@@ -85,8 +85,10 @@ export default class ChatState {
             }
             case 'message.edit': {
                 let actions = message.data.attributes.actions;
+                if (app.session.user && actions.invoker == app.session.user.id()) return;
+
                 if (actions.msg !== undefined) {
-                    if (!app.session.user || message.user().id() != app.session.user.id()) this.editChatMessage(message, false, actions.msg);
+                    if (!app.session.user || message.user() != app.session.user) this.editChatMessage(message, false, actions.msg);
                 } else if (actions.hide !== undefined) {
                     if (!app.session.user || actions.invoker != app.session.user.id())
                         actions.hide ? this.hideChatMessage(message, false, message.deleted_by()) : this.restoreChatMessage(message, false);
@@ -94,8 +96,7 @@ export default class ChatState {
                 break;
             }
             case 'message.delete': {
-                if (!app.session.user || message.deleted_by().id() != app.session.user.id())
-                    this.deleteChatMessage(message, false, message.deleted_by());
+                if (!app.session.user || message.deleted_by() != app.session.user) this.deleteChatMessage(message, false, message.deleted_by());
 
                 break;
             }

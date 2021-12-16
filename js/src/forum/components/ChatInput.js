@@ -49,6 +49,7 @@ export default class ChatInput extends Component {
                     oninput={this.inputProcess.bind(this)}
                     onpaste={this.inputProcess.bind(this)}
                     rows={this.state.input.rows}
+                    value={this.state.input.content()}
                 />
                 {this.state.messageEditing ? (
                     <div className="icon edit" onclick={this.state.messageEditEnd.bind(this.state)}>
@@ -64,11 +65,7 @@ export default class ChatInput extends Component {
                         <div className="icon send" onclick={this.inputPressButton.bind(this)}>
                             <i class="fas fa-angle-double-right"></i>
                         </div>,
-                        <div
-                            id="chat-limiter"
-                            className={this.reachedLimit() ? 'reaching-limit' : ''}
-                            style={{ display: !app.chat.getPermissions().post ? 'none' : '' }}
-                        ></div>,
+                        <div id="chat-limiter"></div>,
                     ]
                 )}
             </div>
@@ -78,22 +75,20 @@ export default class ChatInput extends Component {
     updateLimit() {
         const limiter = this.element.querySelector('#chat-limiter');
         if (!limiter) return;
-        limiter.innerText = this.messageCharLimit - (this.state.input.messageLength || 0) + '/' + this.messageCharLimit;
-    }
 
-    reachedLimit() {
-        this.oldReached = this.messageCharLimit - (this.state.input.messageLength || 0) < 100;
-        return this.oldReached;
+        let charsTyped = this.messageCharLimit - (this.state.input.messageLength || 0);
+        limiter.innerText = charsTyped + '/' + this.messageCharLimit;
+        limiter.className = charsTyped < 100 ? 'reaching-limit' : '';
     }
 
     inputProcess(e) {
         if (e) e.redraw = false;
 
         let input = e.target;
+        this.state.input.content(input.value);
         let inputValue = input.value.trim();
         this.state.input.messageLength = inputValue.length;
         this.updateLimit();
-        this.state.input.content(inputValue);
 
         if (!input.lineHeight) input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
         input.rows = 1;

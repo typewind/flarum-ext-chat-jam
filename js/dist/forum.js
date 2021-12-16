@@ -1392,7 +1392,8 @@ function (_Component) {
       onkeypress: this.inputPressEnter.bind(this),
       oninput: this.inputProcess.bind(this),
       onpaste: this.inputProcess.bind(this),
-      rows: this.state.input.rows
+      rows: this.state.input.rows,
+      value: this.state.input.content()
     }), this.state.messageEditing ? m("div", {
       className: "icon edit",
       onclick: this.state.messageEditEnd.bind(this.state)
@@ -1411,32 +1412,25 @@ function (_Component) {
     }, m("i", {
       "class": "fas fa-angle-double-right"
     })), m("div", {
-      id: "chat-limiter",
-      className: this.reachedLimit() ? 'reaching-limit' : '',
-      style: {
-        display: !app.chat.getPermissions().post ? 'none' : ''
-      }
+      id: "chat-limiter"
     })]);
   };
 
   _proto.updateLimit = function updateLimit() {
     var limiter = this.element.querySelector('#chat-limiter');
     if (!limiter) return;
-    limiter.innerText = this.messageCharLimit - (this.state.input.messageLength || 0) + '/' + this.messageCharLimit;
-  };
-
-  _proto.reachedLimit = function reachedLimit() {
-    this.oldReached = this.messageCharLimit - (this.state.input.messageLength || 0) < 100;
-    return this.oldReached;
+    var charsTyped = this.messageCharLimit - (this.state.input.messageLength || 0);
+    limiter.innerText = charsTyped + '/' + this.messageCharLimit;
+    limiter.className = charsTyped < 100 ? 'reaching-limit' : '';
   };
 
   _proto.inputProcess = function inputProcess(e) {
     if (e) e.redraw = false;
     var input = e.target;
+    this.state.input.content(input.value);
     var inputValue = input.value.trim();
     this.state.input.messageLength = inputValue.length;
     this.updateLimit();
-    this.state.input.content(inputValue);
     if (!input.lineHeight) input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
     input.rows = 1;
     this.state.input.rows = Math.min(input.scrollHeight / input.lineHeight, app.screen() === 'phone' ? 2 : 5);

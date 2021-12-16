@@ -1389,7 +1389,6 @@ function (_Component) {
       maxlength: this.messageCharLimit,
       disabled: !app.chat.getPermissions().post || this.model.removed_at(),
       placeholder: this.inputPlaceholder,
-      value: this.state.input.content(),
       onkeypress: this.inputPressEnter.bind(this),
       oninput: this.inputProcess.bind(this),
       onpaste: this.inputProcess.bind(this),

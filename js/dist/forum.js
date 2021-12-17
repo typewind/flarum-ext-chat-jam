@@ -1392,6 +1392,7 @@ function (_Component) {
       onkeypress: this.inputPressEnter.bind(this),
       oninput: this.inputProcess.bind(this),
       onpaste: this.inputProcess.bind(this),
+      onkeyup: this.inputSaveDraft.bind(this),
       rows: this.state.input.rows,
       value: this.state.input.content()
     }), this.state.messageEditing ? m("div", {
@@ -1422,6 +1423,18 @@ function (_Component) {
     var charsTyped = this.messageCharLimit - (this.state.input.messageLength || 0);
     limiter.innerText = charsTyped + '/' + this.messageCharLimit;
     limiter.className = charsTyped < 100 ? 'reaching-limit' : '';
+  };
+
+  _proto.inputSaveDraft = function inputSaveDraft(e) {
+    var _this2 = this;
+
+    if (e) e.redraw = false;
+    var input = e.target;
+    var inputState = this.state.input;
+    if (inputState.timeoutSaveDraft) clearTimeout(inputState.timeoutSaveDraft);
+    inputState.timeoutSaveDraft = setTimeout(function () {
+      _this2.state.setChatStorageValue('draft', input.value.trim());
+    }, 50);
   };
 
   _proto.inputProcess = function inputProcess(e) {
@@ -3668,7 +3681,9 @@ function () {
     }
 
     this.chats.push(model);
-    this.viewportStates[model.id()] = new _ViewportState__WEBPACK_IMPORTED_MODULE_4__["default"]();
+    this.viewportStates[model.id()] = new _ViewportState__WEBPACK_IMPORTED_MODULE_4__["default"]({
+      model: model
+    });
     if (model.id() == this.getFrameState('selectedChat')) this.onChatChanged(model);
     if (outside) model.isNeedToFlash = true;
   };
@@ -4097,7 +4112,7 @@ __webpack_require__.r(__webpack_exports__);
 var ViewportState =
 /*#__PURE__*/
 function () {
-  function ViewportState() {
+  function ViewportState(params) {
     Object(_babel_runtime_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_1__["default"])(this, "loadingSend", false);
 
     Object(_babel_runtime_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_1__["default"])(this, "scroll", {
@@ -4116,9 +4131,43 @@ function () {
     });
 
     Object(_babel_runtime_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_1__["default"])(this, "messagesFetched", false);
+
+    Object(_babel_runtime_helpers_esm_defineProperty__WEBPACK_IMPORTED_MODULE_1__["default"])(this, "chatStorage", {
+      key: null,
+      draft: null
+    });
+
+    if (params.model) {
+      this.initChatStorage(params.model);
+      this.input.content(this.getChatStorageValue('draft'));
+    }
   }
 
   var _proto = ViewportState.prototype;
+
+  _proto.initChatStorage = function initChatStorage(model) {
+    this.chatStorage.key = "neonchat.viewport" + model.id();
+    var parsedData = JSON.parse(localStorage.getItem(this.chatStorage.key));
+
+    if (parsedData) {
+      var _parsedData$draft;
+
+      this.chatStorage.draft = (_parsedData$draft = parsedData.draft) != null ? _parsedData$draft : '';
+    }
+  };
+
+  _proto.getChatStorageValue = function getChatStorageValue(key) {
+    return this.chatStorage[key];
+  };
+
+  _proto.setChatStorageValue = function setChatStorageValue(key, value) {
+    var _JSON$parse;
+
+    var cachedState = (_JSON$parse = JSON.parse(localStorage.getItem(this.chatStorage.key))) != null ? _JSON$parse : {};
+    cachedState[key] = value;
+    localStorage.setItem(this.chatStorage.key, JSON.stringify(cachedState));
+    this.chatStorage[key] = value;
+  };
 
   _proto.onChatMessageClicked = function onChatMessageClicked(eventName, model) {
     switch (eventName) {

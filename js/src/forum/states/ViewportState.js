@@ -19,6 +19,40 @@ export default class ViewportState {
 
     messagesFetched = false;
 
+    constructor(params) {
+        if (params.model) {
+            this.initChatStorage(params.model);
+
+            this.input.content(this.getChatStorageValue('draft'));
+        }
+    }
+
+    chatStorage = {
+        key: null,
+        draft: null,
+    };
+
+    initChatStorage(model) {
+        this.chatStorage.key = `neonchat.viewport${model.id()}`;
+        let parsedData = JSON.parse(localStorage.getItem(this.chatStorage.key));
+
+        if (parsedData) {
+            this.chatStorage.draft = parsedData.draft ?? '';
+        }
+    }
+
+    getChatStorageValue(key) {
+        return this.chatStorage[key];
+    }
+
+    setChatStorageValue(key, value) {
+        let cachedState = JSON.parse(localStorage.getItem(this.chatStorage.key)) ?? {};
+        cachedState[key] = value;
+        localStorage.setItem(this.chatStorage.key, JSON.stringify(cachedState));
+
+        this.chatStorage[key] = value;
+    }
+
     onChatMessageClicked(eventName, model) {
         switch (eventName) {
             case 'dropdownEditStart': {

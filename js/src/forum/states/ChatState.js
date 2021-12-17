@@ -177,7 +177,8 @@ export default class ChatState {
 
     addChat(model, outside = false) {
         this.chats.push(model);
-        this.viewportStates[model.id()] = new ViewportState();
+
+        this.viewportStates[model.id()] = new ViewportState({ model });
 
         if (model.id() == this.getFrameState('selectedChat')) this.onChatChanged(model);
         if (outside) model.isNeedToFlash = true;

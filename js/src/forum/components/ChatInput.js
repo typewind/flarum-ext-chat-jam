@@ -48,6 +48,7 @@ export default class ChatInput extends Component {
                     onkeypress={this.inputPressEnter.bind(this)}
                     oninput={this.inputProcess.bind(this)}
                     onpaste={this.inputProcess.bind(this)}
+                    onkeyup={this.inputSaveDraft.bind(this)}
                     rows={this.state.input.rows}
                     value={this.state.input.content()}
                 />
@@ -79,6 +80,18 @@ export default class ChatInput extends Component {
         let charsTyped = this.messageCharLimit - (this.state.input.messageLength || 0);
         limiter.innerText = charsTyped + '/' + this.messageCharLimit;
         limiter.className = charsTyped < 100 ? 'reaching-limit' : '';
+    }
+
+    inputSaveDraft(e) {
+        if (e) e.redraw = false;
+
+        let input = e.target;
+        let inputState = this.state.input;
+
+        if (inputState.timeoutSaveDraft) clearTimeout(inputState.timeoutSaveDraft);
+        inputState.timeoutSaveDraft = setTimeout(() => {
+            this.state.setChatStorageValue('draft', input.value.trim());
+        }, 100);
     }
 
     inputProcess(e) {

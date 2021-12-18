@@ -98,15 +98,18 @@ export default class ViewportState {
     }
 
     messageEdit(model) {
-        if (this.input.writingPreview) this.inputPreviewEnd();
+        if (this.input.writingPreview) this.input.instance.inputPreviewEnd();
+        if(this.messageEditing) this.messageEditEnd();
 
         model.isEditing = true;
         model.oldContent = model.message();
 
         this.messageEditing = model;
 
-        this.input.content(model.oldContent);
-        this.getChatInput().focus();
+        let inputElement = this.getChatInput();
+        inputElement.value = this.input.content(model.oldContent);
+        inputElement.focus();
+        app.chat.input.resizeInput();
 
         m.redraw();
     }

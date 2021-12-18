@@ -2,6 +2,7 @@ import Message from '../models/Message';
 
 import Model from 'flarum/Model';
 import Stream from 'flarum/utils/Stream';
+import Link from 'flarum/components/Link';
 
 import * as resources from '../resources';
 import ViewportState from './ViewportState';
@@ -214,17 +215,6 @@ export default class ChatState {
         });
     }
 
-    colorizeOddChatMessages() {
-        let odd = false;
-        $($('.message-wrapper').get().reverse()).each(function () {
-            let e = $(this);
-            if (!e.hasClass('deleted')) {
-                odd = !odd;
-                odd ? e.removeClass('odd') : e.addClass('odd');
-            }
-        });
-    }
-
     onChatChanged(model, e = {}) {
         e.redraw = false;
         if (model == this.getCurrentChat()) return;
@@ -303,6 +293,20 @@ export default class ChatState {
         if (element) {
             element.innerText = content;
             s9e.TextFormatter.preview(content, element);
+
+            // Workaround for user mentions that doesn't works properly
+            $(element).find('.UserMention').each(function () {
+                let user = app.store.getBy('users', 'username', this.innerText.substring(1));
+                if(user)
+                {
+                    this.className = '';
+                    m.render(this, (
+                        <Link href={app.route.user(user)}>
+                            <span className="UserMention">{'@' + user.displayName()}</span>
+                        </Link>
+                    ))
+                }
+            });
 
             if (this.executeScriptsTimeout) clearTimeout(this.executeScriptsTimeout);
             this.executeScriptsTimeout = setTimeout(() => {

@@ -26,7 +26,6 @@ export default class ChatViewport extends Component {
 
     onupdate(vnode) {
         super.onupdate(vnode);
-        //app.chat.colorizeOddChatMessages();
 
         // this.attrs is broken in onupdate hook
         const model = vnode.attrs.chatModel;

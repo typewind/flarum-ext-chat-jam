@@ -1330,6 +1330,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/components/Button */ "flarum/components/Button");
 /* harmony import */ var flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Button__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _ChatEditModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatEditModal */ "./src/forum/components/ChatEditModal.js");
+/* harmony import */ var flarum_utils_throttleDebounce__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! flarum/utils/throttleDebounce */ "flarum/utils/throttleDebounce");
+/* harmony import */ var flarum_utils_throttleDebounce__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_throttleDebounce__WEBPACK_IMPORTED_MODULE_5__);
+
 
 
 
@@ -1354,12 +1357,24 @@ function (_Component) {
 
     this.model = this.attrs.model;
     this.state = this.attrs.state;
+    app.chat.input = this;
     this.messageCharLimit = (_app$forum$attribute = app.forum.attribute('xelson-chat.settings.charlimit')) != null ? _app$forum$attribute : 512;
     this.updatePlaceholder();
   };
 
   _proto.oncreate = function oncreate(vnode) {
     _Component.prototype.oncreate.call(this, vnode);
+
+    var inputState = this.state.input;
+    var input = this.$('#chat-input')[0];
+    input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
+    inputState.element = input;
+
+    if (inputState.content().length) {
+      this.inputProcess({
+        target: input
+      });
+    }
 
     this.updateLimit();
   };
@@ -1394,7 +1409,10 @@ function (_Component) {
       onpaste: this.inputProcess.bind(this),
       onkeyup: this.inputSaveDraft.bind(this),
       rows: this.state.input.rows,
-      value: this.state.input.content()
+      value: this.state.input.content(),
+      onupdate: function onupdate() {
+        return _this.saveDraft.apply(_this);
+      }
     }), this.state.messageEditing ? m("div", {
       className: "icon edit",
       onclick: this.state.messageEditEnd.bind(this.state)
@@ -1425,16 +1443,30 @@ function (_Component) {
     limiter.className = charsTyped < 100 ? 'reaching-limit' : '';
   };
 
-  _proto.inputSaveDraft = function inputSaveDraft(e) {
+  _proto.saveDraft = function saveDraft(text) {
     var _this2 = this;
 
+    if (text === void 0) {
+      text = this.state.input.content();
+    }
+
+    this.state.input.lastDraft != text && Object(flarum_utils_throttleDebounce__WEBPACK_IMPORTED_MODULE_5__["throttle"])(300, function () {
+      _this2.state.setChatStorageValue('draft', text);
+    })();
+    this.state.input.lastDraft = text;
+  };
+
+  _proto.inputSaveDraft = function inputSaveDraft(e) {
     if (e) e.redraw = false;
     var input = e.target;
-    var inputState = this.state.input;
-    if (inputState.timeoutSaveDraft) clearTimeout(inputState.timeoutSaveDraft);
-    inputState.timeoutSaveDraft = setTimeout(function () {
-      _this2.state.setChatStorageValue('draft', input.value.trim());
-    }, 50);
+    this.saveDraft(input.value.trim());
+  };
+
+  _proto.resizeInput = function resizeInput() {
+    var input = this.state.input.element;
+    input.rows = 1;
+    this.state.input.rows = Math.min(input.scrollHeight / input.lineHeight, app.screen() === 'phone' ? 2 : 5);
+    input.rows = this.state.input.rows;
   };
 
   _proto.inputProcess = function inputProcess(e) {
@@ -1444,10 +1476,7 @@ function (_Component) {
     var inputValue = input.value.trim();
     this.state.input.messageLength = inputValue.length;
     this.updateLimit();
-    if (!input.lineHeight) input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
-    input.rows = 1;
-    this.state.input.rows = Math.min(input.scrollHeight / input.lineHeight, app.screen() === 'phone' ? 2 : 5);
-    input.rows = this.state.input.rows;
+    this.resizeInput();
 
     if (this.state.input.messageLength) {
       if (!this.state.input.writingPreview && !this.state.messageEditing) this.inputPreviewStart(inputValue);
@@ -2671,8 +2700,7 @@ function (_Component) {
   };
 
   _proto.onupdate = function onupdate(vnode) {
-    _Component.prototype.onupdate.call(this, vnode); //app.chat.colorizeOddChatMessages();
-    // this.attrs is broken in onupdate hook
+    _Component.prototype.onupdate.call(this, vnode); // this.attrs is broken in onupdate hook
 
 
     var model = vnode.attrs.chatModel;
@@ -3271,7 +3299,9 @@ app.initializers.add('xelson-chat', function (app) {
     if ('Notification' in window && app.chat.getFrameState('notify')) Notification.requestPermission();
 
     if (!app.pusher) {
-      console.error(app.translator.trans('xelson-chat.forum.pusher_not_found'));
+      app.alerts.show({
+        type: 'error'
+      }, app.translator.trans('xelson-chat.forum.pusher_not_found'));
     }
 
     app.chat.apiFetchChats();
@@ -3469,18 +3499,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var flarum_Model__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flarum_Model__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! flarum/utils/Stream */ "flarum/utils/Stream");
 /* harmony import */ var flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _resources__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../resources */ "./src/forum/resources.js");
-/* harmony import */ var _ViewportState__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ViewportState */ "./src/forum/states/ViewportState.js");
+/* harmony import */ var flarum_components_Link__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! flarum/components/Link */ "flarum/components/Link");
+/* harmony import */ var flarum_components_Link__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(flarum_components_Link__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _resources__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../resources */ "./src/forum/resources.js");
+/* harmony import */ var _ViewportState__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ViewportState */ "./src/forum/states/ViewportState.js");
+
 
 
 
 
 
 var refAudio = new Audio();
-refAudio.src = _resources__WEBPACK_IMPORTED_MODULE_3__["base64AudioNotificationRef"];
+refAudio.src = _resources__WEBPACK_IMPORTED_MODULE_4__["base64AudioNotificationRef"];
 refAudio.volume = 0.5;
 var audio = new Audio();
-audio.src = _resources__WEBPACK_IMPORTED_MODULE_3__["base64AudioNotification"];
+audio.src = _resources__WEBPACK_IMPORTED_MODULE_4__["base64AudioNotification"];
 audio.volume = 0.5;
 
 var ChatState =
@@ -3681,7 +3714,7 @@ function () {
     }
 
     this.chats.push(model);
-    this.viewportStates[model.id()] = new _ViewportState__WEBPACK_IMPORTED_MODULE_4__["default"]({
+    this.viewportStates[model.id()] = new _ViewportState__WEBPACK_IMPORTED_MODULE_5__["default"]({
       model: model
     });
     if (model.id() == this.getFrameState('selectedChat')) this.onChatChanged(model);
@@ -3728,18 +3761,6 @@ function () {
       }) && users.some(function (model) {
         return model == user2;
       });
-    });
-  };
-
-  _proto.colorizeOddChatMessages = function colorizeOddChatMessages() {
-    var odd = false;
-    $($('.message-wrapper').get().reverse()).each(function () {
-      var e = $(this);
-
-      if (!e.hasClass('deleted')) {
-        odd = !odd;
-        odd ? e.removeClass('odd') : e.addClass('odd');
-      }
     });
   };
 
@@ -3851,7 +3872,20 @@ function () {
 
     if (element) {
       element.innerText = content;
-      s9e.TextFormatter.preview(content, element);
+      s9e.TextFormatter.preview(content, element); // Workaround for user mentions that doesn't works properly
+
+      $(element).find('.UserMention').each(function () {
+        var user = app.store.getBy('users', 'username', this.innerText.substring(1));
+
+        if (user) {
+          this.className = '';
+          m.render(this, m(flarum_components_Link__WEBPACK_IMPORTED_MODULE_3___default.a, {
+            href: app.route.user(user)
+          }, m("span", {
+            className: "UserMention"
+          }, '@' + user.displayName())));
+        }
+      });
       if (this.executeScriptsTimeout) clearTimeout(this.executeScriptsTimeout);
       this.executeScriptsTimeout = setTimeout(function () {
         $('.NeonChatFrame script').each(function () {
@@ -4053,7 +4087,7 @@ function () {
 
   _proto.notifySend = function notifySend(model) {
     var avatar = model.user().avatarUrl();
-    if (!avatar) avatar = _resources__WEBPACK_IMPORTED_MODULE_3__["base64PlaceholderAvatarImage"];
+    if (!avatar) avatar = _resources__WEBPACK_IMPORTED_MODULE_4__["base64PlaceholderAvatarImage"];
     if (this.getFrameState('notify') && document.hidden) new Notification(model.chat().title(), {
       body: model.user().username() + ": " + model.message(),
       icon: avatar,
@@ -4219,12 +4253,15 @@ function () {
   };
 
   _proto.messageEdit = function messageEdit(model) {
-    if (this.input.writingPreview) this.inputPreviewEnd();
+    if (this.input.writingPreview) this.input.instance.inputPreviewEnd();
+    if (this.messageEditing) this.messageEditEnd();
     model.isEditing = true;
     model.oldContent = model.message();
     this.messageEditing = model;
-    this.input.content(model.oldContent);
-    this.getChatInput().focus();
+    var inputElement = this.getChatInput();
+    inputElement.value = this.input.content(model.oldContent);
+    inputElement.focus();
+    app.chat.input.resizeInput();
     m.redraw();
   };
 
@@ -4619,6 +4656,17 @@ module.exports = flarum.core.compat['utils/extractText'];
 /***/ (function(module, exports) {
 
 module.exports = flarum.core.compat['utils/humanTime'];
+
+/***/ }),
+
+/***/ "flarum/utils/throttleDebounce":
+/*!***************************************************************!*\
+  !*** external "flarum.core.compat['utils/throttleDebounce']" ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = flarum.core.compat['utils/throttleDebounce'];
 
 /***/ })
 

@@ -1,6 +1,7 @@
 import Component from 'flarum/Component';
 import Button from 'flarum/components/Button';
 import ChatEditModal from './ChatEditModal';
+import {throttle} from 'flarum/utils/throttleDebounce';
 
 export default class ChatInput extends Component {
     oninit(vnode) {
@@ -9,6 +10,8 @@ export default class ChatInput extends Component {
         this.model = this.attrs.model;
         this.state = this.attrs.state;
 
+        app.chat.input = this;
+
         this.messageCharLimit = app.forum.attribute('xelson-chat.settings.charlimit') ?? 512;
 
         this.updatePlaceholder();
@@ -16,6 +19,15 @@ export default class ChatInput extends Component {
 
     oncreate(vnode) {
         super.oncreate(vnode);
+
+        let inputState = this.state.input;
+        let input = this.$('#chat-input')[0];
+        input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
+        inputState.element = input;
+
+        if(inputState.content().length) {
+            this.inputProcess({target: input});
+        }
 
         this.updateLimit();
     }
@@ -51,6 +63,7 @@ export default class ChatInput extends Component {
                     onkeyup={this.inputSaveDraft.bind(this)}
                     rows={this.state.input.rows}
                     value={this.state.input.content()}
+                    onupdate={() => this.saveDraft.apply(this)}
                 />
                 {this.state.messageEditing ? (
                     <div className="icon edit" onclick={this.state.messageEditEnd.bind(this.state)}>
@@ -82,16 +95,28 @@ export default class ChatInput extends Component {
         limiter.className = charsTyped < 100 ? 'reaching-limit' : '';
     }
 
+    saveDraft(text = this.state.input.content())
+    {
+        (this.state.input.lastDraft != text) && throttle(300, () => {
+            this.state.setChatStorageValue('draft', text);
+        })();
+        this.state.input.lastDraft = text;
+    }
+
     inputSaveDraft(e) {
         if (e) e.redraw = false;
 
         let input = e.target;
-        let inputState = this.state.input;
+        this.saveDraft(input.value.trim());
+    }
 
-        if (inputState.timeoutSaveDraft) clearTimeout(inputState.timeoutSaveDraft);
-        inputState.timeoutSaveDraft = setTimeout(() => {
-            this.state.setChatStorageValue('draft', input.value.trim());
-        }, 100);
+    resizeInput()
+    {
+        let input = this.state.input.element;
+
+        input.rows = 1;
+        this.state.input.rows = Math.min(input.scrollHeight / input.lineHeight, app.screen() === 'phone' ? 2 : 5);
+        input.rows = this.state.input.rows;
     }
 
     inputProcess(e) {
@@ -103,10 +128,7 @@ export default class ChatInput extends Component {
         this.state.input.messageLength = inputValue.length;
         this.updateLimit();
 
-        if (!input.lineHeight) input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
-        input.rows = 1;
-        this.state.input.rows = Math.min(input.scrollHeight / input.lineHeight, app.screen() === 'phone' ? 2 : 5);
-        input.rows = this.state.input.rows;
+        this.resizeInput();
 
         if (this.state.input.messageLength) {
             if (!this.state.input.writingPreview && !this.state.messageEditing) this.inputPreviewStart(inputValue);

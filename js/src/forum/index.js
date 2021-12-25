@@ -54,10 +54,7 @@ app.initializers.add('xelson-chat', (app) => {
         if ('Notification' in window && app.chat.getFrameState('notify')) Notification.requestPermission();
 
         if (!app.pusher) {
-            app.alerts.show(
-                { type: 'error' },
-                app.translator.trans('xelson-chat.forum.pusher_not_found')
-            );
+            app.alerts.show({ type: 'error' }, app.translator.trans('xelson-chat.forum.pusher_not_found'));
         }
 
         app.chat.apiFetchChats();

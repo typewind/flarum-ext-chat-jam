@@ -1,7 +1,7 @@
 import Component from 'flarum/Component';
 import Button from 'flarum/components/Button';
 import ChatEditModal from './ChatEditModal';
-import {throttle} from 'flarum/utils/throttleDebounce';
+import { throttle } from 'flarum/utils/throttleDebounce';
 
 export default class ChatInput extends Component {
     oninit(vnode) {
@@ -25,8 +25,8 @@ export default class ChatInput extends Component {
         input.lineHeight = parseInt(window.getComputedStyle(input).getPropertyValue('line-height'));
         inputState.element = input;
 
-        if(inputState.content().length) {
-            this.inputProcess({target: input});
+        if (inputState.content() && inputState.content().length) {
+            this.inputProcess({ target: input });
         }
 
         this.updateLimit();
@@ -95,11 +95,11 @@ export default class ChatInput extends Component {
         limiter.className = charsTyped < 100 ? 'reaching-limit' : '';
     }
 
-    saveDraft(text = this.state.input.content())
-    {
-        (this.state.input.lastDraft != text) && throttle(300, () => {
-            this.state.setChatStorageValue('draft', text);
-        })();
+    saveDraft(text = this.state.input.content()) {
+        this.state.input.lastDraft != text &&
+            throttle(300, () => {
+                this.state.setChatStorageValue('draft', text);
+            })();
         this.state.input.lastDraft = text;
     }
 
@@ -110,9 +110,8 @@ export default class ChatInput extends Component {
         this.saveDraft(input.value.trim());
     }
 
-    resizeInput()
-    {
-        let input = this.state.input.element;
+    resizeInput() {
+        let input = this.state.getChatInput();
 
         input.rows = 1;
         this.state.input.rows = Math.min(input.scrollHeight / input.lineHeight, app.screen() === 'phone' ? 2 : 5);

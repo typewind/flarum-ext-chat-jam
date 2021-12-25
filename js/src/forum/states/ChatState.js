@@ -6,6 +6,7 @@ import Link from 'flarum/components/Link';
 
 import * as resources from '../resources';
 import ViewportState from './ViewportState';
+import { throttle } from 'flarum/utils/throttleDebounce';
 
 var refAudio = new Audio();
 refAudio.src = resources.base64AudioNotificationRef;
@@ -291,25 +292,20 @@ export default class ChatState {
         let element = model instanceof Model ? document.querySelector(`.NeonChatFrame .message-wrapper[data-id="${model.id()}"] .message`) : model;
 
         if (element) {
-            element.innerText = content;
             s9e.TextFormatter.preview(content, element);
 
             // Workaround for user mentions that doesn't works properly
-            $(element).find('.UserMention').each(function () {
-                let user = app.store.getBy('users', 'username', this.innerText.substring(1));
-                if(user)
-                {
-                    this.className = '';
-                    m.render(this, (
-                        <Link href={app.route.user(user)}>
-                            <span className="UserMention">{'@' + user.displayName()}</span>
-                        </Link>
-                    ))
-                }
-            });
+            $(element)
+                .find('.UserMention.UserMention--deleted')
+                .each(function () {
+                    let user = app.store.getBy('users', 'username', this.innerText.substring(1));
+                    if (this && user) {
+                        this.classList.remove('UserMention--deleted');
+                        m.render(this, <Link href={app.route.user(user)}>{this.innerText}</Link>);
+                    }
+                });
 
-            if (this.executeScriptsTimeout) clearTimeout(this.executeScriptsTimeout);
-            this.executeScriptsTimeout = setTimeout(() => {
+            throttle(100, () => {
                 $('.NeonChatFrame script').each(function () {
                     if (!self.executedScripts) self.executedScripts = {};
                     let scriptURL = $(this).attr('src');
@@ -321,7 +317,7 @@ export default class ChatState {
                         self.executedScripts[scriptURL] = true;
                     }
                 });
-            }, 100);
+            })();
         }
     }
 

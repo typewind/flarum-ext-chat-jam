@@ -99,7 +99,7 @@ export default class ViewportState {
 
     messageEdit(model) {
         if (this.input.writingPreview) this.input.instance.inputPreviewEnd();
-        if(this.messageEditing) this.messageEditEnd();
+        if (this.messageEditing) this.messageEditEnd();
 
         model.isEditing = true;
         model.oldContent = model.message();

@@ -56,6 +56,11 @@ return [
         $schema->table('pushedx_messages', function (Blueprint $table) {
 			$table->renameColumn('user_id', 'actorId');
 
+			$table->dropForeign(['chat_id']);
+			$table->dropForeign(['user_id']);
+			$table->dropForeign(['deleted_by']);
+
+			$table->dropColumn('chat_id', 'type', 'is_readed', 'ip_addres');
         });
     }
 ];

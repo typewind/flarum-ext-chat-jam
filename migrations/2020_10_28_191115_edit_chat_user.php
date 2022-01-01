@@ -18,11 +18,9 @@ return [
 
     'down' => function (Builder $schema) {
         $schema->table('neonchat_chat_user', function (Blueprint $table) {
-            $table->dropColumn('role');
-            $table->dropColumn('removed_by');
-            $table->dropColumn('readed_at');
-            $table->dropColumn('removed_at');
-            $table->dropColumn('joined_at');
+            $table->dropForeign(['removed_by']);
+
+            $table->dropColumn('role', 'removed_by', 'readed_at', 'removed_at', 'joined_at');
         });
     }
 ];

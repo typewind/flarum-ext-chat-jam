@@ -36,6 +36,7 @@ export default class ChatViewport extends Component {
                 this.state = app.chat.getViewportState(this.model);
                 this.loadChat();
             }
+            app.chat.flashItem($('.wrapper'));
         }
     }
 
@@ -227,7 +228,7 @@ export default class ChatViewport extends Component {
 
     checkUnreaded() {
         let wrapper = this.getChatWrapper();
-        if (wrapper && this.model.unreaded()) {
+        if (wrapper && this.model && this.model.unreaded()) {
             let list = app.chat.getChatMessages((mdl) => mdl.chat() == this.model && mdl.created_at() >= this.model.readed_at() && !mdl.isReaded);
 
             for (const message of list) {

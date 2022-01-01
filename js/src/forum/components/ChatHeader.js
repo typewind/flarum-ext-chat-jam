@@ -26,6 +26,12 @@ export default class ChatHeader extends Component {
                 ) : (
                     ''
                 )}
+                <div
+                    className="icon toggle-chat"
+                    onclick={this.toggleChatsList.bind(this)}
+                >
+                    <i className="fas fa-chevron-left"></i>
+                </div>
                 <h2>
                     {app.chat.getCurrentChat()
                         ? [
@@ -113,25 +119,29 @@ export default class ChatHeader extends Component {
         return items;
     }
 
-    toggleChat(e) {
-        const showing = !app.chat.getFrameState('beingShown');
+    toggleChatsList(e) {
+        app.chat.toggleChatsList();
 
-        app.chat.saveFrameState('beingShown', showing);
+        e.preventDefault();
+        e.stopPropagation(); 
+    }
+
+    toggleChat(e) {
+        app.chat.toggleChat();
 
         e.preventDefault();
         e.stopPropagation();
     }
 
     toggleSound(e) {
-        app.chat.saveFrameState('isMuted', !app.chat.getFrameState('isMuted'));
+        app.chat.toggleSound();
 
         e.preventDefault();
         e.stopPropagation();
     }
 
     toggleNotifications(e) {
-        app.chat.saveFrameState('notify', !app.chat.getFrameState('notify'));
-        if ('Notification' in window && app.chat.getFrameState('notify')) Notification.requestPermission();
+        app.chat.toggleNotifications();
 
         e.preventDefault();
         e.stopPropagation();

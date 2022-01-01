@@ -3,6 +3,7 @@
     height: 35px;
     background-color: @color-hr;
     position: relative;
+    z-index: 1;
     .user-select(none);
 
     .window-buttons {
@@ -24,6 +25,15 @@
 
         &:hover {
             color: #fff;
+        }
+
+        &.toggle-chat
+        {
+            @media @tablet-up
+            {
+                display: none;   
+            }
+            margin-left: 5px;
         }
     }
 

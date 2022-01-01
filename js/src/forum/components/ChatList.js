@@ -12,6 +12,7 @@ export default class ChatFrame extends Component {
                     <div className="input-wrapper input--down">
                         <input id="chat-find" bidi={app.chat.q} placeholder={app.translator.trans('xelson-chat.forum.chat.list.placeholder')} />
                     </div>
+                    <i class="fas fa-cloud logo"></i>
                     {this.attrs.inPage ? (
                         ''
                     ) : (
@@ -27,11 +28,7 @@ export default class ChatFrame extends Component {
                     )}
                 </div>
                 <div className="list">
-                    {app.chat.getChatsSortedByLastUpdate().map((model) => (
-                        <div onclick={app.chat.onChatChanged.bind(app.chat, model)}>
-                            <ChatPreview key={model.id()} model={model} />
-                        </div>
-                    ))}
+                    {this.content()}
                     {app.session.user && app.chat.getPermissions().create.chat ? (
                         <div class="panel-add" onclick={() => app.modal.show(ChatCreateModal)}></div>
                     ) : null}
@@ -42,29 +39,23 @@ export default class ChatFrame extends Component {
 
     content() {
         return app.chat.getChatsSortedByLastUpdate().map((model) => (
-            <div onclick={this.onChatChanged.bind(this, model)}>
+            <div onclick={this.onChatPreviewClicked.bind(this, model)}>
                 <ChatPreview key={model.id()} model={model} />
             </div>
         ));
     }
 
-    getChatsListPanel() {
-        return document.querySelector('.ChatList');
-    }
-
-    getChatsList() {
-        return document.querySelector('.ChatList .list');
+    onChatPreviewClicked(model, e)
+    {
+        e.redraw = false;
+        if(app.screen() == 'phone') app.chat.toggleChatsList();
+        app.chat.onChatChanged(model);
     }
 
     toggleChatsList(e) {
-        var chatLists = this.getChatsListPanel();
-        var showing = true;
+        app.chat.toggleChatsList();
 
-        if (chatLists.classList.contains('toggled')) {
-            chatLists.classList.remove('toggled');
-            showing = false;
-        } else chatLists.classList.add('toggled');
-
-        app.chat.saveFrameState('beingShownChatsList', showing);
+        e.preventDefault();
+        e.stopPropagation();
     }
 }

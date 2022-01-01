@@ -216,8 +216,7 @@ export default class ChatState {
         });
     }
 
-    onChatChanged(model, e = {}) {
-        e.redraw = false;
+    onChatChanged(model) {
         if (model == this.getCurrentChat()) return;
 
         this.setCurrentChat(model);
@@ -442,6 +441,40 @@ export default class ChatState {
                 silent: true,
                 timestamp: new Date(),
             });
+    }
+
+    toggleChatsList() {
+        var chatLists = this.getChatsListPanel();
+        var showing = true;
+
+        if (chatLists.classList.contains('toggled')) {
+            chatLists.classList.remove('toggled');
+            showing = false;
+        } else chatLists.classList.add('toggled');
+
+        this.saveFrameState('beingShownChatsList', showing);
+    }
+
+    toggleChat(e) {
+        this.saveFrameState('beingShown', !this.getFrameState('beingShown'));
+    }
+
+    toggleSound(e) {
+        this.saveFrameState('isMuted', !this.getFrameState('isMuted'));
+    }
+
+    toggleNotifications(e) {
+        let notify = this.getFrameState('notify')
+        this.saveFrameState('notify', !notify);
+        if ('Notification' in window && notify) Notification.requestPermission();
+    }
+
+    getChatsListPanel() {
+        return document.querySelector('.ChatList');
+    }
+
+    getChatsList() {
+        return document.querySelector('.ChatList .list');
     }
 
     notifySound(model) {

@@ -52,7 +52,7 @@ class CreateChatHandler
         $attributes = Arr::get($data, 'attributes', []);
         $ip_address = $command->ip_address;
 
-        $isChannel = $attributes['isChannel'];
+        $isChannel = intval($attributes['isChannel']);
 
         $actor->assertCan($isChannel ? 'xelson-chat.permissions.create.channel' : 'xelson-chat.permissions.create');
 

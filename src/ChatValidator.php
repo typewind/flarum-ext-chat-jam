@@ -9,6 +9,7 @@
 namespace Xelson\Chat;
 
 use Flarum\Foundation\AbstractValidator;
+use Illuminate\Validation\Rule;
 
 class ChatValidator extends AbstractValidator
 {
@@ -30,8 +31,8 @@ class ChatValidator extends AbstractValidator
 			],
 			'type' => 
 			[
-				'required',
-				"integer|digits_between:0,1"
+				"required",
+				Rule::in([0, 1])
 			]
 		];
 	}

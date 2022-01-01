@@ -464,7 +464,7 @@ export default class ChatState {
     }
 
     toggleNotifications(e) {
-        let notify = this.getFrameState('notify')
+        let notify = this.getFrameState('notify');
         this.saveFrameState('notify', !notify);
         if ('Notification' in window && notify) Notification.requestPermission();
     }

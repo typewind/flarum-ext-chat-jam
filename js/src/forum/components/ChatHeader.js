@@ -26,10 +26,7 @@ export default class ChatHeader extends Component {
                 ) : (
                     ''
                 )}
-                <div
-                    className="icon toggle-chat"
-                    onclick={this.toggleChatsList.bind(this)}
-                >
+                <div className="icon toggle-chat" onclick={this.toggleChatsList.bind(this)}>
                     <i className="fas fa-chevron-left"></i>
                 </div>
                 <h2>
@@ -123,7 +120,7 @@ export default class ChatHeader extends Component {
         app.chat.toggleChatsList();
 
         e.preventDefault();
-        e.stopPropagation(); 
+        e.stopPropagation();
     }
 
     toggleChat(e) {

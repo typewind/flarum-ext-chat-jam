@@ -45,10 +45,9 @@ export default class ChatFrame extends Component {
         ));
     }
 
-    onChatPreviewClicked(model, e)
-    {
+    onChatPreviewClicked(model, e) {
         e.redraw = false;
-        if(app.screen() == 'phone') app.chat.toggleChatsList();
+        if (app.screen() == 'phone') app.chat.toggleChatsList();
         app.chat.onChatChanged(model);
     }
 

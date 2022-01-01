@@ -41,9 +41,7 @@ export default class ChatViewport extends Component {
     }
 
     loadChat() {
-        const state = this.state;
-
-        if (!state) return;
+        if (!this.state) return;
 
         const oldScroll = this.state.scroll.oldScroll;
         this.reloadMessages();

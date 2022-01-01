@@ -31,7 +31,7 @@ class ChatValidator extends AbstractValidator
 			'type' => 
 			[
 				'required',
-				"min:0|max:1"
+				"integer|digits_between:0,1"
 			]
 		];
 	}

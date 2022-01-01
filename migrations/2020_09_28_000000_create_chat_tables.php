@@ -48,19 +48,19 @@ return [
         });
     },
     'down' => function (Builder $schema) {
-		$schema->rename('neonchat_messages', 'pushedx_messages');
-
-		$schema->drop('neonchat_chats');
-		$schema->drop('neonchat_chat_user');
-
-        $schema->table('pushedx_messages', function (Blueprint $table) {
+        $schema->table('neonchat_messages', function (Blueprint $table) {
 			$table->renameColumn('user_id', 'actorId');
 
 			$table->dropForeign(['chat_id']);
 			$table->dropForeign(['user_id']);
 			$table->dropForeign(['deleted_by']);
 
-			$table->dropColumn('chat_id', 'type', 'is_readed', 'ip_addres');
-        });
+			$table->dropColumn('chat_id', 'type', 'is_readed', 'ip_address');
+		});
+		
+		$schema->drop('neonchat_chat_user');
+		$schema->drop('neonchat_chats');
+
+		$schema->rename('neonchat_messages', 'pushedx_messages');
     }
 ];

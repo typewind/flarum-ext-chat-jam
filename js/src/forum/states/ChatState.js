@@ -177,6 +177,15 @@ export default class ChatState {
         });
     }
 
+    getUnreadedTotal() {
+        return (
+            !this.getChats().length ||
+            this.getChats()
+                .map((m) => m.unreaded())
+                .reduce((a, b) => a + b)
+        );
+    }
+
     addChat(model, outside = false) {
         this.chats.push(model);
 

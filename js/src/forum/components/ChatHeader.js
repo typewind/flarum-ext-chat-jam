@@ -26,9 +26,7 @@ export default class ChatHeader extends Component {
                 ) : (
                     ''
                 )}
-                <div className="icon toggle-chat" onclick={this.toggleChatsList.bind(this)}>
-                    <i className="fas fa-chevron-left"></i>
-                </div>
+                {this.componentToChatListButton()}
                 <h2>
                     {app.chat.getCurrentChat()
                         ? [
@@ -114,6 +112,17 @@ export default class ChatHeader extends Component {
         */
 
         return items;
+    }
+
+    componentToChatListButton() {
+        let totalUnreaded = app.chat.getUnreadedTotal();
+
+        return (
+            <div className="icon toggle-chat" onclick={this.toggleChatsList.bind(this)}>
+                {totalUnreaded ? <div className="unreaded">{totalUnreaded}</div> : null}
+                <i className="fas fa-chevron-left"></i>
+            </div>
+        );
     }
 
     toggleChatsList(e) {

@@ -122,8 +122,15 @@
 
 .hidden {
     .frame {
-        .ChatViewport, .ChatList {
+        .ChatViewport {
             display: none;
+        }
+        @media @tablet-up
+        {
+            .ChatList
+            {
+                display: none;
+            }
         }
         .ChatHeader .icon.toggle-chat {
             display: none

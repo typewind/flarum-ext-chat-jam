@@ -1,6 +1,7 @@
 ### Styled
 The new minimalistic design will make communication more pleasant.  
-![Image](https://sun9-55.userapi.com/ru_bsd67g5LJ2MnQyw_iN1fnynJv8aoX2IPNqw/ojpbJCIctKA.jpg)
+![Image](https://i.ibb.co/3m4wCV3/b40f10da617c.png)
+![Image](https://c.radikal.ru/c15/2201/0f/600cc5faac92.png)
 
 ### Media content preview
 Send media content to people to make communication brighter!  
@@ -8,6 +9,7 @@ Send media content to people to make communication brighter!
 
 ### Groups, PMs and channels
 You can create your own conversations and channels, add or remove users, change their rights, and customize the appearance of the chat.
+
 ![Image](https://sun9-13.userapi.com/sZjGejXxf0pY8tBOQPgeTGWAnrWOYGqAR8AkCA/L9zBWvw7FPQ.jpg)
 
 ### Push and sound notifications  
@@ -41,7 +43,6 @@ composer update xelson/flarum-ext-chat
 php flarum migrate
 php flarum cache:clear
 ```
-Reenable extenstion in admin panel to execute database migration
 
 For development builds:
 ```

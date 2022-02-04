@@ -468,8 +468,7 @@ export default class ChatState {
         this.saveFrameState('beingShownChatsList', showing);
     }
 
-    chatIsShown()
-    {
+    chatIsShown() {
         return this.getFrameState('beingShown');
     }
 

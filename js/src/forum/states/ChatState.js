@@ -468,6 +468,11 @@ export default class ChatState {
         this.saveFrameState('beingShownChatsList', showing);
     }
 
+    chatIsShown()
+    {
+        return this.getFrameState('beingShown');
+    }
+
     toggleChat(e) {
         this.saveFrameState('beingShown', !this.getFrameState('beingShown'));
     }

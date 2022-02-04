@@ -87,7 +87,7 @@ export default class ChatHeader extends Component {
             items.add(
                 'minimize',
                 <div
-                    className="icon"
+                   className="icon"
                     onclick={this.toggleChat.bind(this)}
                     data-title={app.translator.trans('xelson-chat.forum.toolbar.' + (app.chat.getFrameState('beingShown') ? 'minimize' : 'maximize'))}
                 >

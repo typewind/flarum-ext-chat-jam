@@ -1,7 +1,7 @@
 .NeonChatFrame {
     position: fixed;
     bottom: 0;
-    z-index: @zindex-tooltip - 1;
+    z-index: @zindex-composer - 10;
     max-width: 100%;
     color: #000;
 
@@ -142,6 +142,49 @@
         box-shadow: 0 0 4px 0px #000;
         font-weight: bold;
     }
+}
+
+icon.Chat-FullColor {
+    background: none !important;
+    color: #000;
+}
+
+.Color-Input {
+    position: relative;
+
+    color {
+        position: absolute;
+        height: 18px;
+        width: 18px;
+        background-color: #000;
+        display: block;
+        border-radius: 100px;
+        right: 10px;
+        top: 25%;
+    }
+}
+
+.Icon-Input {
+    position: relative;
+
+    icon {
+        .fa();
+        position: absolute;
+        display: block;
+        border-radius: 100px;
+        right: 10px;
+        top: 25%;
+        font-size: 13pt;
+    }
+}
+
+input[type="color"][color]:after
+{
+    content: attr(color);
+    top: 25%;
+    position: absolute;
+    background: white;
+    width: 90%;
 }
 
 .moving {

@@ -4,6 +4,8 @@ import classList from 'flarum/utils/classList';
 import ChatSearchUser from './ChatSearchUser';
 import ChatModal from './ChatModal';
 import Stream from 'flarum/utils/Stream';
+import FA5IconInput from './FA5IconInput';
+import ColorInput from './ColorInput';
 
 export default class ChatCreateModal extends ChatModal {
     oninit(vnode) {
@@ -34,24 +36,34 @@ export default class ChatCreateModal extends ChatModal {
         this.hide();
     }
 
+    formInputOnUpdate(vnode) {
+        $('.Chat-FullColor').css({ color: this.input.color(), backgroundColor: this.input.color() });
+    }
+
     componentFormInputColor() {
-        return this.componentFormColor({
-            title: app.translator.trans('xelson-chat.forum.chat.list.add_modal.form.color.label'),
-            desc: app.translator.trans('xelson-chat.forum.chat.list.add_modal.form.color.validator'),
-            stream: this.getInput().color,
-            placeholder: app.translator.trans('xelson-chat.forum.chat.list.add_modal.form.color.label'),
-        });
+        return (
+            <ColorInput
+                title={app.translator.trans('xelson-chat.forum.chat.list.add_modal.form.color.label')}
+                desc={app.translator.trans('xelson-chat.forum.chat.list.add_modal.form.color.validator')}
+                stream={this.getInput().color}
+                placeholder={app.translator.trans('xelson-chat.forum.chat.list.add_modal.form.color.label')}
+                inputOnUpdate={this.formInputOnUpdate.bind(this)}
+            />
+        );
     }
 
     componentFormInputIcon() {
-        return this.componentFormIcon({
-            title: app.translator.trans('xelson-chat.forum.chat.list.add_modal.form.icon.label'),
-            desc: app.translator.trans('xelson-chat.forum.chat.list.add_modal.form.icon.validator', {
-                a: <a href="https://fontawesome.com/icons?m=free" tabindex="-1" target="blank" />,
-            }),
-            stream: this.getInput().icon,
-            placeholder: 'fas fa-bolt',
-        });
+        return (
+            <FA5IconInput
+                title={app.translator.trans('xelson-chat.forum.chat.edit_modal.form.icon.label')}
+                desc={app.translator.trans('xelson-chat.forum.chat.edit_modal.form.icon.validator', {
+                    a: <a href="https://fontawesome.com/icons?m=free" tabindex="-1" target="blank" />,
+                })}
+                stream={this.getInput().icon}
+                placeholder="fas fa-bolt"
+                inputOnUpdate={this.formInputOnUpdate.bind(this)}
+            />
+        );
     }
 
     componentFormChat() {

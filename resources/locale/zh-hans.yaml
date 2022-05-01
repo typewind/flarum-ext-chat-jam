@@ -3,15 +3,86 @@
 xelson-chat:
   forum:
     toolbar:
-      title: 在线聊天室
+      title: 苹果河畔酒吧街
       enable_sounds: 开启声音
       disable_sounds: 关闭声音
       enable_notifications: 开启通知
       disable_notifications: 关闭通知
       minimize: 最小化
       maximize: 窗口化
+      chat:
+        settings: 酒馆设置
     chat:
-      placeholder: 请自觉遵守互联网相关的政策法规，严禁发布色情、暴力、反动的言论...
+      welcome:
+        header: 欢迎来到苹果河畔酒馆街！
+        subheader: 请从左侧选择想要加入的酒馆
+      placeholder: 请自觉遵守互联网相关的政策法规，严禁发布色情、暴力和反动言论...
+      moder: 酒保
+      kick: 踢人
+      leave: 离开
+      rejoin: 重新加入
+      edit_modal:
+        title: 酒馆管理
+        moderator:
+          got: 你现在成为了 {chatname} 的酒保!
+          lost: 你不再担任 {chatname} 的酒保.
+        form:
+          title:
+            label: 酒馆名称
+            validator: At least 1 symbol
+          color:
+            label: Color
+            validator: In hex format
+          icon:
+            label: => core.ref.icon
+            validator: => core.ref.icon_text
+          users:
+            edit: Select and edit users
+          leave: Leave the chat
+          return: Enter the chat
+          delete:
+            title: 你确定要关闭这个酒馆么？
+            desc: Copy and paste the chat name to continue
+            placeholder: Chat name
+            button: Delete chat
+        search:
+          placeholder: 搜索顾客
+          failed: 未找到顾客
+          invited: 已邀请
+        save_button: => core.ref.save_changes
+      list:
+        pin: Pin panel
+        unpin: Unpin panel
+        placeholder: Filter Chats
+        preview:
+          empty: No messages
+        add_modal:
+          title: 选择候选人
+          chat: Chat
+          channel: Channel
+          create:
+            chat: Create a new chat
+            channel: Create a new channel
+          alerts:
+            exists: You can't create another PM with this user!
+          form:
+            title:
+              chat: Chat name
+              channel: Channel name
+              validator: At least 1 symbol
+            icon:
+              label: => core.ref.icon
+              validator: => core.ref.icon_text
+            color:
+              label: => xelson-chat.forum.chat.edit_modal.form.color.label
+              validator: => xelson-chat.forum.chat.edit_modal.form.color.validator
+            users: Selected users
+          search:
+            placeholder: Search Users
+            failed: No matching users found
+            invited: Invited
+            more_results: And {more_results} more...
+      placeholder: Type your message...
       message:
         actions:
           hide: 隐藏
@@ -21,14 +92,14 @@ xelson-chat:
       chatdenied: 您所在的用户组没有权限参与聊天
   admin:
     permissions:
-      post: 聊天室：发送消息
-      edit: 聊天室：编辑自己的消息
-      delete: 聊天室：删除自己的消息
+      post: 酒馆：发送消息
+      edit: 酒馆：编辑自己的消息
+      delete: 酒馆：删除自己的消息
       moderate:
-        delete: 聊天室：删除消息
+        delete: 酒馆：删除消息
 
     settings:
-      title: 聊天室设置
+      title: 酒馆管理
       charlimit: 限制每条消息的最大字数（不区分中英文）
       floodgate:
         title: 防刷屏

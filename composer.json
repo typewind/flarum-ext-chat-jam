@@ -1,5 +1,5 @@
 {
-    "name": "xelson/flarum-ext-chat",
+    "name": "typewind/flarum-ext-chat-jam",
     "description": "Realtime Chat for Flarum!",
     "keywords": [
         "chat",
@@ -11,8 +11,8 @@
     "type": "flarum-extension",
     "license": "MIT",
     "support": {
-        "issues": "https://github.com/Xelson/flarum-ext-chat/issues",
-        "source": "https://github.com/Xelson/flarum-ext-chat",
+        "issues": "https://github.com/typewind/flarum-ext-chat-jam/issues",
+        "source": "https://github.com/typewind/flarum-ext-chat-jam",
         "forum": "https://discuss.flarum.org/d/25361"
     },
     "authors": [
@@ -27,6 +27,10 @@
         {
             "name": "Xelson",
             "homepage": "https://neonsky.ru"
+        },
+        {
+            "name": "typewind",
+            "email": "cshuyaoxx@gmail.com"
         }
     ],
     "require": {
@@ -35,11 +39,11 @@
     },
     "extra": {
         "flarum-extension": {
-            "title": "Neon Chat",
+            "title": "JAM Chat",
             "category": "feature",
             "icon": {
                 "image": "icon.svg",
-                "backgroundColor": "#ffaad4",
+                "backgroundColor": "#ffaaaa",
                 "backgroundSize": "cover",
                 "backgroundPosition": "center"
             }
@@ -47,7 +51,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Xelson\\Chat\\": "src/"
+            "typewind\\Chat\\": "src/"
         }
     }
 }
